@@ -53,6 +53,37 @@ button{cursor:pointer;border:0;background:none}
 :focus-visible{outline:2px solid var(--orange);outline-offset:2px}
 .wrap{max-width:560px;margin:0 auto;padding:0 14px}
 
+.gate{position:fixed;inset:0;z-index:200;background:var(--iron);
+  display:flex;align-items:center;justify-content:center;padding:24px;overflow-y:auto}
+.gate[hidden]{display:none}
+.gate-card{width:100%;max-width:360px}
+.gate .logo{width:52px;height:36px;margin-bottom:20px}
+.gate h1{font-family:var(--display);font-weight:700;font-size:38px;line-height:1;margin:0 0 6px;color:var(--paper)}
+.gate p.sub{font-size:14px;color:#9A9384;margin:0 0 22px;line-height:1.5}
+.gate label{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.12em;
+  text-transform:uppercase;color:#9A9384;margin:0 0 6px}
+.gate input{width:100%;padding:14px;margin-bottom:14px;border-radius:2px;
+  background:var(--iron-2);border:1px solid var(--iron-line);color:var(--paper);font-size:16px}
+.gate input:focus{outline:none;border-color:var(--orange)}
+.gate .btn{margin-bottom:10px}
+.gate .btn-alt{background:var(--iron-2);color:var(--paper);border:1px solid var(--iron-line)}
+.gate .link{display:block;width:100%;text-align:center;font-size:13px;color:#9A9384;padding:10px}
+.gate .link u{color:var(--orange);text-decoration:none;border-bottom:1px solid var(--orange)}
+.gate .msg{font-size:13px;line-height:1.5;padding:11px 12px;border-radius:2px;margin:0 0 14px}
+.gate .msg.err{background:#3A2418;color:#FFB27A}
+.gate .msg.ok{background:#1F3327;color:#9FD3B0}
+.gate .msg[hidden]{display:none}
+.gate .or{display:flex;align-items:center;gap:12px;margin:16px 0;color:#6E685C;
+  font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase}
+.gate .or::before,.gate .or::after{content:"";flex:1;height:1px;background:var(--iron-line)}
+.acct{display:flex;align-items:center;gap:11px;margin-bottom:14px}
+.acct .who{flex:1;min-width:0}
+.acct .who b{display:block;font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.acct .who span{font-family:var(--mono);font-size:11px;color:var(--slate)}
+.sync{font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--slate)}
+.sync.on{color:var(--green)}
+.sync.off{color:var(--orange-deep)}
+
 /* ---------- masthead ---------- */
 .masthead{
   position:sticky;top:0;z-index:40;
@@ -340,6 +371,32 @@ button.tile:active{transform:translateY(2px)}
 </style>
 </head>
 <body>
+<div class="gate" id="gate" hidden>
+  <div class="gate-card">
+    <svg class="logo" viewBox="145.51 259.08 732.98 505.84" aria-label="Ironwork" role="img">
+        <g fill="#FF6600">
+          <g transform="translate(316.51 373.84) scale(0.205)"><g transform="matrix(0.0132948,0,0,-0.0132948,-6.3814,1845.8164)"><path d="M513 138788 c31 -28 584 -229 1227 -446 644 -216 2682 -912 4530 -1544 1848 -633 3819 -1308 4380 -1500 561 -192 1938 -663 3060 -1048 2801 -960 4085 -1399 5700 -1949 759 -259 2258 -772 3330 -1141 1073 -369 2571 -882 3330 -1140 759 -257 2258 -770 3330 -1139 2428 -836 6124 -2102 7710 -2641 660 -225 2159 -737 3330 -1139 2684 -921 6052 -2074 7251 -2483 507 -173 942 -353 967 -401 157 -293 283 -8539 188 -12237 -96 -3707 -201 -5830 -456 -9180 -1119 -14690 -4313 -29264 -9403 -42900 -6902 -18493 -17360 -35648 -30231 -49590 -2218 -2402 -5642 -5768 -7450 -7324 -740 -636 -524 -530 1693 832 20449 12562 35472 27074 45792 44232 3655 6076 6918 12957 9333 19680 3214 8944 5372 17900 6911 28680 658 4607 1151 8851 1474 12690 412 4881 434 5661 481 17040 17 4043 47 9004 68 11025 l38 3675 -33320 0 c-18594 0 -33295 -23 -33263 -52z M77302 135315 c21 -1939 51 -7021 68 -11295 33 -8241 58 -10266 153 -12240 78 -1626 212 -3413 453 -6030 211 -2300 704 -6717 896 -8040 15 -99 68 -504 118 -900 1923 -15099 5550 -28388 10937 -40080 10073 -21860 26907 -39845 51343 -54852 1886 -1158 2128 -1300 2161 -1267 14 14 -250 267 -586 562 -4499 3953 -9821 9706 -14510 15687 -7578 9665 -13758 19906 -19137 31710 -947 2079 -2750 6462 -3698 8992 -1672 4459 -3315 9552 -4483 13898 -2823 10496 -4498 20704 -5225 31832 -225 3462 -359 8695 -311 12208 45 3236 155 6595 221 6718 26 48 380 201 788 340 407 138 1267 432 1910 652 644 221 1751 599 2460 841 1222 417 2212 756 4410 1511 528 181 1541 528 2250 769 1646 562 5298 1812 6390 2188 462 159 1907 654 3210 1100 1304 446 2856 977 3450 1181 1343 461 9825 3363 11250 3849 578 197 1509 517 2070 710 561 194 1574 541 2250 772 4395 1497 7771 2660 7793 2682 15 15 -14980 27 -33321 27 l-33348 0 38 -3525z"/></g></g>
+          <rect x="228.51" y="273.08" width="58.0" height="220.0" rx="29.0"/>
+          <rect x="159.51" y="312.08" width="45.0" height="142.0" rx="22.5"/>
+          <rect x="737.49" y="273.08" width="58.0" height="220.0" rx="29.0"/>
+          <rect x="819.49" y="312.08" width="45.0" height="142.0" rx="22.5"/>
+        </g>
+      </svg>
+    <h1>Ironwork</h1>
+    <p class="sub" id="gateSub">Sign in to keep your training with you on every device.</p>
+    <p class="msg" id="gateMsg" hidden></p>
+    <label for="gEmail">Email</label>
+    <input id="gEmail" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com">
+    <label for="gPass">Password</label>
+    <input id="gPass" type="password" autocomplete="current-password" placeholder="••••••••">
+    <button class="btn" id="gSignIn">Sign in</button>
+    <button class="btn btn-alt" id="gCreate">Create an account</button>
+    <div class="or">or</div>
+    <button class="btn btn-alt" id="gGoogle">Continue with Google</button>
+    <button class="link" id="gReset">Forgotten your password? <u>Reset it</u></button>
+  </div>
+</div>
+
 <header class="masthead">
   <div class="masthead-in">
     <div class="mark">
@@ -749,32 +806,78 @@ function blankState(){
   };
 }
 
+let UID = null, ACCOUNT = {}, cloudOK = true, cloudPending = false;
+
+function userKey(){ return UID ? KEY + ":" + UID : KEY; }
+
+function pickNewer(a, b){
+  if(!a) return b;
+  if(!b) return a;
+  return (b.updatedAt || 0) > (a.updatedAt || 0) ? b : a;
+}
+
+function readLocal(k){
+  try{ const raw = localStorage.getItem(k); return raw ? JSON.parse(raw) : null; }
+  catch(e){ return null; }
+}
+
 async function loadState(){
-  try{
-    const raw = localStorage.getItem(KEY);
-    S = raw ? JSON.parse(raw) : blankState();
-  }catch(e){
-    S = blankState();
-    storageOK = false;
+  const local = readLocal(userKey());
+  let cloud = null;
+  if(window.__cloud && UID){
+    try{ cloud = await window.__cloud.get(UID); cloudOK = true; }
+    catch(e){ cloudOK = false; }
+  }
+
+  S = pickNewer(local, cloud);
+
+  /* first sign-in on a device that already has anonymous history: adopt it */
+  if(!S){
+    const legacy = readLocal(KEY);
+    if(legacy && legacy.history && legacy.history.length){
+      S = legacy;
+      S.updatedAt = Date.now();
+    }
   }
   if(!S || !S.v) S = blankState();
   if(!S.custom) S.custom = [];
-  /* prove the store is writable — private browsing can read but not write */
-  try{ localStorage.setItem(KEY + ":probe", "1"); localStorage.removeItem(KEY + ":probe"); }
+
+  try{ localStorage.setItem(userKey() + ":probe", "1"); localStorage.removeItem(userKey() + ":probe"); }
   catch(e){ storageOK = false; }
+
+  /* if the cloud was empty or behind, push what we have up */
+  if(UID && window.__cloud && (!cloud || (S.updatedAt || 0) > (cloud.updatedAt || 0))) pushCloud();
+}
+
+let cloudTimer = null;
+function pushCloud(){
+  if(!UID || !window.__cloud) return;
+  clearTimeout(cloudTimer);
+  cloudPending = true;
+  cloudTimer = setTimeout(async ()=>{
+    try{
+      await window.__cloud.set(UID, S);
+      cloudPending = false;
+      if(!cloudOK){ cloudOK = true; render(); }
+    }catch(e){
+      cloudPending = false;
+      if(cloudOK){ cloudOK = false; render(); }
+    }
+  }, 1200);
 }
 
 let saveQueued = false;
 function save(){
-  if(saveQueued) return;
-  saveQueued = true;
-  setTimeout(()=>{
-    saveQueued = false;
-    try{ localStorage.setItem(KEY, JSON.stringify(S)); }
-    catch(e){
-      if(storageOK){ storageOK = false; render(); }
-    }
-  }, 120);
+  S.updatedAt = Date.now();
+  if(!saveQueued){
+    saveQueued = true;
+    setTimeout(()=>{
+      saveQueued = false;
+      try{ localStorage.setItem(userKey(), JSON.stringify(S)); }
+      catch(e){ if(storageOK){ storageOK = false; render(); } }
+    }, 120);
+  }
+  pushCloud();
 }
 
 /* ============================================================
@@ -993,7 +1096,7 @@ const esc = t => String(t).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&
 
 function render(){
   document.getElementById("mastSub").textContent =
-    S.current ? "Session in progress" : "Session " + (S.sessionIndex + 1);
+    !cloudOK ? "Offline" : S.current ? "Session in progress" : "Session " + (S.sessionIndex + 1);
   document.querySelectorAll(".nav button").forEach(b=>{
     b.classList.toggle("on", b.dataset.tab === tab);
   });
@@ -1678,7 +1781,19 @@ function viewLibrary(){
 
 /* ---------- settings ---------- */
 function viewSettings(){
-  return '<div class="panel"><div class="pad">' +
+  const initials = (ACCOUNT.name || ACCOUNT.email || "?").trim().slice(0,1).toUpperCase();
+  const acct = UID ? '<div class="panel"><div class="pad">' +
+      '<p class="eyebrow">Account</p>' +
+      '<div class="acct">' +
+        '<span class="ex-icon lead" style="font-family:var(--ui);font-weight:700">' + esc(initials) + '</span>' +
+        '<span class="who"><b>' + esc(ACCOUNT.name || ACCOUNT.email || "Signed in") + '</b>' +
+        '<span>' + (cloudOK ? "Syncing to your account" : "Offline — saved on this device") + '</span></span>' +
+        '<span class="sync ' + (cloudOK ? "on" : "off") + '">' + (cloudOK ? "Synced" : "Local") + '</span>' +
+      '</div>' +
+      '<p class="lede" style="margin-bottom:14px">Your training is stored against your account, so it follows you to any device you sign in on.</p>' +
+      '<button class="btn btn-ghost" data-act="signout">Sign out</button>' +
+    '</div></div>' : "";
+  return acct + '<div class="panel"><div class="pad">' +
     '<p class="eyebrow">Setup</p>' +
     '<div class="setting"><label>Units<span class="hint">Relabels the app — it does not convert loads already logged</span></label>' +
       '<div class="seg"><button data-units="kg" class="' + (S.units==="kg"?"on":"") + '">kg</button>' +
@@ -1698,7 +1813,7 @@ function viewSettings(){
   '</div></div>' +
   '<div class="panel"><div class="pad">' +
     '<p class="eyebrow">Data</p>' +
-    '<p class="lede" style="margin-bottom:14px">Everything is stored on this device and stays between sessions.</p>' +
+    '<p class="lede" style="margin-bottom:14px">Your history is kept on this device and copied to your account, so a lost phone is not a lost log.</p>' +
     '<button class="btn btn-ghost" data-act="export">Copy my history as JSON</button>' +
     '<div style="height:8px"></div>' +
     '<button class="btn btn-ghost" data-act="reset">Erase everything and start over</button>' +
@@ -1847,6 +1962,12 @@ document.addEventListener("click", e=>{
     if(S.current) addExtraToSession(id); else { pick.sel = id; render(); }
     return;
   }
+  if(act === "signout"){
+    if(confirm("Sign out? Your training is saved to your account.")){
+      if(window.__auth) window.__auth.signOut();
+    }
+    return;
+  }
   if(act === "start"){ startSession(); }
   if(act === "startOpen"){ startOpen(); }
   if(act === "startOpenPick"){
@@ -1890,11 +2011,139 @@ if("serviceWorker" in navigator){
   window.addEventListener("load", ()=>{ navigator.serviceWorker.register("sw.js").catch(()=>{}); });
 }
 
+window.ironworkSignedIn = async function(uid, profile){
+  UID = uid;
+  S = null;
+  ACCOUNT = profile || {};
+  stopRest();
+  summaryRec = null; tab = "train"; pick = {open:false, sel:null}; addOpen = false;
+  await loadState();
+  document.getElementById("gate").hidden = true;
+  render();
+};
+
+window.ironworkSignedOut = function(){
+  UID = null; ACCOUNT = {}; S = blankState();
+  document.getElementById("gate").hidden = false;
+  document.getElementById("view").innerHTML = "";
+};
+
 (async function(){
   await loadState();
   render();
   setInterval(()=>{ if(S.current && tab === "train" && !summaryRec){ /* keep elapsed fresh, cheap */ } }, 60000);
 })();
+</script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword,
+         signOut, GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail,
+         setPersistence, browserLocalPersistence }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, enableIndexedDbPersistence }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { FIREBASE_CONFIG } from "./firebase-config.js";
+
+const gate = document.getElementById("gate");
+const msg  = document.getElementById("gateMsg");
+const email = document.getElementById("gEmail");
+const pass  = document.getElementById("gPass");
+
+function say(text, kind){
+  msg.textContent = text;
+  msg.className = "msg " + (kind || "err");
+  msg.hidden = !text;
+}
+function friendly(e){
+  const c = (e && e.code) || "";
+  if(c.includes("invalid-credential") || c.includes("wrong-password") || c.includes("user-not-found"))
+    return "That email and password do not match an account.";
+  if(c.includes("email-already-in-use")) return "That email already has an account. Try signing in.";
+  if(c.includes("weak-password")) return "Passwords need to be at least six characters.";
+  if(c.includes("invalid-email")) return "That does not look like an email address.";
+  if(c.includes("too-many-requests")) return "Too many attempts. Wait a minute and try again.";
+  if(c.includes("popup-blocked")) return "Your browser blocked the Google popup. Allow popups and retry.";
+  if(c.includes("popup-closed")) return "The Google window closed before sign-in finished.";
+  if(c.includes("unauthorized-domain")) return "This domain is not authorised in Firebase yet. Add it under Authentication, Settings, Authorized domains.";
+  if(c.includes("network")) return "No connection. Sign in once online and the app works offline after that.";
+  return "Something went wrong signing in. Please try again.";
+}
+
+if(!FIREBASE_CONFIG.apiKey || !FIREBASE_CONFIG.projectId){
+  gate.hidden = false;
+  document.getElementById("gateSub").textContent =
+    "Accounts are not configured yet. Add your Firebase project details to firebase-config.js.";
+  ["gSignIn","gCreate","gGoogle","gReset"].forEach(id=>{
+    const b = document.getElementById(id); b.disabled = true; b.style.opacity = ".45";
+  });
+}else{
+  const app  = initializeApp(FIREBASE_CONFIG);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+  enableIndexedDbPersistence(db).catch(()=>{});
+  await setPersistence(auth, browserLocalPersistence).catch(()=>{});
+
+  window.__auth = { signOut: ()=> signOut(auth) };
+  window.__cloud = {
+    async get(uid){
+      const snap = await getDoc(doc(db, "ironwork", uid));
+      return snap.exists() ? snap.data().state : null;
+    },
+    async set(uid, state){
+      await setDoc(doc(db, "ironwork", uid), { state: state, updatedAt: Date.now() });
+    }
+  };
+
+  const busy = (on)=> ["gSignIn","gCreate","gGoogle"].forEach(id=>{
+    const b = document.getElementById(id); b.disabled = on; b.style.opacity = on ? ".55" : "1";
+  });
+
+  document.getElementById("gSignIn").addEventListener("click", async ()=>{
+    say(""); busy(true);
+    try{ await signInWithEmailAndPassword(auth, email.value.trim(), pass.value); }
+    catch(e){ say(friendly(e)); }
+    busy(false);
+  });
+
+  document.getElementById("gCreate").addEventListener("click", async ()=>{
+    say(""); busy(true);
+    try{ await createUserWithEmailAndPassword(auth, email.value.trim(), pass.value); }
+    catch(e){ say(friendly(e)); }
+    busy(false);
+  });
+
+  document.getElementById("gGoogle").addEventListener("click", async ()=>{
+    say(""); busy(true);
+    try{ await signInWithPopup(auth, new GoogleAuthProvider()); }
+    catch(e){ say(friendly(e)); }
+    busy(false);
+  });
+
+  document.getElementById("gReset").addEventListener("click", async ()=>{
+    const addr = email.value.trim();
+    if(!addr){ say("Type your email address first, then tap reset."); return; }
+    try{
+      await sendPasswordResetEmail(auth, addr);
+      say("Reset link sent. Check your inbox.", "ok");
+    }catch(e){ say(friendly(e)); }
+  });
+
+  pass.addEventListener("keydown", e=>{ if(e.key === "Enter") document.getElementById("gSignIn").click(); });
+
+  onAuthStateChanged(auth, async (user)=>{
+    if(user){
+      say("");
+      pass.value = "";
+      await window.ironworkSignedIn(user.uid, {
+        name: user.displayName || "",
+        email: user.email || ""
+      });
+    }else{
+      window.ironworkSignedOut();
+    }
+  });
+}
 </script>
 </body>
 </html>
