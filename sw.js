@@ -1,6 +1,6 @@
 /* Ironwork service worker — cache-first for the shell, so the app
    opens instantly and works with no signal in a garage or basement. */
-const CACHE = "ironwork-v6";
+const CACHE = "ironwork-v7";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./icon.svg"];
 
 self.addEventListener("install", e=>{
