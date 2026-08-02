@@ -1067,6 +1067,8 @@ function finishSession(){
   }
   const rec = {
     date: new Date().toISOString(),
+    day: dayKey(new Date()),
+    tz: (function(){ try{ return Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(e){ return ""; } })(),
     key: c.key, index: c.index, open: !!c.open,
     title: c.open ? (c.entries[0] ? (c.entries[0].name || "Open session") : "Open session") : null,
     minutes: Math.round((Date.now() - c.startedAt) / 60000),
@@ -1157,18 +1159,54 @@ function storageWarn(){
 }
 
 /* ---------- home dashboard helpers ---------- */
-function dayKey(d){ return new Date(d).toISOString().slice(0, 10); }
+function dayKey(d){
+  const x = new Date(d);
+  return x.getFullYear() + "-" +
+    String(x.getMonth() + 1).padStart(2, "0") + "-" +
+    String(x.getDate()).padStart(2, "0");
+}
+
+function startOfDay(d){ const x = new Date(d); x.setHours(0,0,0,0); return x.getTime(); }
+
+/* the calendar day a session belongs to, as it was where you trained.
+   Older records predate the stamp, so fall back to the device's reading. */
+function recDay(h){ return h.day || dayKey(h.date); }
+
+/* a YYYY-MM-DD key as a local moment, safe for date maths */
+function keyDate(k){
+  const p = String(k).split("-");
+  return new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]), 12, 0, 0, 0);
+}
+function daysSinceKey(k){ return daysBetween(keyDate(k), new Date()); }
+
+function zoneName(tz){
+  if(!tz) return "";
+  const bit = tz.split("/").pop();
+  return bit ? bit.replace(/_/g, " ") : "";
+}
+function loggedElsewhere(h){
+  if(!h.tz) return "";
+  let here = "";
+  try{ here = Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(e){}
+  return (here && h.tz !== here) ? zoneName(h.tz) : "";
+}
+
+/* whole calendar days between two moments — trained at 7pm yesterday and it is
+   9am now is one day, not zero */
+function daysBetween(a, b){
+  return Math.round((startOfDay(b) - startOfDay(a)) / 86400000);
+}
 
 function cadence(days){
   const trained = {};
   S.history.forEach(h=>{
-    const k = dayKey(h.date);
+    const k = recDay(h);
     if(!trained[k]) trained[k] = {s:false, o:false};
     if(h.open) trained[k].o = true; else trained[k].s = true;
   });
   const out = [];
   for(let i = days - 1; i >= 0; i--){
-    const d = new Date(Date.now() - i * 86400000);
+    const d = new Date(); d.setHours(12,0,0,0); d.setDate(d.getDate() - i);
     const k = dayKey(d);
     out.push({key:k, s:trained[k] ? trained[k].s : false, o:trained[k] ? trained[k].o : false, today:i === 0});
   }
@@ -1206,15 +1244,16 @@ function sessionTitle(h){
 function niceDate(d){
   return new Date(d).toLocaleDateString("en-GB", {weekday:"short", day:"numeric", month:"short"});
 }
+function recDateLabel(h){ return keyDate(recDay(h)).toLocaleDateString("en-GB", {weekday:"short", day:"numeric", month:"short"}); }
 
 function viewHistList(){
   const rows = S.history.map((h, i)=>({h:h, i:i}))
-    .filter(r => !histDay || dayKey(r.h.date) === histDay)
+    .filter(r => !histDay || recDay(r.h) === histDay)
     .reverse();
 
   let html = '<div class="panel"><div class="pad">' +
     '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">' +
-      '<div><p class="eyebrow">' + (histDay ? niceDate(histDay + "T12:00:00") : "Everything logged") + '</p>' +
+      '<div><p class="eyebrow">' + (histDay ? esc(keyDate(histDay).toLocaleDateString("en-GB", {weekday:"short", day:"numeric", month:"short"})) : "Everything logged") + '</p>' +
       '<h1 class="session-title">' + (histDay ? "That day" : "Past sessions") + '</h1></div>' +
       '<button class="mini" data-act="closeHist">Done</button>' +
     '</div>' +
@@ -1230,7 +1269,7 @@ function viewHistList(){
           icon(r.h.open && r.h.entries[0] ? iconFor(r.h.entries[0].exId) : "barbell", 18) + '</span>' +
         '<span style="flex:1;min-width:0">' +
           '<b>' + esc(sessionTitle(r.h)) + (r.h.open ? ' <span class="tag-open">open</span>' : '') + '</b>' +
-          '<span>' + niceDate(r.h.date) + ' · ' + sets + ' sets · ' + (r.h.minutes || 0) + ' min</span>' +
+          '<span>' + recDateLabel(r.h) + ' · ' + sets + ' sets · ' + (r.h.minutes || 0) + ' min</span>' +
         '</span>' +
         '<span class="chev-r">›</span></button>';
     });
@@ -1269,7 +1308,9 @@ function viewHistory(){
 
   let html = '<div class="panel"><div class="pad">' +
     '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">' +
-      '<div><p class="eyebrow">' + esc(niceDate(h.date)) + (h.open ? " · open session" : "") + '</p>' +
+      '<div><p class="eyebrow">' + esc(recDateLabel(h)) +
+        (loggedElsewhere(h) ? ' · ' + esc(loggedElsewhere(h)) + ' time' : "") +
+        (h.open ? " · open session" : "") + '</p>' +
       '<h1 class="session-title">' + esc(sessionTitle(h)) + '</h1></div>' +
       '<button class="mini" data-act="closeHist">Done</button>' +
     '</div>' +
@@ -1375,18 +1416,18 @@ function viewHome(){
   const strength = S.history.filter(h => !h.open);
   const opens = S.history.filter(h => h.open);
   const last = strength[strength.length - 1];
-  const days = last ? Math.floor((Date.now() - new Date(last.date).getTime()) / 86400000) : null;
+  const days = last ? daysSinceKey(recDay(last)) : null;
   const totalSets = S.history.reduce((n,h)=> n + h.entries.reduce((m,e)=> m + e.sets.length, 0), 0);
   const totalMins = S.history.reduce((n,h)=> n + (h.minutes || 0), 0);
   const totalVol = S.history.reduce((n,h)=> n + h.entries.reduce((m,e)=>
     m + ((e.track||"load")==="load" ? e.sets.reduce((k,s)=> k + s.w*s.r, 0) : 0), 0), 0);
-  const last28 = strength.filter(h => Date.now() - new Date(h.date).getTime() < 28 * 86400000).length;
-  const open28 = opens.filter(h => Date.now() - new Date(h.date).getTime() < 28 * 86400000).length;
+  const last28 = strength.filter(h => daysSinceKey(recDay(h)) < 28).length;
+  const open28 = opens.filter(h => daysSinceKey(recDay(h)) < 28).length;
 
   const readiness = days === null
     ? "First session. Start light enough that the last set still looks like the first."
     : days === 0 ? "You trained today. Rest is where the adaptation happens — come back tomorrow."
-    : days === 1 ? "One day since the last session. This is the rhythm."
+    : days === 1 ? "You trained yesterday. This is the rhythm."
     : days >= 4 ? "It has been " + days + " days. Take 10% off the suggested loads and rebuild from there."
     : days + " days since the last session.";
 
@@ -1963,7 +2004,7 @@ function viewProgress(){
   const recent = S.history.slice(-8).reverse().map(h=>{
     const sess = SESSIONS.find(s => s.key === h.key);
     const label = h.open ? (h.title || "Open session") : (sess ? sess.title : "Session");
-    const d = new Date(h.date);
+    const d = keyDate(recDay(h));
     return '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--paper-2);font-size:13px">' +
       '<span>' + esc(label) + (h.open ? ' <span style="font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--slate)">open</span>' : "") + '</span>' +
       '<span style="font-family:var(--mono);font-size:12px;color:var(--slate)">' +
@@ -2156,7 +2197,7 @@ document.addEventListener("click", e=>{
 
   if(t.dataset.day){
     const key = t.dataset.day;
-    const hits = S.history.map((h,i)=>({h:h,i:i})).filter(r => dayKey(r.h.date) === key);
+    const hits = S.history.map((h,i)=>({h:h,i:i})).filter(r => recDay(r.h) === key);
     if(!hits.length) return;
     if(hits.length === 1){ histIdx = hits[0].i; histList = false; }
     else { histDay = key; histList = true; histIdx = null; }
