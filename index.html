@@ -299,6 +299,29 @@ h2.head{
 .cad i.today{border-bottom:3px solid var(--ink)}
 .cad-l{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;
   letter-spacing:.08em;text-transform:uppercase;color:var(--slate)}
+.cad button{flex:1;height:32px;background:var(--paper-2);border-radius:1px;display:block;padding:0;
+  border:0;cursor:pointer;transition:transform .08s ease}
+.cad button.on{background:var(--orange)}
+.cad button.open{background:var(--paper);border:2px solid var(--orange)}
+.cad button.today{border-bottom:3px solid var(--ink)}
+.cad button:active{transform:translateY(2px)}
+
+.numlink{font-family:var(--mono);font-weight:600;font-size:19px;line-height:1.1;padding:0;
+  color:var(--orange-deep);border-bottom:1px solid var(--orange-deep);display:inline-block}
+.numlink:active{opacity:.6}
+
+.histrow{display:flex;align-items:center;gap:11px;width:100%;text-align:left;
+  padding:11px 0;border-bottom:1px solid var(--paper-2);color:var(--ink)}
+.histrow:last-of-type{border-bottom:0}
+.histrow b{display:block;font-family:var(--display);font-size:19px;font-weight:700;line-height:1.15}
+.histrow span span{font-family:var(--mono);font-size:11px;color:var(--slate)}
+.histrow .chev-r{font-size:22px;color:var(--rule);line-height:1}
+.histrow:active{opacity:.6}
+.tag-open{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--slate);vertical-align:2px}
+.tick-btn.rm{font-size:20px;color:var(--slate);line-height:1}
+.tick-btn.rm::after{display:none}
+.tick-btn.rm:active{background:var(--orange-pale);color:var(--orange-deep)}
 
 .setting{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--paper-2)}
 .setting:last-of-type{border-bottom:0}
@@ -915,7 +938,6 @@ function fmt(n){
   if(n === null || n === undefined || isNaN(n)) return "—";
   return (Math.round(n * 100) / 100).toString();
 }
-function e1rm(w, r){ return w * (1 + r / 30); }
 
 /* last completed performance of a given exercise id */
 function lastPerf(exId){
@@ -925,19 +947,34 @@ function lastPerf(exId){
   }
   return null;
 }
+function topWeight(sets){ return sets.reduce((m,s)=> Math.max(m, s.w), 0); }
+
+/* a true one-rep max only counts if a single was actually completed */
+function trueSingle(sets){
+  const singles = sets.filter(s => s.r === 1);
+  return singles.length ? singles.reduce((m,s)=> Math.max(m, s.w), 0) : null;
+}
+
 function allPerf(exId){
   const out = [];
   S.history.forEach(h=>{
     const e = h.entries.find(x => x.exId === exId && x.sets.some(s => s.done));
     if(e){
       const done = e.sets.filter(s=>s.done);
-      const best = done.reduce((m,s)=> Math.max(m, e1rm(s.w, s.r)), 0);
-      const vol = done.reduce((m,s)=> m + s.w * s.r, 0);
-      out.push({date:h.date, sets:done, e1rm:best, vol:vol});
+      out.push({
+        date:h.date,
+        sets:done,
+        top: topWeight(done),
+        single: trueSingle(done),
+        vol: done.reduce((m,s)=> m + s.w * s.r, 0)
+      });
     }
   });
   return out;
 }
+
+/* has this exercise ever been taken to a genuine single? */
+function anySingle(hist){ return hist.some(x => x.single !== null); }
 
 /* the learning bit: what should today's load be? */
 function suggest(ex, item, sessionIndex){
@@ -1102,7 +1139,14 @@ function render(){
   });
   const v = document.getElementById("view");
   if(summaryRec){ v.innerHTML = viewSummary(); return; }
-  if(tab === "train")    v.innerHTML = S.current ? viewSession() : (pick.open ? viewPicker() : viewHome());
+  if(tab === "train"){
+    v.innerHTML = S.current ? viewSession()
+      : histIdx !== null ? viewHistory()
+      : histList ? viewHistList()
+      : previewOpen ? viewPreview()
+      : pick.open ? viewPicker()
+      : viewHome();
+  }
   if(tab === "progress") v.innerHTML = viewProgress();
   if(tab === "library")  v.innerHTML = viewLibrary();
   if(tab === "settings") v.innerHTML = viewSettings();
@@ -1136,7 +1180,7 @@ function slotPerf(slotId){
   S.history.forEach(h=>{
     const e = h.entries.find(x => x.slot === slotId && (x.track || "load") === "load");
     if(e && e.sets.length){
-      out.push({date:h.date, exId:e.exId, e1rm:e.sets.reduce((m,s)=> Math.max(m, e1rm(s.w, s.r)), 0)});
+      out.push({date:h.date, exId:e.exId, top:topWeight(e.sets), single:trueSingle(e.sets)});
     }
   });
   return out;
@@ -1152,7 +1196,179 @@ function extrasTally(){
   return {km:km, mins:mins, count:count};
 }
 
+
+/* ---------- history: list ---------- */
+function sessionTitle(h){
+  if(h.open) return h.title || "Open session";
+  const sess = SESSIONS.find(x => x.key === h.key);
+  return sess ? sess.title : "Session";
+}
+function niceDate(d){
+  return new Date(d).toLocaleDateString("en-GB", {weekday:"short", day:"numeric", month:"short"});
+}
+
+function viewHistList(){
+  const rows = S.history.map((h, i)=>({h:h, i:i}))
+    .filter(r => !histDay || dayKey(r.h.date) === histDay)
+    .reverse();
+
+  let html = '<div class="panel"><div class="pad">' +
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">' +
+      '<div><p class="eyebrow">' + (histDay ? niceDate(histDay + "T12:00:00") : "Everything logged") + '</p>' +
+      '<h1 class="session-title">' + (histDay ? "That day" : "Past sessions") + '</h1></div>' +
+      '<button class="mini" data-act="closeHist">Done</button>' +
+    '</div>' +
+    '<p class="lede" style="margin-top:6px;margin-bottom:14px">Tap a session to review it, or to correct anything that went in wrong.</p>';
+
+  if(!rows.length){
+    html += '<div class="empty">Nothing logged here yet.</div>';
+  }else{
+    rows.forEach(r=>{
+      const sets = r.h.entries.reduce((n,e)=> n + e.sets.length, 0);
+      html += '<button class="histrow" data-hopen="' + r.i + '">' +
+        '<span class="ex-icon' + (r.h.open ? "" : " lead") + '">' +
+          icon(r.h.open && r.h.entries[0] ? iconFor(r.h.entries[0].exId) : "barbell", 18) + '</span>' +
+        '<span style="flex:1;min-width:0">' +
+          '<b>' + esc(sessionTitle(r.h)) + (r.h.open ? ' <span class="tag-open">open</span>' : '') + '</b>' +
+          '<span>' + niceDate(r.h.date) + ' · ' + sets + ' sets · ' + (r.h.minutes || 0) + ' min</span>' +
+        '</span>' +
+        '<span class="chev-r">›</span></button>';
+    });
+  }
+  return html + '</div></div>';
+}
+
+/* ---------- history: one session, editable ---------- */
+function histRows(ei, entry){
+  const cfg = TRACK[entry.track || "load"];
+  const aUnit = cfg.a(), bUnit = cfg.b;
+  return entry.sets.map((st, si)=>
+    '<div class="set">' +
+      '<span class="set-n">' + (si + 1) + '</span>' +
+      '<div class="field grow">' +
+        '<button class="step" data-hnudge="w:-1:' + ei + ':' + si + '" aria-label="Less">−</button>' +
+        '<input type="number" inputmode="decimal" data-hin="w:' + ei + ':' + si + '" value="' + st.w + '" aria-label="' + aUnit + '">' +
+        '<span class="unit">' + aUnit + '</span>' +
+        '<button class="step" data-hnudge="w:1:' + ei + ':' + si + '" aria-label="More">+</button>' +
+      '</div>' +
+      '<div class="field" style="width:116px">' +
+        '<button class="step" data-hnudge="r:-1:' + ei + ':' + si + '" aria-label="Less">−</button>' +
+        '<input type="number" inputmode="decimal" data-hin="r:' + ei + ':' + si + '" value="' + st.r + '" aria-label="' + bUnit + '">' +
+        '<span class="unit">' + bUnit + '</span>' +
+        '<button class="step" data-hnudge="r:1:' + ei + ':' + si + '" aria-label="More">+</button>' +
+      '</div>' +
+      '<button class="tick-btn rm" data-hrmset="' + ei + ':' + si + '" aria-label="Delete set ' + (si+1) + '">×</button>' +
+    '</div>').join("");
+}
+
+function viewHistory(){
+  const h = S.history[histIdx];
+  if(!h){ histIdx = null; return viewHome(); }
+  const sets = h.entries.reduce((n,e)=> n + e.sets.length, 0);
+  const vol = h.entries.reduce((n,e)=> n + ((e.track||"load")==="load" ? e.sets.reduce((m,x)=> m + x.w*x.r, 0) : 0), 0);
+
+  let html = '<div class="panel"><div class="pad">' +
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">' +
+      '<div><p class="eyebrow">' + esc(niceDate(h.date)) + (h.open ? " · open session" : "") + '</p>' +
+      '<h1 class="session-title">' + esc(sessionTitle(h)) + '</h1></div>' +
+      '<button class="mini" data-act="closeHist">Done</button>' +
+    '</div>' +
+    '<div class="meta">' +
+      '<div><span class="n">' + (h.minutes || 0) + '<span style="font-size:12px">min</span></span><span class="l">Elapsed</span></div>' +
+      '<div><span class="n">' + sets + '</span><span class="l">Sets</span></div>' +
+      '<div><span class="n">' + Math.round(vol) + '</span><span class="l">Volume ' + S.units + '</span></div>' +
+    '</div>' +
+    '<p class="lede" style="margin-top:14px">Corrections save straight away and feed back into what the app suggests next time.</p>' +
+  '</div></div>';
+
+  h.entries.forEach((entry, ei)=>{
+    const f = findEx(entry.exId);
+    const name = entry.name || (f ? f.ex.name : "Exercise");
+    html += '<div class="panel"><div class="pad">' +
+      '<div class="ex-head">' +
+        '<span class="ex-icon' + (ei === 0 ? " lead" : "") + '">' + icon(iconFor(entry.exId), 19) + '</span>' +
+        '<div style="flex:1;min-width:0">' +
+          '<p class="ex-pattern">' + esc(f ? f.label : "Added") + '</p>' +
+          '<h3 class="ex-name" style="cursor:default">' + esc(name) + '</h3>' +
+        '</div>' +
+        '<button class="mini" data-hrmex="' + ei + '">Remove</button>' +
+      '</div>' +
+      '<div class="bar-line"></div><div class="sets">' + histRows(ei, entry) + '</div>' +
+      '<div style="margin-top:10px"><button class="mini" data-haddset="' + ei + '">Add a set</button></div>' +
+    '</div></div>';
+  });
+
+  html += '<div class="panel"><div class="pad">' +
+    '<button class="btn btn-quiet" data-act="closeHist">Done</button>' +
+    '<div style="height:10px"></div>' +
+    '<button class="btn btn-ghost" data-act="delSession">Delete this session</button>' +
+  '</div></div>';
+  return html;
+}
+
+/* ---------- preview the next programme session ---------- */
+function viewPreview(){
+  const i = S.sessionIndex;
+  const sess = sessionAt(i);
+  let html = '<div class="panel"><div class="pad">' +
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">' +
+      '<div><p class="eyebrow">Coming up · session ' + (i + 1) + ' · ' + esc(sess.focus) + '</p>' +
+      '<h1 class="session-title">' + esc(sess.title) + '</h1></div>' +
+      '<button class="mini" data-act="closePreview">Close</button>' +
+    '</div>' +
+    (isDeload(i) ? '<div class="warn">Deload session. Loads drop to 85% — speed and quality, not strain.</div>' : '') +
+    '<div class="meta">' +
+      '<div><span class="n">' + estimateMinutes(sess) + '<span style="font-size:12px">min</span></span><span class="l">Planned</span></div>' +
+      '<div><span class="n">' + sess.blocks.reduce((n,b)=> n + b.items.length * b.items[0].sets, 0) + '</span><span class="l">Working sets</span></div>' +
+      '<div><span class="n">' + sess.blocks.length + '</span><span class="l">Blocks</span></div>' +
+    '</div>' +
+    '<p class="lede" style="margin-top:14px">Nothing here is logged and the rotation does not move until you start.</p>' +
+  '</div></div>';
+
+  sess.blocks.forEach((b, bi)=>{
+    html += '<div class="panel"><div class="pad">';
+    html += b.items.length > 1
+      ? '<span class="pair-flag">Superset — alternate, rest ' + b.rest + 's after the pair</span>'
+      : '<span class="pair-flag">Rest ' + b.rest + 's between sets</span>';
+    b.items.forEach(item=>{
+      const ex = variantFor(item.slot, i);
+      const sug = suggest(ex, item, i);
+      const lp = lastPerf(ex.id);
+      const ghost = lp
+        ? "Last: " + fmt(lp.entry.sets.filter(x=>x.done)[0].w) + " " + S.units + " × " +
+          lp.entry.sets.filter(x=>x.done).map(x=>x.r).join(" · ")
+        : "No history yet";
+      html += '<div class="ex" style="padding-top:16px;margin-top:16px">' +
+        '<div class="ex-head">' +
+          '<span class="ex-icon' + (bi === 0 ? " lead" : "") + '">' + icon(iconFor(ex.id), 19) + '</span>' +
+          '<div style="flex:1;min-width:0">' +
+            '<p class="ex-pattern">' + esc(SLOTS[item.slot].label) + '</p>' +
+            '<button class="ex-name" data-diag="' + ex.id + '">' + esc(ex.name) +
+              (isNewVariant(item.slot, i) ? '<span class="tag-new">New</span>' : '') +
+              '<span class="chev">' + infoIcon(!!openDiag[ex.id]) + '</span></button>' +
+          '</div>' +
+        '</div>' +
+        '<p class="target"><b>' + item.sets + ' × ' + item.lo + '–' + item.hi +
+          (ex.perSide ? " each side" : "") + '</b>' +
+          '<span>' + (sug.w === null ? "load to find" : fmt(sug.w) + " " + S.units) + '</span></p>' +
+        '<p class="ghost">' + esc(ghost) + '</p>' +
+        '<p class="cue">' + esc(ex.cue) + '</p>' +
+        (openDiag[ex.id] ? diagram(ex.id) : "") +
+      '</div>';
+    });
+    html += '</div></div>';
+  });
+
+  html += '<div class="panel"><div class="pad">' +
+    '<button class="btn" data-act="start">Start this session</button>' +
+    '<div style="height:10px"></div>' +
+    '<button class="btn btn-ghost" data-act="closePreview">Back</button>' +
+  '</div></div>';
+  return html;
+}
+
 /* ---------- home ---------- */
+
 function viewHome(){
   const i = S.sessionIndex;
   const sess = sessionAt(i);
@@ -1195,6 +1411,7 @@ function viewHome(){
       '</div>' +
       (isDeload(i) ? '<div class="warn">Deload session. Loads drop to 85% — speed and quality, not strain.</div>' : '') +
       '<p class="lede" style="margin-top:14px">' + esc(readiness) + '</p>' +
+      '<div style="margin-top:14px"><button class="btn btn-ghost" data-act="preview">See what is in ' + esc(sess.title) + ' first</button></div>' +
     '</div></div>';
 
   /* ---- rhythm ---- */
@@ -1209,12 +1426,16 @@ function viewHome(){
        : strength.length ? "Sparse fortnight. Getting back to a fixed rhythm matters more than the loads."
        : "Nothing logged yet — the strip fills in as you train.") +
       (open28 ? " Plus " + open28 + " open session" + (open28 > 1 ? "s" : "") + "." : "") + '</p>' +
-    '<div class="cad">' + cad.map(d=>
-      '<i class="' + (d.s ? "on " : d.o ? "open " : "") + (d.today ? "today" : "") + '" title="' + d.key + '"></i>').join("") + '</div>' +
+    '<div class="cad">' + cad.map(d=>{
+      const cls = (d.s ? "on " : d.o ? "open " : "") + (d.today ? "today" : "");
+      return (d.s || d.o)
+        ? '<button class="' + cls + '" data-day="' + d.key + '" title="' + d.key + ' — tap to open" aria-label="Sessions on ' + d.key + '"></button>'
+        : '<i class="' + cls + '" title="' + d.key + '"></i>';
+    }).join("") + '</div>' +
     '<div class="cad-l"><span>28 days ago</span><span>Today</span></div>' +
-    '<p class="lede" style="font-size:12px;margin-top:8px">Solid bars are programme sessions, outlined bars are open ones.</p>' +
+    '<p class="lede" style="font-size:12px;margin-top:8px">Solid bars are programme sessions, outlined are open ones. Tap any bar to review or correct that session.</p>' +
     '<div class="meta">' +
-      '<div><span class="n">' + strength.length + '</span><span class="l">Programme</span></div>' +
+      '<div><button class="n numlink" data-act="histList">' + strength.length + '</button><span class="l">Programme</span></div>' +
       '<div><span class="n">' + totalMins + '</span><span class="l">Minutes</span></div>' +
       '<div><span class="n">' + totalSets + '</span><span class="l">Sets</span></div>' +
     '</div>' +
@@ -1235,22 +1456,26 @@ function viewHome(){
         return;
       }
       const latest = perf[perf.length - 1], first = perf[0];
-      const d = latest.e1rm - first.e1rm;
+      const hasSingle = perf.some(x => x.single !== null);
+      const curV = hasSingle ? latest.single : latest.top;
+      const firstV = hasSingle ? (first.single !== null ? first.single : first.top) : first.top;
+      const d = curV - firstV;
       const cls = d > 0.5 ? "delta-up" : d < -0.5 ? "delta-down" : "delta-flat";
       const lf = findEx(latest.exId);
       rows += '<div class="exrow">' +
         '<div class="exrow-top">' +
           '<span class="exrow-name">' + esc(pair[1]) + '</span>' +
-          '<span class="exrow-n">' + fmt(Math.round(latest.e1rm * 2) / 2) + ' ' + S.units + '</span>' +
+          '<span class="exrow-n">' + fmt(curV) + ' ' + S.units + '</span>' +
         '</div>' +
-        '<div class="exrow-sub">' + esc(lf ? lf.ex.name : "") + ' · ' + perf.length + ' logged · ' +
-          '<span class="' + cls + '">' + (d > 0 ? "+" : "") + fmt(Math.round(d * 2) / 2) + ' ' + S.units + ' since you started</span></div>' +
-        sparkline(perf.map(x => x.e1rm)) +
+        '<div class="exrow-sub">' + esc(lf ? lf.ex.name : "") + ' · ' + (hasSingle ? "one-rep max" : "heaviest set") +
+          ' · ' + perf.length + ' logged · ' +
+          '<span class="' + cls + '">' + (d > 0 ? "+" : "") + fmt(d) + ' ' + S.units + ' since you started</span></div>' +
+        sparkline(perf.map(x => (hasSingle && x.single !== null) ? x.single : x.top)) +
       '</div>';
     });
     html += '<div class="panel"><div class="pad">' +
       '<p class="eyebrow">Movement on the main patterns</p>' +
-      '<p class="lede" style="margin-bottom:6px">Estimated one-rep max, tracked across whichever variation is loaded.</p>' +
+      '<p class="lede" style="margin-bottom:6px">Heaviest set, tracked across whichever variation is loaded. Take a lift to a true single and it switches to a one-rep max.</p>' +
       rows +
       '<div style="margin-top:14px"><button class="btn btn-ghost" data-tab="progress">See every exercise</button></div>' +
     '</div></div>';
@@ -1405,6 +1630,10 @@ function setRows(entry, rest){
 let newExtra = {open:false, name:"", track:"time"};
 let pick = {open:false, sel:null};
 let addOpen = false;
+let histIdx = null;    // history entry being viewed / edited
+let histDay = null;    // filter the list to one day
+let histList = false;
+let previewOpen = false;
 
 function newExtraForm(){
   if(!newExtra.open){
@@ -1618,9 +1847,17 @@ function viewSummary(){
     if((e.track||"load") !== "load") return;
     const f = findEx(e.exId);
     if(!f) return;
-    const best = e.sets.reduce((m,s)=> Math.max(m, e1rm(s.w, s.r)), 0);
-    const prior = allPerf(e.exId).slice(0, -1).reduce((m,h)=> Math.max(m, h.e1rm), 0);
-    if(best > prior && prior > 0) pbs.push(f.ex.name + " — est. max now " + fmt(Math.round(best*2)/2) + " " + S.units);
+    const prev = allPerf(e.exId).slice(0, -1);
+    const single = trueSingle(e.sets);
+    if(single !== null){
+      const priorSingle = prev.reduce((m,h)=> Math.max(m, h.single === null ? 0 : h.single), 0);
+      if(single > priorSingle && priorSingle > 0)
+        pbs.push(f.ex.name + " — one-rep max now " + fmt(single) + " " + S.units);
+    }
+    const best = topWeight(e.sets);
+    const priorTop = prev.reduce((m,h)=> Math.max(m, h.top), 0);
+    if(best > priorTop && priorTop > 0)
+      pbs.push(f.ex.name + " — heaviest set now " + fmt(best) + " " + S.units);
   });
 
   const next = sessionAt(S.sessionIndex);
@@ -1680,13 +1917,18 @@ function viewProgress(){
 
     let head, sub, series;
     if(tr === "load"){
-      const d = cur.e1rm - first.e1rm;
+      const hasSingle = anySingle(hist);
+      const curV = hasSingle ? (cur.single !== null ? cur.single : cur.top) : cur.top;
+      const firstV = hasSingle ? (first.single !== null ? first.single : first.top) : first.top;
+      const d = curV - firstV;
       const cls = d > 0.5 ? "delta-up" : d < -0.5 ? "delta-down" : "delta-flat";
-      head = fmt(Math.round(cur.e1rm * 2) / 2) + " " + S.units;
+      const heavy = cur.sets.reduce((m,x)=> x.w > m.w ? x : m, cur.sets[0]);
+      head = fmt(curV) + " " + S.units;
       sub = label + ' · ' + hist.length + ' session' + (hist.length > 1 ? "s" : "") +
-        ' · top set ' + fmt(cur.sets[cur.sets.length-1].w) + ' × ' + cur.sets[cur.sets.length-1].r +
-        ' · <span class="' + cls + '">' + (d > 0 ? "+" : "") + fmt(Math.round(d * 2) / 2) + ' ' + S.units + ' est. max</span>';
-      series = hist.map(x => x.e1rm);
+        ' · best set ' + fmt(heavy.w) + ' × ' + heavy.r +
+        ' · <span class="' + cls + '">' + (d > 0 ? "+" : "") + fmt(d) + ' ' + S.units +
+        (hasSingle ? ' one-rep max' : ' heaviest set') + '</span>';
+      series = hist.map(x => (hasSingle && x.single !== null) ? x.single : x.top);
     }else if(tr === "distance"){
       const dist = x => x.sets.reduce((n,s)=> n + s.w, 0);
       const mins = x => x.sets.reduce((n,s)=> n + s.r, 0);
@@ -1831,7 +2073,7 @@ function setVal(id, field, val){
 }
 
 document.addEventListener("click", e=>{
-  const t = e.target.closest("[data-tab],[data-act],[data-done],[data-nudge],[data-swap],[data-units],[data-bar],[data-rest],[data-diag],[data-rmx],[data-addset],[data-newtrack],[data-delcustom],[data-pick],[data-addpick]");
+  const t = e.target.closest("[data-tab],[data-act],[data-done],[data-nudge],[data-swap],[data-units],[data-bar],[data-rest],[data-diag],[data-rmx],[data-addset],[data-newtrack],[data-delcustom],[data-pick],[data-addpick],[data-day],[data-hopen],[data-hnudge],[data-haddset],[data-hrmset],[data-hrmex]");
   if(!t) return;
 
   if(t.dataset.diag){
@@ -1840,7 +2082,7 @@ document.addEventListener("click", e=>{
     render(); return;
   }
 
-  if(t.dataset.tab){ summaryRec = null; tab = t.dataset.tab; render(); return; }
+  if(t.dataset.tab){ summaryRec = null; histIdx = null; histList = false; histDay = null; previewOpen = false; tab = t.dataset.tab; render(); return; }
 
   if(t.dataset.rest){
     if(t.dataset.rest === "add"){ restLeft += 30; drawRest(); }
@@ -1912,6 +2154,70 @@ document.addEventListener("click", e=>{
 
   if(t.dataset.pick){ pick.sel = (pick.sel === t.dataset.pick ? null : t.dataset.pick); render(); return; }
 
+  if(t.dataset.day){
+    const key = t.dataset.day;
+    const hits = S.history.map((h,i)=>({h:h,i:i})).filter(r => dayKey(r.h.date) === key);
+    if(!hits.length) return;
+    if(hits.length === 1){ histIdx = hits[0].i; histList = false; }
+    else { histDay = key; histList = true; histIdx = null; }
+    previewOpen = false; render(); return;
+  }
+
+  if(t.dataset.hopen !== undefined){
+    histIdx = Number(t.dataset.hopen); histList = false; render(); return;
+  }
+
+  if(t.dataset.hnudge){
+    const [field, dir, ei, si] = t.dataset.hnudge.split(":");
+    const entry = S.history[histIdx].entries[Number(ei)];
+    const cfg = TRACK[entry.track || "load"];
+    const set = entry.sets[Number(si)];
+    if(field === "w"){
+      let st = cfg.aStep;
+      if(st === null){ const f = findEx(entry.exId); st = f ? step(f.ex.kind) : 2.5; }
+      set.w = Math.max(0, Math.round(((Number(set.w)||0) + Number(dir)*st) / st) * st);
+    }else{
+      let v = (Number(set.r)||0) + Number(dir)*cfg.bStep;
+      if(cfg.bMax) v = Math.min(cfg.bMax, v);
+      set.r = Math.max(0, v);
+    }
+    save(); render(); return;
+  }
+
+  if(t.dataset.haddset){
+    const entry = S.history[histIdx].entries[Number(t.dataset.haddset)];
+    const last = entry.sets[entry.sets.length - 1];
+    entry.sets.push({w: last ? last.w : 0, r: last ? last.r : 0, done:true});
+    save(); render(); return;
+  }
+
+  if(t.dataset.hrmset){
+    const [ei, si] = t.dataset.hrmset.split(":").map(Number);
+    const entry = S.history[histIdx].entries[ei];
+    entry.sets.splice(si, 1);
+    if(!entry.sets.length) S.history[histIdx].entries.splice(ei, 1);
+    if(!S.history[histIdx].entries.length){
+      if(confirm("That was the last set in this session. Delete the session?")){
+        S.history.splice(histIdx, 1); histIdx = null;
+      }else{
+        S.history[histIdx].entries.push(entry); entry.sets.push({w:0, r:0, done:true});
+      }
+    }
+    save(); render(); return;
+  }
+
+  if(t.dataset.hrmex){
+    const ei = Number(t.dataset.hrmex);
+    const entry = S.history[histIdx].entries[ei];
+    const f = findEx(entry.exId);
+    if(confirm("Remove " + (entry.name || (f ? f.ex.name : "this exercise")) + " from this session?")){
+      S.history[histIdx].entries.splice(ei, 1);
+      if(!S.history[histIdx].entries.length){ S.history.splice(histIdx, 1); histIdx = null; }
+      save(); render();
+    }
+    return;
+  }
+
   if(t.dataset.newtrack){ newExtra.track = t.dataset.newtrack; render(); return; }
 
   if(t.dataset.done){
@@ -1962,13 +2268,26 @@ document.addEventListener("click", e=>{
     if(S.current) addExtraToSession(id); else { pick.sel = id; render(); }
     return;
   }
+  if(act === "histList"){ histList = true; histDay = null; histIdx = null; previewOpen = false; render(); return; }
+  if(act === "closeHist"){ histIdx = null; histList = false; histDay = null; render(); return; }
+  if(act === "delSession"){
+    const h = S.history[histIdx];
+    if(h && confirm("Delete " + sessionTitle(h) + " from " + niceDate(h.date) + "? This cannot be undone.")){
+      S.history.splice(histIdx, 1);
+      histIdx = null;
+      save(); render();
+    }
+    return;
+  }
+  if(act === "preview"){ previewOpen = true; render(); return; }
+  if(act === "closePreview"){ previewOpen = false; render(); return; }
   if(act === "signout"){
     if(confirm("Sign out? Your training is saved to your account.")){
       if(window.__auth) window.__auth.signOut();
     }
     return;
   }
-  if(act === "start"){ startSession(); }
+  if(act === "start"){ previewOpen = false; startSession(); }
   if(act === "startOpen"){ startOpen(); }
   if(act === "startOpenPick"){
     const sel = document.getElementById("openPick");
@@ -1998,6 +2317,12 @@ document.addEventListener("input", e=>{
   if(t.dataset.in){
     const [field, exId, si] = t.dataset.in.split(":");
     setVal(exId + ":" + si, field, t.value === "" ? "" : Number(t.value));
+    save();
+  }
+  if(t.dataset.hin){
+    const [field, ei, si] = t.dataset.hin.split(":");
+    const set = S.history[histIdx].entries[Number(ei)].sets[Number(si)];
+    set[field] = t.value === "" ? 0 : Number(t.value);
     save();
   }
   if(t.dataset.new === "name"){ newExtra.name = t.value; }
