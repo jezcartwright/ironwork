@@ -327,6 +327,46 @@ h2.head{
 .setting:last-of-type{border-bottom:0}
 .setting label{font-size:14px;font-weight:500}
 .setting .hint{font-size:12px;color:var(--slate);display:block;font-weight:400;margin-top:2px}
+.rot-strip{display:flex;gap:6px;margin:10px 0 0}
+.rot{flex:1;min-width:0;text-align:center;padding:9px 3px;border-radius:11px;
+  background:var(--paper-2);color:var(--slate);display:flex;flex-direction:column;align-items:center;gap:3px}
+.rot b{font-size:12px;font-weight:600;color:var(--ink);line-height:1.1}
+.rot span{font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase}
+.rot.next{background:var(--orange);color:var(--orange-pale)}
+.rot.next b{color:#FFFFFF}
+.rot.done{opacity:.55}
+
+.sess-head{display:flex;align-items:center;gap:12px}
+
+.blurb{background:var(--paper-2);border-radius:11px;padding:12px;margin:14px 0;
+  font-size:14px;line-height:1.55;color:var(--iron-3)}
+
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{background:var(--orange-pale);color:var(--orange-deep);font-size:12px;
+  padding:4px 11px;border-radius:20px}
+
+.prow{display:flex;align-items:center;gap:10px;width:100%;text-align:left;
+  padding:9px 0;border-bottom:1px solid var(--paper-2);color:var(--ink)}
+.prow-i{width:28px;height:28px;flex:0 0 28px;background:var(--paper-2);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;color:var(--ink)}
+.prow-i.lead{background:var(--orange);color:#FFFFFF}
+.prow b{display:block;font-size:14px;font-weight:500;line-height:1.25}
+.prow span span{font-family:var(--mono);font-size:11px;color:var(--slate)}
+.prow-n{font-family:var(--mono);font-size:11px;color:var(--slate);white-space:nowrap}
+.prow:active{opacity:.6}
+
+.wkrow{display:flex;gap:11px;padding:13px 0;border-top:1px solid var(--rule)}
+.wkrow b{font-size:15px;font-weight:600;display:block}
+.wkrow b span{font-family:var(--mono);font-size:11px;font-weight:400;color:var(--slate);letter-spacing:.03em}
+
+.aero-tile{display:flex;align-items:center;gap:12px;width:100%;text-align:left;
+  border:2px solid var(--orange);border-radius:14px;padding:14px;color:var(--ink)}
+.aero-ico{width:40px;height:40px;flex:0 0 40px;border-radius:11px;background:var(--orange-pale);
+  color:var(--orange-deep);display:flex;align-items:center;justify-content:center}
+.aero-tile b{display:block;font-size:16px;font-weight:600;line-height:1.2}
+.aero-tile span span{font-size:12px;color:var(--slate);line-height:1.45;display:block;margin-top:2px}
+.aero-tile:active{opacity:.7}
+
 .tiles{display:flex;gap:11px}
 .tile-big{
   flex:1;min-width:0;border-radius:16px;padding:15px 13px;min-height:136px;
@@ -559,25 +599,31 @@ const SLOTS = {
    THE PROGRAMME — three full-body sessions, run in rotation
    ============================================================ */
 const SESSIONS = [
-  {key:"A", title:"Drive", focus:"Squat led",
-   blurb:"Built on the squat — driving up out of the bottom position under a heavy bar.",
-   trains:"Quads, glutes, trunk under load. The chest and back work that follows keeps the session full-body rather than leg day.",
+  {key:"A", title:"Drive", lift:"Squat session", glyph:"down",
+   blurb:"Legs under a loaded bar. The squat leads, then a press and a pull to keep it full body.",
+   trains:"Everything you use to stand up under weight, plus enough upper-body work that this never becomes leg day.",
+   tags:["Quads","Glutes","Chest","Back"],
+   focus:"Squat led",
    blocks:[
     {rest:150, items:[{slot:"squat", sets:4, lo:5, hi:8}]},
     {rest:90, items:[{slot:"bench", sets:3, lo:6, hi:10},{slot:"vpull", sets:3, lo:6, hi:10}]},
     {rest:75, items:[{slot:"rdl", sets:3, lo:8, hi:12},{slot:"antirot", sets:3, lo:10, hi:12}]}
   ]},
-  {key:"B", title:"Root", focus:"Hinge led",
-   blurb:"Built on the deadlift — pulling from the floor, rooted and hard to shift.",
-   trains:"The whole back of the body: hamstrings, glutes, spinal erectors and grip. Overhead pressing and rowing balance it, then single-leg work for the side-to-side differences a barbell hides.",
+  {key:"B", title:"Root", lift:"Hinge session", glyph:"floor",
+   blurb:"Lifting from the floor. The deadlift is the anchor, then pressing, rowing and single-leg work around it.",
+   trains:"The whole back of your body — the part that makes you hard to shift. Single-leg work catches the left-right differences a barbell hides.",
+   tags:["Hamstrings","Glutes","Back","Grip"],
+   focus:"Hinge led",
    blocks:[
     {rest:180, items:[{slot:"deadlift", sets:4, lo:3, hi:6}]},
     {rest:90, items:[{slot:"press", sets:3, lo:5, hi:8},{slot:"hrow", sets:3, lo:8, hi:12}]},
     {rest:75, items:[{slot:"unilateral", sets:3, lo:8, hi:10},{slot:"antiext", sets:3, lo:8, hi:12}]}
   ]},
-  {key:"C", title:"Reach", focus:"Upper led, conditioning finish",
-   blurb:"Built on the pull-up — overhead reaching, pulling and pressing, finished with conditioning.",
-   trains:"Lats, shoulders and arms, with hip work to keep the legs ticking over between the two heavier sessions. The finisher is the one bit of the week that should leave you breathing hard.",
+  {key:"C", title:"Reach", lift:"Upper session", glyph:"up",
+   blurb:"Overhead pulling and pressing, arms, and a finisher that leaves you breathing hard.",
+   trains:"Shoulders, lats and arms, with hip work ticking the legs over between the two heavier sessions.",
+   tags:["Lats","Shoulders","Arms","Conditioning"],
+   focus:"Upper led, conditioning finish",
    blocks:[
     {rest:150, items:[{slot:"vpullHeavy", sets:4, lo:5, hi:8}]},
     {rest:105, items:[{slot:"vpush2", sets:3, lo:6, hi:10},{slot:"glute", sets:3, lo:8, hi:12}]},
@@ -1360,64 +1406,45 @@ function viewHistory(){
 function viewPreview(){
   const i = S.sessionIndex;
   const sess = sessionAt(i);
-  let html = '<div class="panel"><div class="pad">' +
-    '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">' +
-      '<div><p class="eyebrow">Coming up · session ' + (i + 1) + ' · ' + esc(sess.focus) + '</p>' +
-      '<h1 class="session-title">' + esc(sess.title) + '</h1></div>' +
-      '<button class="mini" data-act="closePreview">Close</button>' +
-    '</div>' +
-    (isDeload(i) ? '<div class="warn">Deload session. Loads drop to 85% — speed and quality, not strain.</div>' : '') +
-    '<div class="meta">' +
-      '<div><span class="n">' + estimateMinutes(sess) + '<span style="font-size:12px">min</span></span><span class="l">Planned</span></div>' +
-      '<div><span class="n">' + sess.blocks.reduce((n,b)=> n + b.items.length * b.items[0].sets, 0) + '</span><span class="l">Working sets</span></div>' +
-      '<div><span class="n">' + sess.blocks.length + '</span><span class="l">Blocks</span></div>' +
-    '</div>' +
-    '<hr class="rule">' +
-    '<p class="lede" style="margin-bottom:10px">' + esc(sess.blurb) + '</p>' +
-    '<p class="lede">' + esc(sess.trains) + '</p>' +
-    '<p class="lede" style="margin-top:12px;font-size:13px">Nothing here is logged and the rotation does not move until you start.</p>' +
-  '</div></div>';
+  const pos = (i % 3) + 1;
 
+  let list = "";
   sess.blocks.forEach((b, bi)=>{
-    html += '<div class="panel"><div class="pad">';
-    html += b.items.length > 1
-      ? '<span class="pair-flag">Superset — alternate, rest ' + b.rest + 's after the pair</span>'
-      : '<span class="pair-flag">Rest ' + b.rest + 's between sets</span>';
     b.items.forEach(item=>{
       const ex = variantFor(item.slot, i);
       const sug = suggest(ex, item, i);
-      const lp = lastPerf(ex.id);
-      const ghost = lp
-        ? "Last: " + fmt(lp.entry.sets.filter(x=>x.done)[0].w) + " " + S.units + " × " +
-          lp.entry.sets.filter(x=>x.done).map(x=>x.r).join(" · ")
-        : "No history yet";
-      html += '<div class="ex" style="padding-top:16px;margin-top:16px">' +
-        '<div class="ex-head">' +
-          '<span class="ex-icon' + (bi === 0 ? " lead" : "") + '">' + icon(iconFor(ex.id), 19) + '</span>' +
-          '<div style="flex:1;min-width:0">' +
-            '<p class="ex-pattern">' + esc(SLOTS[item.slot].label) + '</p>' +
-            '<button class="ex-name" data-diag="' + ex.id + '">' + esc(ex.name) +
-              (isNewVariant(item.slot, i) ? '<span class="tag-new">New</span>' : '') +
-              '<span class="chev">' + infoIcon(!!openDiag[ex.id]) + '</span></button>' +
-          '</div>' +
-        '</div>' +
-        '<p class="target"><b>' + item.sets + ' × ' + item.lo + '–' + item.hi +
-          (ex.perSide ? " each side" : "") + '</b>' +
-          '<span>' + (sug.w === null ? "load to find" : fmt(sug.w) + " " + S.units) + '</span></p>' +
-        '<p class="ghost">' + esc(ghost) + '</p>' +
-        '<p class="cue">' + esc(ex.cue) + '</p>' +
-        (openDiag[ex.id] ? diagram(ex.id) : "") +
-      '</div>';
+      list += '<button class="prow" data-diag="' + ex.id + '">' +
+        '<span class="prow-i' + (bi === 0 ? " lead" : "") + '">' + icon(iconFor(ex.id), 16) + '</span>' +
+        '<span style="flex:1;min-width:0">' +
+          '<b>' + esc(ex.name) + (isNewVariant(item.slot, i) ? '<span class="tag-new">New</span>' : '') + '</b>' +
+          '<span>' + (sug.w === null ? "find a load" : fmt(sug.w) + " " + S.units) +
+            (ex.perSide ? " · each side" : "") + '</span>' +
+        '</span>' +
+        '<span class="prow-n">' + item.sets + ' × ' + item.lo + '–' + item.hi + '</span>' +
+      '</button>' +
+      (openDiag[ex.id] ? '<p class="cue" style="margin:0 0 10px">' + esc(ex.cue) + '</p>' + diagram(ex.id) : "");
     });
-    html += '</div></div>';
   });
 
-  html += '<div class="panel"><div class="pad">' +
-    '<button class="btn" data-act="start">Start this session</button>' +
-    '<div style="height:10px"></div>' +
+  return '<div class="panel"><div class="pad">' +
+    '<div style="display:flex;justify-content:flex-end"><button class="mini" data-act="closePreview">Close</button></div>' +
+    '<div class="sess-head" style="margin-top:4px">' +
+      '<span class="ex-icon lead">' + icon(sess.glyph, 20) + '</span>' +
+      '<div style="min-width:0">' +
+        '<h1 class="session-title" style="font-size:30px">' + esc(sess.title) + '</h1>' +
+        '<p class="eyebrow" style="margin:3px 0 0">' + esc(sess.lift) + ' · ' + pos + ' of 3 · ' + estimateMinutes(sess) + ' min</p>' +
+      '</div>' +
+    '</div>' +
+    '<div class="blurb">' + esc(sess.blurb) + ' ' + esc(sess.trains) + '</div>' +
+    (isDeload(i) ? '<div class="warn">Deload session. Loads drop to 85% — speed and quality, not strain.</div>' : '') +
+    '<p class="eyebrow">What you will do</p>' + list +
+    '<p class="eyebrow" style="margin-top:16px">What it trains</p>' +
+    '<div class="tags">' + sess.tags.map(t=>'<span class="tag">' + esc(t) + '</span>').join("") + '</div>' +
+    '<p class="lede" style="margin-top:16px;font-size:13px">Tap any exercise to see how it is done. Nothing is logged and the rotation does not move until you start.</p>' +
+    '<div style="margin-top:16px"><button class="btn" data-act="start">Start ' + esc(sess.title) + '</button></div>' +
+    '<div style="height:9px"></div>' +
     '<button class="btn btn-ghost" data-act="closePreview">Back</button>' +
   '</div></div>';
-  return html;
 }
 
 /* ---------- home ---------- */
@@ -1443,31 +1470,39 @@ function viewHome(){
     : days >= 4 ? "It has been " + days + " days. Take 10% off the suggested loads and rebuild from there."
     : days + " days since the last session.";
 
-  /* ---- the two ways in ---- */
+  /* ---- where you are in the rotation ---- */
+  const pos = i % 3;
+  const rot = SESSIONS.map((x, n)=>{
+    const state = n < pos ? "done" : n === pos ? "next" : "after";
+    return '<div class="rot ' + state + '">' + icon(x.glyph, 18) +
+      '<b>' + esc(x.title) + '</b><span>' + state + '</span></div>';
+  }).join("");
+
   let html = storageWarn() +
     '<div class="panel"><div class="pad">' +
-      '<div class="tiles">' +
-        '<button class="tile-big tile-w" data-act="start">' +
-          '<span class="tile-top">' + icon("barbell", 30) +
-            '<svg viewBox="0 0 24 24" style="width:18px;height:18px"><path d="M12 5v14M5 12h14" fill="none" stroke="#FFFFFF" stroke-width="2.8" stroke-linecap="round"/></svg>' +
-          '</span>' +
-          '<span><span class="t">Weight Session</span>' +
-          '<span class="s">' + esc(sess.title) + ' · ' + estimateMinutes(sess) + ' min</span></span>' +
-        '</button>' +
-        '<button class="tile-big tile-a" data-act="openPicker">' +
-          '<span class="tile-top">' + icon("run", 30) +
-            '<svg viewBox="0 0 24 24" style="width:18px;height:18px"><path d="M12 5v14M5 12h14" fill="none" stroke="#FF6600" stroke-width="2.8" stroke-linecap="round"/></svg>' +
-          '</span>' +
-          '<span><span class="t">Aerobic Session</span>' +
-          '<span class="s">No slot used</span></span>' +
-        '</button>' +
-      '</div>' +
-      (isDeload(i) ? '<div class="warn">Deload session. Loads drop to 85% — speed and quality, not strain.</div>' : '') +
+      '<p class="eyebrow">Rotation · every other day</p>' +
+      '<div class="rot-strip">' + rot + '</div>' +
       '<hr class="rule">' +
-      '<p class="eyebrow">' + esc(sess.title) + ' · ' + esc(sess.focus) + '</p>' +
-      '<p class="lede">' + esc(sess.blurb) + '</p>' +
-      '<p class="lede" style="margin-top:12px">' + esc(readiness) + '</p>' +
-      '<div style="margin-top:14px"><button class="btn btn-ghost" data-act="preview">See what is in ' + esc(sess.title) + ' first</button></div>' +
+      '<div class="sess-head">' +
+        '<span class="ex-icon lead">' + icon(sess.glyph, 20) + '</span>' +
+        '<div style="min-width:0">' +
+          '<h1 class="session-title" style="font-size:32px">' + esc(sess.title) + '</h1>' +
+          '<p class="eyebrow" style="margin:3px 0 0">' + esc(sess.lift) + ' · ' + estimateMinutes(sess) + ' min</p>' +
+        '</div>' +
+      '</div>' +
+      '<p class="lede" style="margin-top:11px">' + esc(sess.blurb) + '</p>' +
+      (isDeload(i) ? '<div class="warn">Deload session. Loads drop to 85% — speed and quality, not strain.</div>' : '') +
+      '<p class="lede" style="margin-top:10px;font-size:13px">' + esc(readiness) + '</p>' +
+      '<div style="margin-top:16px"><button class="btn" data-act="start">Start ' + esc(sess.title) + '</button></div>' +
+      '<div style="height:9px"></div>' +
+      '<button class="btn btn-ghost" data-act="preview">See next session ›</button>' +
+    '</div></div>' +
+    '<div class="panel"><div class="pad">' +
+      '<button class="aero-tile" data-act="openPicker">' +
+        '<span class="aero-ico">' + icon("run", 21) + '</span>' +
+        '<span style="min-width:0"><b>Aerobic session</b>' +
+        '<span>A run, ride, intervals or mobility. Does not use a slot — ' + esc(sess.title) + ' stays next.</span></span>' +
+      '</button>' +
     '</div></div>';
 
   /* ---- rhythm ---- */
@@ -1589,7 +1624,10 @@ const ICON_PATHS = {
   stairs:'<path d="M3.5 20h4.5v-4h4.5v-4H17V8h3.5"/>',
   stretch:'<path d="M20.2 12a8.2 8.2 0 1 1-2.6-6"/><path d="M20.6 2.6v4.2h-4.2"/>',
   yoga:'<rect x="2.4" y="8.3" width="14.6" height="7.4" rx="2.2"/><circle cx="17" cy="12" r="3.7"/><circle cx="17" cy="12" r="1.1"/>',
-  clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7v5.5l3.5 2"/>'
+  clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7v5.5l3.5 2"/>',
+  down:'<circle cx="12" cy="12" r="8.6"/><path d="M12 7.6v8.8M8.3 12.7L12 16.4l3.7-3.7"/>',
+  floor:'<path d="M3.6 20.4h16.8M12 17.4V4.2M8.1 8.1L12 4.2l3.9 3.9"/>',
+  up:'<circle cx="12" cy="12" r="8.6"/><path d="M12 16.4V7.6M8.3 11.3L12 7.6l3.7 3.7"/>'
 };
 function infoIcon(on){
   const box = '<svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true">';
@@ -1837,9 +1875,12 @@ function viewSession(){
   const sess = sessionAt(c.index);
   let html = storageWarn() +
     '<div class="panel"><div class="pad">' +
-      '<p class="eyebrow">Session ' + (c.index + 1) + ' · ' + esc(sess.focus) + '</p>' +
-      '<h1 class="session-title">' + esc(sess.title) + '</h1>' +
-      '<p class="lede" style="margin-top:6px">' + esc(sess.blurb) + '</p>' +
+      '<div class="sess-head">' +
+        '<span class="ex-icon lead">' + icon(sess.glyph, 20) + '</span>' +
+        '<div style="min-width:0"><h1 class="session-title" style="font-size:32px">' + esc(sess.title) + '</h1>' +
+        '<p class="eyebrow" style="margin:3px 0 0">' + esc(sess.lift) + ' · session ' + (c.index + 1) + '</p></div>' +
+      '</div>' +
+      '<p class="lede" style="margin-top:10px">' + esc(sess.blurb) + '</p>' +
       '<p class="focus-note" style="margin-top:12px">' + esc(FOCUS_CUES[c.index % FOCUS_CUES.length]) + '</p>' +
     '</div></div>';
 
@@ -1936,7 +1977,7 @@ function viewSummary(){
     (pbs.length ? '<hr class="rule"><p class="pb">Personal best</p>' +
       pbs.map(p=>'<p class="lede" style="margin-top:4px">' + esc(p) + '</p>').join("") : "") +
     '<hr class="rule">' +
-    '<p class="lede">Next up is <b>' + esc(next.title) + '</b> — ' + esc(next.blurb) + ' Leave a full day between sessions.</p>' +
+    '<p class="lede">Next up is <b>' + esc(next.title) + '</b>, the ' + esc(next.lift.toLowerCase()) + '. ' + esc(next.blurb) + ' Leave a full day between sessions.</p>' +
     '<div style="margin-top:16px"><button class="btn btn-quiet" data-act="closeSummary">Done</button></div>' +
   '</div></div>';
 }
@@ -2042,15 +2083,18 @@ function viewLibrary(){
   const i = S.sessionIndex;
   let html = '<div class="panel"><div class="pad">' +
     '<p class="eyebrow">The programme</p>' +
-    '<h2 class="head">Three sessions, on rotation</h2>' +
-    '<p class="lede" style="margin-top:8px">Every other day, in order. Each one is full-body — a squat, a hinge, a push, a pull and trunk work — so a week covers everything twice over rather than splitting the body into parts.</p>' +
-    '<hr class="rule">' +
+    '<h2 class="head">How the week works</h2>' +
+    '<p class="lede" style="margin-top:8px;margin-bottom:6px">Three sessions on rotation, every other day. Each one is full body — the name tells you which lift leads it.</p>' +
     SESSIONS.map(x=>
-      '<div class="libslot">' +
-        '<h3>' + esc(x.title) + ' <span style="font-family:var(--mono);font-size:11px;font-weight:400;color:var(--slate);letter-spacing:.04em">' + esc(x.focus) + '</span></h3>' +
-        '<p class="lede" style="margin:0 0 8px">' + esc(x.blurb) + '</p>' +
-        '<p class="lede" style="margin:0;font-size:13px">' + esc(x.trains) + '</p>' +
+      '<div class="wkrow">' +
+        '<span class="ex-icon">' + icon(x.glyph, 18) + '</span>' +
+        '<div style="min-width:0">' +
+          '<b>' + esc(x.title) + ' <span>' + esc(x.lift) + '</span></b>' +
+          '<p class="lede" style="margin:3px 0 0;font-size:13px">' + esc(x.blurb) + '</p>' +
+          '<div class="tags" style="margin-top:7px">' + x.tags.map(t=>'<span class="tag">' + esc(t) + '</span>').join("") + '</div>' +
+        '</div>' +
       '</div>').join("") +
+    '<p class="lede" style="margin-top:12px;font-size:13px">Across a week you cover every pattern twice. Nothing gets missed and nothing gets hammered.</p>' +
   '</div></div>' +
   '<div class="panel"><div class="pad">' +
     '<p class="eyebrow">Movement pools</p>' +
