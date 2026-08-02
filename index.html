@@ -559,17 +559,26 @@ const SLOTS = {
    THE PROGRAMME — three full-body sessions, run in rotation
    ============================================================ */
 const SESSIONS = [
-  {key:"A", title:"Drive", focus:"Squat led", blocks:[
+  {key:"A", title:"Drive", focus:"Squat led",
+   blurb:"Built on the squat — driving up out of the bottom position under a heavy bar.",
+   trains:"Quads, glutes, trunk under load. The chest and back work that follows keeps the session full-body rather than leg day.",
+   blocks:[
     {rest:150, items:[{slot:"squat", sets:4, lo:5, hi:8}]},
     {rest:90, items:[{slot:"bench", sets:3, lo:6, hi:10},{slot:"vpull", sets:3, lo:6, hi:10}]},
     {rest:75, items:[{slot:"rdl", sets:3, lo:8, hi:12},{slot:"antirot", sets:3, lo:10, hi:12}]}
   ]},
-  {key:"B", title:"Root", focus:"Hinge led", blocks:[
+  {key:"B", title:"Root", focus:"Hinge led",
+   blurb:"Built on the deadlift — pulling from the floor, rooted and hard to shift.",
+   trains:"The whole back of the body: hamstrings, glutes, spinal erectors and grip. Overhead pressing and rowing balance it, then single-leg work for the side-to-side differences a barbell hides.",
+   blocks:[
     {rest:180, items:[{slot:"deadlift", sets:4, lo:3, hi:6}]},
     {rest:90, items:[{slot:"press", sets:3, lo:5, hi:8},{slot:"hrow", sets:3, lo:8, hi:12}]},
     {rest:75, items:[{slot:"unilateral", sets:3, lo:8, hi:10},{slot:"antiext", sets:3, lo:8, hi:12}]}
   ]},
-  {key:"C", title:"Reach", focus:"Upper led, conditioning finish", blocks:[
+  {key:"C", title:"Reach", focus:"Upper led, conditioning finish",
+   blurb:"Built on the pull-up — overhead reaching, pulling and pressing, finished with conditioning.",
+   trains:"Lats, shoulders and arms, with hip work to keep the legs ticking over between the two heavier sessions. The finisher is the one bit of the week that should leave you breathing hard.",
+   blocks:[
     {rest:150, items:[{slot:"vpullHeavy", sets:4, lo:5, hi:8}]},
     {rest:105, items:[{slot:"vpush2", sets:3, lo:6, hi:10},{slot:"glute", sets:3, lo:8, hi:12}]},
     {rest:60, items:[{slot:"triceps", sets:2, lo:10, hi:14},{slot:"biceps", sets:2, lo:10, hi:14}]},
@@ -1363,7 +1372,10 @@ function viewPreview(){
       '<div><span class="n">' + sess.blocks.reduce((n,b)=> n + b.items.length * b.items[0].sets, 0) + '</span><span class="l">Working sets</span></div>' +
       '<div><span class="n">' + sess.blocks.length + '</span><span class="l">Blocks</span></div>' +
     '</div>' +
-    '<p class="lede" style="margin-top:14px">Nothing here is logged and the rotation does not move until you start.</p>' +
+    '<hr class="rule">' +
+    '<p class="lede" style="margin-bottom:10px">' + esc(sess.blurb) + '</p>' +
+    '<p class="lede">' + esc(sess.trains) + '</p>' +
+    '<p class="lede" style="margin-top:12px;font-size:13px">Nothing here is logged and the rotation does not move until you start.</p>' +
   '</div></div>';
 
   sess.blocks.forEach((b, bi)=>{
@@ -1451,7 +1463,10 @@ function viewHome(){
         '</button>' +
       '</div>' +
       (isDeload(i) ? '<div class="warn">Deload session. Loads drop to 85% — speed and quality, not strain.</div>' : '') +
-      '<p class="lede" style="margin-top:14px">' + esc(readiness) + '</p>' +
+      '<hr class="rule">' +
+      '<p class="eyebrow">' + esc(sess.title) + ' · ' + esc(sess.focus) + '</p>' +
+      '<p class="lede">' + esc(sess.blurb) + '</p>' +
+      '<p class="lede" style="margin-top:12px">' + esc(readiness) + '</p>' +
       '<div style="margin-top:14px"><button class="btn btn-ghost" data-act="preview">See what is in ' + esc(sess.title) + ' first</button></div>' +
     '</div></div>';
 
@@ -1824,6 +1839,7 @@ function viewSession(){
     '<div class="panel"><div class="pad">' +
       '<p class="eyebrow">Session ' + (c.index + 1) + ' · ' + esc(sess.focus) + '</p>' +
       '<h1 class="session-title">' + esc(sess.title) + '</h1>' +
+      '<p class="lede" style="margin-top:6px">' + esc(sess.blurb) + '</p>' +
       '<p class="focus-note" style="margin-top:12px">' + esc(FOCUS_CUES[c.index % FOCUS_CUES.length]) + '</p>' +
     '</div></div>';
 
@@ -1920,7 +1936,7 @@ function viewSummary(){
     (pbs.length ? '<hr class="rule"><p class="pb">Personal best</p>' +
       pbs.map(p=>'<p class="lede" style="margin-top:4px">' + esc(p) + '</p>').join("") : "") +
     '<hr class="rule">' +
-    '<p class="lede">Next up is <b>' + esc(next.title) + '</b> — ' + esc(next.focus) + '. Leave a full day between sessions.</p>' +
+    '<p class="lede">Next up is <b>' + esc(next.title) + '</b> — ' + esc(next.blurb) + ' Leave a full day between sessions.</p>' +
     '<div style="margin-top:16px"><button class="btn btn-quiet" data-act="closeSummary">Done</button></div>' +
   '</div></div>';
 }
@@ -2025,6 +2041,18 @@ function viewProgress(){
 function viewLibrary(){
   const i = S.sessionIndex;
   let html = '<div class="panel"><div class="pad">' +
+    '<p class="eyebrow">The programme</p>' +
+    '<h2 class="head">Three sessions, on rotation</h2>' +
+    '<p class="lede" style="margin-top:8px">Every other day, in order. Each one is full-body — a squat, a hinge, a push, a pull and trunk work — so a week covers everything twice over rather than splitting the body into parts.</p>' +
+    '<hr class="rule">' +
+    SESSIONS.map(x=>
+      '<div class="libslot">' +
+        '<h3>' + esc(x.title) + ' <span style="font-family:var(--mono);font-size:11px;font-weight:400;color:var(--slate);letter-spacing:.04em">' + esc(x.focus) + '</span></h3>' +
+        '<p class="lede" style="margin:0 0 8px">' + esc(x.blurb) + '</p>' +
+        '<p class="lede" style="margin:0;font-size:13px">' + esc(x.trains) + '</p>' +
+      '</div>').join("") +
+  '</div></div>' +
+  '<div class="panel"><div class="pad">' +
     '<p class="eyebrow">Movement pools</p>' +
     '<h2 class="head">Every pattern, four ways</h2>' +
     '<p class="lede" style="margin-top:8px">Each slot holds four variations of the same movement pattern. The programme advances to the next one every four cycles, or you can swap by hand during a session. The dot marks what is loaded now — tap any exercise to see how it is performed.</p>' +
