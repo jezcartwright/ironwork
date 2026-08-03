@@ -423,7 +423,29 @@ button.tile:active{transform:translateY(2px)}
 .card-head{display:flex;gap:13px;align-items:center;margin-bottom:8px}
 .card-head .eyebrow{margin:0 0 2px}
 .pick-row{display:flex;gap:10px;align-items:center}
-.pick-row .pick{flex:1;min-width:0;margin-bottom:0}
+.pick-row .newrow{display:flex;gap:10px;align-items:center;margin-bottom:6px}
+.newico{width:52px;height:52px;flex:0 0 52px;border-radius:13px;background:var(--paper-2);
+  border:1px solid var(--rule);color:var(--ink);display:flex;align-items:center;justify-content:center}
+.newico:active{background:var(--orange-pale);color:var(--orange-deep)}
+.ico-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:14px}
+.ico-opt{aspect-ratio:1;border-radius:10px;background:var(--paper-2);color:var(--ink);
+  display:flex;align-items:center;justify-content:center}
+.ico-opt.on{background:var(--orange);color:#FFFFFF}
+.whenrow{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.whenrow input{font-family:var(--mono);font-size:14px}
+
+.pick{flex:1;min-width:0;margin-bottom:0}
+
+.newrow{display:flex;gap:10px;align-items:center;margin-bottom:6px}
+.newico{width:52px;height:52px;flex:0 0 52px;border-radius:13px;background:var(--paper-2);
+  border:1px solid var(--rule);color:var(--ink);display:flex;align-items:center;justify-content:center}
+.newico:active{background:var(--orange-pale);color:var(--orange-deep)}
+.ico-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:14px}
+.ico-opt{aspect-ratio:1;border-radius:10px;background:var(--paper-2);color:var(--ink);
+  display:flex;align-items:center;justify-content:center}
+.ico-opt.on{background:var(--orange);color:#FFFFFF}
+.whenrow{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.whenrow input{font-family:var(--mono);font-size:14px}
 
 .pick{
   width:100%;padding:13px;border:1px solid var(--rule);border-radius:2px;
@@ -1129,8 +1151,9 @@ function startSession(){
   save(); render();
 }
 
-function startOpen(){
+function startOpen(when){
   S.current = {index:S.sessionIndex, key:"X", open:true, startedAt:Date.now(), entries:[]};
+  if(when) S.current.retro = when;
   addOpen = false;
   save(); render();
 }
@@ -1142,13 +1165,17 @@ function finishSession(){
     if(!confirm("No sets logged. Discard this session?")) return;
     S.current = null; save(); render(); return;
   }
+  const when = c.retro ? keyDate(c.retro) : new Date();
   const rec = {
-    date: new Date().toISOString(),
-    day: dayKey(new Date()),
+    date: when.toISOString(),
+    day: dayKey(when),
     tz: (function(){ try{ return Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(e){ return ""; } })(),
     key: c.key, index: c.index, open: !!c.open,
     title: c.open ? (c.entries[0] ? (c.entries[0].name || "Open session") : "Open session") : null,
-    minutes: Math.round((Date.now() - c.startedAt) / 60000),
+    minutes: c.retro
+      ? c.entries.reduce((n,e)=> n + ((e.track === "time" || e.track === "distance")
+          ? e.sets.reduce((m,x)=> m + (e.track === "time" ? x.w : x.r), 0) : 0), 0)
+      : Math.round((Date.now() - c.startedAt) / 60000),
     entries: c.entries.map(e=>({
       slot:e.slot, exId:e.exId, track:e.track || "load", extra:!!e.extra, name:e.name,
       sets:e.sets.filter(s=>s.done).map(s=>({w:Number(s.w)||0, r:Number(s.r)||0, done:true}))
@@ -1334,7 +1361,9 @@ function viewHistList(){
       '<h1 class="session-title">' + (histDay ? "That day" : "Past sessions") + '</h1></div>' +
       '<button class="mini" data-act="closeHist">Done</button>' +
     '</div>' +
-    '<p class="lede" style="margin-top:6px;margin-bottom:14px">Tap a session to review it, or to correct anything that went in wrong.</p>';
+    '<p class="lede" style="margin-top:6px;margin-bottom:14px">Tap a session to review it, or to correct anything that went in wrong.</p>' +
+    '<button class="btn btn-quiet" data-act="logPast">Log something from a past date</button>' +
+    '<div style="height:14px"></div>';
 
   if(!rows.length){
     html += '<div class="empty">Nothing logged here yet.</div>';
@@ -1396,7 +1425,11 @@ function viewHistory(){
       '<div><span class="n">' + sets + '</span><span class="l">Sets</span></div>' +
       '<div><span class="n">' + Math.round(vol) + '</span><span class="l">Volume ' + S.units + '</span></div>' +
     '</div>' +
-    '<p class="lede" style="margin-top:14px">Corrections save straight away and feed back into what the app suggests next time.</p>' +
+    '<div class="whenrow" style="margin-top:14px">' +
+      '<span class="eyebrow" style="margin:0">Date</span>' +
+      '<input type="date" class="pick" style="margin:0;width:auto" data-hdate value="' + esc(recDay(h)) + '" max="' + dayKey(new Date()) + '">' +
+    '</div>' +
+    '<p class="lede" style="margin-top:12px">Corrections save straight away and feed back into what the app suggests next time.</p>' +
   '</div></div>';
 
   h.entries.forEach((entry, ei)=>{
@@ -1650,7 +1683,16 @@ const ICON_PATHS = {
   clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7v5.5l3.5 2"/>',
   down:'<circle cx="12" cy="12" r="8.6"/><path d="M12 7.6v8.8M8.3 12.7L12 16.4l3.7-3.7"/>',
   floor:'<path d="M3.6 20.4h16.8M12 17.4V4.2M8.1 8.1L12 4.2l3.9 3.9"/>',
-  up:'<circle cx="12" cy="12" r="8.6"/><path d="M12 16.4V7.6M8.3 11.3L12 7.6l3.7 3.7"/>'
+  up:'<circle cx="12" cy="12" r="8.6"/><path d="M12 16.4V7.6M8.3 11.3L12 7.6l3.7 3.7"/>',
+  punch:'<path d="M6.6 5.6h7.6a3.6 3.6 0 0 1 3.6 3.6v3.1a3.9 3.9 0 0 1-3.9 3.9H8.1a3.6 3.6 0 0 1-3.6-3.6V9.2a3.6 3.6 0 0 1 2.1-3.6z"/><path d="M17.8 9.3h1.3a1.9 1.9 0 0 1 0 3.8h-1.3M7.6 16.2v1.7a1.7 1.7 0 0 0 1.7 1.7h5.2a1.7 1.7 0 0 0 1.7-1.7v-1.7"/>',
+  racquet:'<ellipse cx="9.6" cy="8.4" rx="5.6" ry="6.4"/><path d="M13.2 13.4l5.9 6.5M6.6 5.4l6 6M12.9 5.9l-6.2 5.9"/>',
+  ball:'<circle cx="12" cy="12" r="8.6"/><path d="M12 6.3l3.9 2.9-1.5 4.6H9.6L8.1 9.2z"/>',
+  golf:'<path d="M7.6 20.4h8.8M12 20.4V3.6l7.2 3.2L12 10"/>',
+  kettlebell:'<path d="M9 6.6a3 3 0 0 1 6 0v1.3"/><path d="M12 8.4c3.6 0 6.1 2.9 6.1 6.2s-2.5 5.1-6.1 5.1-6.1-1.8-6.1-5.1S8.4 8.4 12 8.4z"/>',
+  sled:'<path d="M4.8 15.6h10l2.4-6.2H7.2z"/><path d="M3.6 19.6h16.8M6.6 15.6v4M14.4 15.6v4"/>',
+  music:'<path d="M9.2 17.6V5.4l10-2v12"/><ellipse cx="6.7" cy="17.8" rx="2.6" ry="2.1"/><ellipse cx="16.7" cy="15.8" rx="2.6" ry="2.1"/>',
+  wave:'<path d="M2.4 16.4c2-1.7 4-1.7 6 0s4 1.7 6 0 4-1.7 6 0M2.4 20c2-1.7 4-1.7 6 0s4 1.7 6 0 4-1.7 6 0M7.2 12.4c3-6 8-8.6 13-8.6-1 5-4 9-8.6 10.6"/>',
+  heart:'<path d="M12 20.1C6.6 16.4 3.6 13.3 3.6 9.8A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 8.4 2.2c0 3.5-3 6.6-8.4 10.3z"/>'
 };
 function infoIcon(on){
   const box = '<svg viewBox="0 0 24 24" style="width:20px;height:20px;display:block" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true">';
@@ -1675,10 +1717,54 @@ const EXTRA_ICON = {
 };
 const SLOT_ICON = {vpull:"pullbar", vpullHeavy:"pullbar", antirot:"core", antiext:"core"};
 
+/* pick an icon from what the exercise is called. First match wins, so the
+   more specific patterns are listed before the general ones. */
+const ICON_WORDS = [
+  [/\b(jump ?rope|skip)/i, "skip"],
+  [/\b(run|jog|sprint|treadmill|parkrun|5 ?k|10 ?k|half marathon|marathon)\b/i, "run"],
+  [/\b(walk|hike|hiking|ramble|stroll|rucking|ruck)\b/i, "walk"],
+  [/\b(cycl|bike|biking|spin|peloton|turbo|ride|zwift)/i, "bike"],
+  [/\b(row|erg|rowing|scull|kayak|canoe|paddle ?board|sup)\b/i, "row"],
+  [/\b(swim|pool|crawl|breaststroke|butterfly|lengths)\b/i, "swim"],
+  [/\b(surf|bodyboard|wave)/i, "wave"],
+  [/\b(stair|step ?mill|steps)\b/i, "stairs"],
+  [/\b(ski|skiing|snowboard|snow|piste|touring)\b/i, "mountain"],
+  [/\b(hill|mountain|incline|trail|summit|scramble)/i, "mountain"],
+  [/\b(box|boxing|bag ?work|punch|spar|muay|kickbox|martial|judo|karate|bjj|wrestl)/i, "punch"],
+  [/\b(tennis|padel|paddle ?tennis|squash|badminton|pickleball|racket|racquet)\b/i, "racquet"],
+  [/\b(football|soccer|rugby|basketball|netball|hockey|cricket|volleyball|match|five.?a.?side)\b/i, "ball"],
+  [/\b(golf|driving range|nine holes|18 holes)\b/i, "golf"],
+  [/\b(kettlebell|swing|turkish|get.?up|snatch|clean)\b/i, "kettlebell"],
+  [/\b(sled|prowler|drag|farmer|carry|yoke)\b/i, "sled"],
+  [/\b(yoga|pilates|barre|vinyasa|flow)\b/i, "yoga"],
+  [/\b(dance|dancing|zumba|salsa|aerobics)\b/i, "music"],
+  [/\b(stretch|mobility|foam|thoracic|hip opener|cool ?down|warm ?up)/i, "stretch"],
+  [/\b(plank|core|abs|hollow|dead ?bug|crunch|sit.?up)\b/i, "core"],
+  [/\b(hiit|interval|tabata|circuit|burpee|conditioning|metcon|amrap|emom|wod)\b/i, "bolt"],
+  [/\b(pull.?up|chin.?up|hang|lat|pulldown)\b/i, "pullbar"],
+  [/\b(cable|pushdown|face ?pull|pull.?through|crossover)\b/i, "cable"],
+  [/\b(barbell|squat|deadlift|bench|shrug|landmine|rack)\b/i, "barbell"],
+  [/\b(dumbbell|curl|raise|fly|press)\b/i, "dumbbell"],
+  [/\b(sauna|breath|meditat|recovery|rest|massage|physio)\b/i, "heart"]
+];
+
+function guessIcon(name, track){
+  const n = String(name || "");
+  for(const pair of ICON_WORDS){ if(pair[0].test(n)) return pair[1]; }
+  return track === "distance" ? "run" : track === "load" ? "dumbbell" : "clock";
+}
+
+/* the shortlist offered when creating an exercise */
+const ICON_CHOICES = ["run","walk","bike","row","swim","skip","bolt","mountain","stairs",
+  "punch","racquet","ball","golf","kettlebell","sled","yoga","stretch","music",
+  "wave","core","heart","barbell","dumbbell","cable","pullbar","clock"];
+
 function iconFor(exId){
   if(EXTRA_ICON[exId]) return EXTRA_ICON[exId];
   const f = findEx(exId);
   if(!f) return "clock";
+  if(f.ex.icon) return f.ex.icon;
+  if(f.ex.cat === "Yours") return guessIcon(f.ex.name, f.track);
   if(f.slot && SLOT_ICON[f.slot]) return SLOT_ICON[f.slot];
   if(f.track === "distance") return "run";
   if(f.track === "time") return "clock";
@@ -1744,8 +1830,8 @@ function setRows(entry, rest){
 }
 
 /* ---------- extras panel ---------- */
-let newExtra = {open:false, name:"", track:"time"};
-let pick = {open:false, sel:null};
+let newExtra = {open:false, name:"", track:"time", icon:null, showIcons:false};
+let pick = {open:false, sel:null, when:null};   // when = YYYY-MM-DD for a past session
 let addOpen = false;
 let histIdx = null;    // history entry being viewed / edited
 let histDay = null;    // filter the list to one day
@@ -1757,9 +1843,20 @@ function newExtraForm(){
   if(!newExtra.open){
     return '<button class="btn btn-ghost" data-act="openNew">Create a new exercise</button>';
   }
+  const chosen = newExtra.icon || guessIcon(newExtra.name, newExtra.track);
   return '<hr class="rule">' +
     '<p class="eyebrow">New exercise</p>' +
-    '<input class="pick" data-new="name" placeholder="What is it called?" value="' + esc(newExtra.name) + '" aria-label="Exercise name">' +
+    '<div class="newrow">' +
+      '<button class="newico" data-act="toggleIcons" aria-label="Change icon">' + icon(chosen, 24) + '</button>' +
+      '<input class="pick" style="margin:0" data-new="name" placeholder="What is it called?" value="' + esc(newExtra.name) + '" aria-label="Exercise name">' +
+    '</div>' +
+    '<p class="lede" style="font-size:12px;margin:0 0 12px">' +
+      (newExtra.icon ? 'Icon chosen by you.' : 'Icon picked from the name — tap it to choose another.') + '</p>' +
+    (newExtra.showIcons
+      ? '<div class="ico-grid">' + ICON_CHOICES.map(k=>
+          '<button class="ico-opt' + (k === chosen ? " on" : "") + '" data-newicon="' + k + '" aria-label="' + k + '">' +
+          icon(k, 20) + '</button>').join("") + '</div>'
+      : "") +
     '<p class="eyebrow" style="margin-bottom:8px">What gets logged</p>' +
     '<div class="seg" style="margin-bottom:12px">' +
       Object.keys(TRACK).map(k=>
@@ -1777,13 +1874,23 @@ function viewPicker(){
   allExtras().forEach(x=>{ if(!cats.includes(x.cat)) cats.push(x.cat); });
   const selEx = pick.sel ? findEx(pick.sel) : null;
 
+  const today = dayKey(new Date());
+  const when = pick.when || today;
+  const past = when !== today;
+
   let html = '<div class="panel"><div class="pad">' +
     '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">' +
       '<div><p class="eyebrow">Aerobic &amp; open · no slot used</p>' +
-      '<h1 class="session-title">What are you doing?</h1></div>' +
+      '<h1 class="session-title">' + (past ? "What did you do?" : "What are you doing?") + '</h1></div>' +
       '<button class="mini" data-act="closePicker">Cancel</button>' +
     '</div>' +
-    '<p class="lede" style="margin-top:6px;margin-bottom:16px"><b>' + esc(sess.title) + '</b> stays next in the queue.</p>';
+    '<p class="lede" style="margin-top:6px;margin-bottom:14px"><b>' + esc(sess.title) + '</b> stays next in the queue.</p>' +
+    '<div class="whenrow">' +
+      '<span class="eyebrow" style="margin:0">When</span>' +
+      '<input type="date" class="pick" style="margin:0;width:auto" data-when value="' + when + '" max="' + today + '">' +
+      (past ? '<button class="mini" data-act="whenToday">Today</button>' : '') +
+    '</div>' +
+    (past ? '<div class="warn">Logging for ' + esc(keyDate(when).toLocaleDateString("en-GB", {weekday:"long", day:"numeric", month:"long"})) + '. Enter what you actually did.</div>' : '');
 
   cats.forEach(cat=>{
     html += '<p class="eyebrow">' + esc(cat) + '</p><div class="opt-grid">' +
@@ -1803,7 +1910,9 @@ function viewPicker(){
   if(!newExtra.open){
     html += '<div style="height:12px"></div>' +
       '<button class="btn" data-act="startPicked">' +
-        (selEx ? "Start " + esc(selEx.ex.name) : "Start without choosing") + '</button>';
+        (past
+          ? (selEx ? "Log " + esc(selEx.ex.name) : "Log this session")
+          : (selEx ? "Start " + esc(selEx.ex.name) : "Start without choosing")) + '</button>';
   }
 
   return html + '</div></div>';
@@ -1869,12 +1978,16 @@ function viewOpen(){
   if(!c.entries.length) addOpen = true;
   return storageWarn() +
     '<div class="panel"><div class="pad">' +
-      '<p class="eyebrow">Aerobic &amp; open session · in progress</p>' +
+      '<p class="eyebrow">' + (c.retro
+        ? "Logging " + esc(keyDate(c.retro).toLocaleDateString("en-GB", {weekday:"long", day:"numeric", month:"long"}))
+        : "Aerobic &amp; open session · in progress") + '</p>' +
       '<div style="display:flex;align-items:center;gap:11px;margin:6px 0 4px">' +
         (c.entries.length ? '<span style="color:var(--orange)">' + icon(iconFor(c.entries[0].exId), 30) + '</span>' : "") +
         '<h1 class="session-title" style="margin:0">' + esc(named || "Choose what you are doing") + '</h1>' +
       '</div>' +
-      '<p class="lede" style="margin-top:6px">Logged and tracked exactly like a programme session, but it does not use a slot — the next one on the rotation is still waiting for you.</p>' +
+      '<p class="lede" style="margin-top:6px">' + (c.retro
+        ? "Enter what you actually did. It will be filed on that date, not today."
+        : "Logged and tracked exactly like a programme session, but it does not use a slot — the next one on the rotation is still waiting for you.") + '</p>' +
     '</div></div>' +
     extrasPanel() +
     finishPanel();
@@ -2211,7 +2324,7 @@ function setVal(id, field, val){
 }
 
 document.addEventListener("click", e=>{
-  const t = e.target.closest("[data-tab],[data-act],[data-done],[data-nudge],[data-swap],[data-units],[data-bar],[data-rest],[data-diag],[data-rmx],[data-addset],[data-newtrack],[data-delcustom],[data-pick],[data-addpick],[data-day],[data-hopen],[data-hnudge],[data-haddset],[data-hrmset],[data-hrmex],[data-rot]");
+  const t = e.target.closest("[data-tab],[data-act],[data-done],[data-nudge],[data-swap],[data-units],[data-bar],[data-rest],[data-diag],[data-rmx],[data-addset],[data-newtrack],[data-delcustom],[data-pick],[data-addpick],[data-day],[data-hopen],[data-hnudge],[data-haddset],[data-hrmset],[data-hrmex],[data-rot],[data-newicon]");
   if(!t) return;
 
   if(t.dataset.diag){
@@ -2361,6 +2474,7 @@ document.addEventListener("click", e=>{
     return;
   }
 
+  if(t.dataset.newicon){ newExtra.icon = t.dataset.newicon; newExtra.showIcons = false; render(); return; }
   if(t.dataset.newtrack){ newExtra.track = t.dataset.newtrack; render(); return; }
 
   if(t.dataset.done){
@@ -2390,26 +2504,36 @@ document.addEventListener("click", e=>{
     return;
   }
   if(act === "toggleAdd"){ addOpen = !addOpen; newExtra.open = false; render(); return; }
-  if(act === "openPicker"){ pick = {open:true, sel:null}; newExtra.open = false; render(); return; }
-  if(act === "closePicker"){ pick = {open:false, sel:null}; newExtra.open = false; render(); return; }
+  if(act === "openPicker"){ pick = {open:true, sel:null, when:null}; newExtra.open = false; render(); return; }
+  if(act === "closePicker"){ pick = {open:false, sel:null, when:null}; newExtra.open = false; render(); return; }
   if(act === "startPicked"){
     const chosen = pick.sel;
-    pick = {open:false, sel:null};
-    startOpen();
+    const when = pick.when;
+    pick = {open:false, sel:null, when:null};
+    startOpen(when && when !== dayKey(new Date()) ? when : null);
     if(chosen) addExtraToSession(chosen);
     return;
   }
-  if(act === "openNew"){ newExtra = {open:true, name:"", track:"time"}; render(); return; }
-  if(act === "cancelNew"){ newExtra.open = false; render(); return; }
+  if(act === "whenToday"){ pick.when = null; render(); return; }
+  if(act === "openNew"){ newExtra = {open:true, name:"", track:"time", icon:null, showIcons:false}; render(); return; }
+  if(act === "cancelNew"){ newExtra.open = false; newExtra.showIcons = false; render(); return; }
+  if(act === "toggleIcons"){ newExtra.showIcons = !newExtra.showIcons; render(); return; }
   if(act === "saveNew"){
     const name = (newExtra.name || "").trim();
     if(!name){ alert("Give the exercise a name first."); return; }
     const id = "c-" + name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") + "-" + Date.now().toString(36).slice(-4);
-    S.custom.push({id:id, name:name, cat:"Yours", track:newExtra.track});
-    newExtra = {open:false, name:"", track:"time"};
+    S.custom.push({id:id, name:name, cat:"Yours", track:newExtra.track,
+                   icon: newExtra.icon || guessIcon(name, newExtra.track)});
+    newExtra = {open:false, name:"", track:"time", icon:null, showIcons:false};
     save();
     if(S.current) addExtraToSession(id); else { pick.sel = id; render(); }
     return;
+  }
+  if(act === "logPast"){
+    const d = new Date(); d.setDate(d.getDate() - 1);
+    pick = {open:true, sel:null, when:dayKey(d)};
+    histList = false; histIdx = null; newExtra.open = false;
+    render(); return;
   }
   if(act === "histList"){ histList = true; histDay = null; histIdx = null; previewOpen = false; render(); return; }
   if(act === "closeHist"){ histIdx = null; histList = false; histDay = null; render(); return; }
@@ -2462,13 +2586,31 @@ document.addEventListener("input", e=>{
     setVal(exId + ":" + si, field, t.value === "" ? "" : Number(t.value));
     save();
   }
+  if(t.hasAttribute("data-when")){ pick.when = t.value || null; render(); }
+  if(t.hasAttribute("data-hdate")){
+    const h = S.history[histIdx];
+    if(h && t.value){
+      const d = keyDate(t.value);
+      h.date = d.toISOString(); h.day = dayKey(d);
+      save(); render();
+    }
+    return;
+  }
   if(t.dataset.hin){
     const [field, ei, si] = t.dataset.hin.split(":");
     const set = S.history[histIdx].entries[Number(ei)].sets[Number(si)];
     set[field] = t.value === "" ? 0 : Number(t.value);
     save();
   }
-  if(t.dataset.new === "name"){ newExtra.name = t.value; }
+  if(t.dataset.new === "name"){
+    const before = newExtra.icon || guessIcon(newExtra.name, newExtra.track);
+    newExtra.name = t.value;
+    const after = newExtra.icon || guessIcon(newExtra.name, newExtra.track);
+    if(after !== before){
+      const host = document.querySelector(".newico");
+      if(host) host.innerHTML = icon(after, 24);
+    }
+  }
   if(t.hasAttribute("data-bar-in")){ S.bar = Number(t.value) || 0; save(); }
 });
 
