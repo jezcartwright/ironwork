@@ -171,6 +171,15 @@ h2.head{
 .ex-name .chev{
   display:inline-flex;margin-left:9px;vertical-align:-4px;color:var(--orange-deep);
 }
+.shots{display:flex;gap:10px;margin:14px 0 0;background:var(--paper-2);padding:12px;border-radius:11px}
+.shots.many{flex-wrap:wrap}
+.shots.many figure{flex:0 0 calc(33.333% - 7px)}
+.shots figure{flex:1;margin:0;min-width:0}
+.shots img{width:100%;height:auto;display:block}
+.shots figcaption{font-size:11px;color:var(--slate);text-align:center;margin-top:6px;line-height:1.35}
+.shots[data-failed] img{display:none}
+.shots[data-failed] figcaption{padding:18px 4px;background:var(--paper);border-radius:6px}
+
 .diag{display:flex;gap:10px;margin:14px 0 0;background:var(--paper-2);padding:12px;border-radius:2px}
 .diag figure{flex:1;margin:0;min-width:0}
 .diag svg{width:100%;height:auto;display:block}
@@ -432,6 +441,13 @@ button.tile:active{transform:translateY(2px)}
   display:flex;align-items:center;justify-content:center}
 .ico-opt.on{background:var(--orange);color:#FFFFFF}
 .whenrow{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.rpe{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin-top:8px}
+.rpe-c{aspect-ratio:1;border-radius:6px;background:var(--paper-2);color:var(--slate);
+  font-family:var(--mono);font-size:12px;font-weight:600;display:flex;
+  align-items:center;justify-content:center;padding:0}
+.rpe-c.on{background:var(--orange-pale);color:var(--orange-deep)}
+.rpe-c.tip{background:var(--orange);color:#FFFFFF}
+.rpe-c:active{transform:translateY(1px)}
 .whenrow input{font-family:var(--mono);font-size:14px}
 
 .pick{flex:1;min-width:0;margin-bottom:0}
@@ -445,6 +461,13 @@ button.tile:active{transform:translateY(2px)}
   display:flex;align-items:center;justify-content:center}
 .ico-opt.on{background:var(--orange);color:#FFFFFF}
 .whenrow{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.rpe{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin-top:8px}
+.rpe-c{aspect-ratio:1;border-radius:6px;background:var(--paper-2);color:var(--slate);
+  font-family:var(--mono);font-size:12px;font-weight:600;display:flex;
+  align-items:center;justify-content:center;padding:0}
+.rpe-c.on{background:var(--orange-pale);color:var(--orange-deep)}
+.rpe-c.tip{background:var(--orange);color:#FFFFFF}
+.rpe-c:active{transform:translateY(1px)}
 .whenrow input{font-family:var(--mono);font-size:14px}
 
 .pick{
@@ -883,9 +906,35 @@ const DIAG = {
 "farmers":"carry","thruster":"thruster","bb-complex":"deadlift","landmine-rot-press":"landmineRot"
 };
 
+const SHOT_CAPS = {"back-squat":["Standing tall, bar across the rear delts, safety arms visible below","Bottom position, hips level with the knee, chest proud, bar over midfoot"],"bb-bench":["Bar at arms length over the chest, shoulder blades pinned","Bar touching the chest, elbows tucked, safety arms just below"],"bb-ohp":["Bar at the collarbone, elbows under, glutes tight","Locked out overhead, head through, ribs down"],"conv-deadlift":["Set up at the bar, shins to the bar, lats set, hips high","Standing at lockout, hips through, shoulders back"],"weighted-pullup":["Dead hang, dumbbell between the feet","Chin over the bar"],"bb-rdl":["Standing tall, bar at the thigh, soft knees","Hips pushed back, bar grazing the shins, back flat"],"bb-row":["Hinged to 45 degrees, bar hanging at arms length","Bar at the lower ribs, elbows past the torso"],"bb-complex":["Romanian deadlift","Row","High pull","Press","Back squat"],"bb-curl":["Arms hanging, bar at the thigh","Bar at the shoulder, elbows still"],"hip-thrust":["Shoulders on the bench, hips low, bar across the hips","Hips locked out level, chin tucked, ribs down"],"reverse-lunge":["Standing tall, bar on the back","Rear knee just off the floor, front shin vertical"],"skullcrusher":["Bar at arms length over the shoulders","Bar at the forehead, elbows pointing up"],"static-split":["Split stance, both feet planted, bar on the back","Rear knee just off the floor"],"close-grip":["Bar at arms length, hands shoulder-width","Bar at the chest, elbows tucked to 30 degrees"],"deficit-deadlift":["Standing on a plate, set up at the bar","Standing at lockout"],"front-squat":["Standing, bar on the front delts, elbows high","Bottom position, torso upright, elbows still high"],"landmine-press":["Half kneeling, sleeve at the shoulder","Pressed up and slightly across, no side bend"],"incline-bb":["Bar at arms length, bench at 30 degrees","Bar touching the upper chest"],"landmine-rdl":["Standing, straddling the bar, both hands on the sleeve","Hinged, sleeve arcing down and back"],"landmine-rainbow":["Sleeve at arms length over one hip","Sleeve arced over to the opposite hip"],"landmine-rot-press":["Sleeve at the shoulder, hips square","Pressed across, hips rotated"],"landmine-squat":["Standing, bar end held at the chest, heels close","Full depth, torso upright"],"paused-squat":["Bottom position held, motionless","Standing, having driven up"],"paused-deadlift":["Bar paused just below the knee","Standing at lockout"],"rack-pull":["Bar resting on the safety arms just below the knee","Standing at lockout"],"landmine-row":["Staggered stance, free hand on the knee, arm extended","Sleeve at the hip, elbow tight to the ribs"],"standing-landmine":["Split stance, sleeve at the shoulder","Pressed up and across, trunk resisting rotation"],"bridge-march":["Bridged with the bar across the hips, both feet down","Bridged, one knee lifted"],"eccentric-pullup":["Top position, chin over the bar","Halfway down, controlled"],"hanging-knee":["Hanging from the bar, legs straight","Pelvis curled up, knees to the chest"],"hollow":["Lying flat, arms overhead","Hollow position held, lower back pressed down"],"neutral-chin":["Dead hang, parallel handles","Chin over the handles"],"pullup":["Dead hang, wide grip, arms straight","Chest to the bar, elbows down and back"],"weighted-chin":["Dead hang, parallel handles, dumbbell between the feet","Chin over the handles"],"pallof":["Standing side on, hands at the sternum, cable taut","Arms pressed straight out, trunk refusing to rotate"],"cable-curl":["Arms hanging, bar at the thigh, low pulley","Bar at the shoulder, constant cable tension"],"deadbug":["On the back, arms holding the cable overhead, knees up","Opposite arm and leg lowered, lower back flat"],"chop":["High pulley, arms long and up on one side","Finished outside the opposite hip, rotation through the hips"],"overhead-ext":["Rope behind the head, elbows high, leaning forward","Arms extended overhead"],"pull-through":["Hinged forward, rope between the legs, facing away","Standing tall, hips snapped through"],"pushdown":["Rope at chest height, elbows pinned to the ribs","Arms extended, rope spread at the bottom"],"hk-pallof":["Half kneeling, hands at the sternum","Arms pressed out, inside glute engaged"],"sa-pulldown":["Half kneeling, arm extended overhead, single handle","Handle at the shoulder, ribs stacked, no side bend"],"heavy-pulldown":["Arms extended overhead, slight lean back","Bar at the collarbone"],"cable-crunch":["Kneeling, rope at the ears, spine tall","Spine flexed down, hips still"],"lat-pulldown":["Arms extended overhead, knees pinned under the pad","Bar at the collarbone, elbows down and back"],"seated-cable-row":["Seated, arms extended, long spine","Handle at the navel, shoulder blades squeezed"],"cable-press":["Handles at the chest, split stance, pulleys behind","Arms extended forward, hands converging"],"bulgarian":["Standing in a split, rear foot on the bench","Bottom position, front shin vertical, rear knee low"],"cs-row":["Chest on the incline pad, arms hanging","Dumbbells at the ribs, elbows back"],"db-rdl":["Standing tall, one dumbbell per hand at the thigh","Hips back, dumbbells tracking down the front of the legs"],"db-bench":["Dumbbells at arms length over the elbows","Dumbbells at chest level, wrists neutral"],"db-curl":["Arms hanging, dumbbells at the thigh","Dumbbells at the shoulder, elbows still"],"farmers":["Standing tall, a dumbbell in each hand at the sides","Mid stride, posture unchanged, shoulders packed"],"floor-press":["Dumbbells at arms length, back on the floor","Triceps resting on the floor, brief pause"],"db-shoulder":["Dumbbells at shoulder height, back on the pad","Locked out overhead"],"step-up":["One foot planted on the bench, dumbbells at the sides","Standing on the bench, other leg lifted"],"thruster":["Front rack, bottom of the squat","Locked out overhead"],"sa-db-press":["Half kneeling, dumbbell at the shoulder","Locked out overhead, no side bend"],"hammer-curl":["Arms hanging, neutral grip","Dumbbells at the shoulder, grip still neutral"],"incline-db":["Dumbbells at arms length, bench at 30 degrees","Dumbbells at the upper chest"],"arnold":["Dumbbells at the chin, palms facing in","Locked out overhead, palms rotated forward"],"sl-rdl":["Standing on one leg, dumbbell in the opposite hand","Hinged forward, free leg extended back, hips square"],"sl-hip-thrust":["Shoulders on the bench, one foot planted, hips low","Hips locked out level, hips square"]};
+
+/* exercises delivered with more than two frames */
+const SHOT_FRAMES = {"bb-complex":5};
+
 const openDiag = {};
 
+function figureBuild(){ return S && S.figure === "f" ? "f" : "m"; }
+
+/* the illustrated set, falling back to the drawn diagram if a file is missing */
+function shots(exId){
+  const caps = SHOT_CAPS[exId];
+  if(!caps) return "";
+  const n = SHOT_FRAMES[exId] || 2;
+  const b = figureBuild();
+  let cells = "";
+  for(let i = 1; i <= n; i++){
+    cells += '<figure>' +
+      '<img src="diagrams/' + exId + '-' + i + '-' + b + '.png" loading="lazy" ' +
+        'alt="' + esc(caps[i-1] || "") + '" ' +
+        'onerror="this.closest(\'.shots\').dataset.failed=1">' +
+      '<figcaption>' + esc(caps[i-1] || "") + '</figcaption></figure>';
+  }
+  return '<div class="shots' + (n > 2 ? " many" : "") + '">' + cells + '</div>';
+}
+
 function diagram(exId){
+  const shot = shots(exId);
+  if(shot) return shot;
   const a = ARCH[DIAG[exId]];
   if(!a) return "";
   return '<div class="diag">' + a.f.map((fr, i)=>
@@ -905,7 +954,7 @@ let restTimer = null, restLeft = 0, restLabel = "";
 
 function blankState(){
   return {
-    v:1, units:"kg", bar:20,
+    v:1, units:"kg", bar:20, figure:"m",
     sessionIndex:0,
     nudge:{},          // slotId -> manual variant offset
     custom:[],         // exercises you have added yourself
@@ -1340,6 +1389,38 @@ function extrasTally(){
 
 
 /* ---------- history: list ---------- */
+function effortWord(n){
+  return n <= 2 ? "Very easy" : n <= 4 ? "Easy" : n <= 6 ? "Moderate"
+       : n <= 8 ? "Hard" : "All out";
+}
+
+/* the record the effort and duration controls are editing */
+function targetRec(){ return summaryRec || (histIdx !== null ? S.history[histIdx] : null); }
+
+function effortBlock(rec){
+  const e = rec.effort || 0;
+  let cells = "";
+  for(let n = 1; n <= 10; n++){
+    cells += '<button class="rpe-c' + (n <= e ? " on" : "") + (n === e ? " tip" : "") +
+      '" data-effort="' + n + '" aria-label="Effort ' + n + ' out of 10">' + n + '</button>';
+  }
+  return '<p class="eyebrow">How hard was it</p>' +
+    '<div class="rpe">' + cells + '</div>' +
+    '<p class="lede" style="font-size:13px;margin-top:7px">' +
+      (e ? '<b>' + e + '/10</b> · ' + esc(effortWord(e)) + (rec.effort ? ' <button class="mini" data-act="clearEffort">Clear</button>' : '')
+         : 'Not recorded. Tap a number — you can do this days later.') + '</p>';
+}
+
+function durationBlock(rec){
+  return '<p class="eyebrow" style="margin-top:16px">How long it took</p>' +
+    '<div class="field" style="width:150px">' +
+      '<button class="step" data-mins="-1" aria-label="Less">−</button>' +
+      '<input type="number" inputmode="numeric" data-minsin value="' + (rec.minutes || 0) + '" aria-label="Minutes">' +
+      '<span class="unit">min</span>' +
+      '<button class="step" data-mins="1" aria-label="More">+</button>' +
+    '</div>';
+}
+
 function sessionTitle(h){
   if(h.open) return h.title || "Open session";
   const sess = SESSIONS.find(x => x.key === h.key);
@@ -1375,7 +1456,8 @@ function viewHistList(){
           icon(r.h.open && r.h.entries[0] ? iconFor(r.h.entries[0].exId) : "barbell", 18) + '</span>' +
         '<span style="flex:1;min-width:0">' +
           '<b>' + esc(sessionTitle(r.h)) + (r.h.open ? ' <span class="tag-open">open</span>' : '') + '</b>' +
-          '<span>' + recDateLabel(r.h) + ' · ' + sets + ' sets · ' + (r.h.minutes || 0) + ' min</span>' +
+          '<span>' + recDateLabel(r.h) + ' · ' + sets + ' sets · ' + (r.h.minutes || 0) + ' min' +
+          (r.h.effort ? ' · ' + r.h.effort + '/10' : '') + '</span>' +
         '</span>' +
         '<span class="chev-r">›</span></button>';
     });
@@ -1423,13 +1505,14 @@ function viewHistory(){
     '<div class="meta">' +
       '<div><span class="n">' + (h.minutes || 0) + '<span style="font-size:12px">min</span></span><span class="l">Elapsed</span></div>' +
       '<div><span class="n">' + sets + '</span><span class="l">Sets</span></div>' +
-      '<div><span class="n">' + Math.round(vol) + '</span><span class="l">Volume ' + S.units + '</span></div>' +
+      '<div><span class="n">' + (h.effort ? h.effort + '<span style="font-size:12px">/10</span>' : '—') + '</span><span class="l">Effort</span></div>' +
     '</div>' +
     '<div class="whenrow" style="margin-top:14px">' +
       '<span class="eyebrow" style="margin:0">Date</span>' +
       '<input type="date" class="pick" style="margin:0;width:auto" data-hdate value="' + esc(recDay(h)) + '" max="' + dayKey(new Date()) + '">' +
     '</div>' +
-    '<p class="lede" style="margin-top:12px">Corrections save straight away and feed back into what the app suggests next time.</p>' +
+    '<hr class="rule">' + effortBlock(h) + durationBlock(h) +
+    '<p class="lede" style="margin-top:14px">Corrections save straight away and feed back into what the app suggests next time.</p>' +
   '</div></div>';
 
   h.entries.forEach((entry, ei)=>{
@@ -1447,6 +1530,40 @@ function viewHistory(){
       '<div style="margin-top:10px"><button class="mini" data-haddset="' + ei + '">Add a set</button></div>' +
     '</div></div>';
   });
+
+  const have = h.entries.map(e => e.exId);
+  html += '<div class="panel"><div class="pad">' +
+    '<button class="add-big' + (histAdd ? " on" : "") + '" data-act="toggleHistAdd">' +
+      '<svg viewBox="0 0 24 24" style="width:22px;height:22px;flex:0 0 22px" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" aria-hidden="true">' +
+        (histAdd ? '<path d="M5 12h14"/>' : '<path d="M12 5v14M5 12h14"/>') + '</svg>' +
+      '<span style="flex:1">' + (histAdd ? "Close" : "Add an exercise") + '</span>' +
+    '</button>';
+
+  if(histAdd){
+    html += '<hr class="rule"><p class="lede" style="margin-bottom:14px">Something you did but did not log at the time.</p>';
+    if(!h.open){
+      const sess = SESSIONS.find(x => x.key === h.key);
+      const missing = [];
+      if(sess) sess.blocks.forEach(b => b.items.forEach(it=>{
+        const ex = variantFor(it.slot, h.index);
+        if(!have.includes(ex.id)) missing.push({ex:ex, slot:it.slot});
+      }));
+      if(missing.length){
+        html += '<p class="eyebrow">From ' + esc(sessionTitle(h)) + '</p><div class="opt-grid">' +
+          missing.map(x=>'<button class="opt" data-hadd="' + x.ex.id + '">' +
+            icon(iconFor(x.ex.id), 26) + '<b>' + esc(x.ex.name) + '</b></button>').join("") + '</div>';
+      }
+    }
+    const cats = [];
+    allExtras().forEach(x=>{ if(!cats.includes(x.cat)) cats.push(x.cat); });
+    cats.forEach(cat=>{
+      html += '<p class="eyebrow">' + esc(cat) + '</p><div class="opt-grid">' +
+        allExtras().filter(x => x.cat === cat).map(x=>
+          '<button class="opt' + (have.includes(x.id) ? " used" : "") + '" data-hadd="' + x.id + '">' +
+            icon(iconFor(x.id), 26) + '<b>' + esc(x.name) + '</b></button>').join("") + '</div>';
+    });
+  }
+  html += '</div></div>';
 
   html += '<div class="panel"><div class="pad">' +
     '<button class="btn btn-quiet" data-act="closeHist">Done</button>' +
@@ -1560,6 +1677,21 @@ function viewHome(){
         '<span>A run, ride, intervals or mobility. Does not use a slot — ' + esc(sess.title) + ' stays next.</span></span>' +
       '</button>' +
     '</div></div>';
+
+  /* ---- anything waiting to be filled in ---- */
+  const unrated = S.history.filter(h => !h.effort && daysSinceKey(recDay(h)) <= 7);
+  if(unrated.length){
+    const one = unrated[unrated.length - 1];
+    const idx = S.history.indexOf(one);
+    html += '<div class="panel"><div class="pad">' +
+      '<p class="eyebrow">Still to fill in</p>' +
+      '<p class="lede" style="margin-bottom:12px">' +
+        (unrated.length === 1
+          ? esc(sessionTitle(one)) + ' on ' + esc(recDateLabel(one)) + ' has no effort recorded.'
+          : unrated.length + ' recent sessions have no effort recorded.') + '</p>' +
+      '<button class="btn btn-quiet" data-hopen="' + idx + '">Add it to ' + esc(sessionTitle(one)) + '</button>' +
+    '</div></div>';
+  }
 
   /* ---- rhythm ---- */
   const cad = cadence(28);
@@ -1838,6 +1970,7 @@ let histDay = null;    // filter the list to one day
 let histList = false;
 let previewOpen = false;
 let previewIdx = null;   // which session index the preview is showing
+let histAdd = false;     // adding an exercise to a past session
 
 function newExtraForm(){
   if(!newExtra.open){
@@ -2103,6 +2236,7 @@ function viewSummary(){
       '<div><span class="n">' + sets + '</span><span class="l">Sets</span></div>' +
       '<div><span class="n">' + Math.round(vol) + '</span><span class="l">Volume ' + S.units + '</span></div>' +
     '</div>' +
+    '<hr class="rule">' + effortBlock(rec) + durationBlock(rec) +
     (cardio.length ? '<hr class="rule"><p class="eyebrow">Also logged</p>' +
       cardio.map(e=>{
         const f = findEx(e.exId);
@@ -2201,7 +2335,8 @@ function viewProgress(){
     return '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--paper-2);font-size:13px">' +
       '<span>' + esc(label) + (h.open ? ' <span style="font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--slate)">open</span>' : "") + '</span>' +
       '<span style="font-family:var(--mono);font-size:12px;color:var(--slate)">' +
-        d.toLocaleDateString("en-GB", {day:"numeric", month:"short"}) + ' · ' + h.minutes + ' min</span></div>';
+        d.toLocaleDateString("en-GB", {day:"numeric", month:"short"}) + ' · ' + h.minutes + ' min' +
+        (h.effort ? ' · ' + h.effort + '/10' : '') + '</span></div>';
   }).join("");
 
   return '<div class="panel"><div class="pad">' +
@@ -2291,6 +2426,9 @@ function viewSettings(){
     '<div class="setting"><label>Units<span class="hint">Relabels the app — it does not convert loads already logged</span></label>' +
       '<div class="seg"><button data-units="kg" class="' + (S.units==="kg"?"on":"") + '">kg</button>' +
       '<button data-units="lb" class="' + (S.units==="lb"?"on":"") + '">lb</button></div></div>' +
+    '<div class="setting"><label>Figure in the diagrams<span class="hint">Which build the exercise illustrations use</span></label>' +
+      '<div class="seg"><button data-figure="m" class="' + (figureBuild()==="m"?"on":"") + '">Male</button>' +
+      '<button data-figure="f" class="' + (figureBuild()==="f"?"on":"") + '">Female</button></div></div>' +
     '<div class="setting"><label>Bar weight<span class="hint">Log total load including the bar</span></label>' +
       '<div class="field" style="width:130px">' +
         '<button class="step" data-bar="-1">−</button>' +
@@ -2324,7 +2462,7 @@ function setVal(id, field, val){
 }
 
 document.addEventListener("click", e=>{
-  const t = e.target.closest("[data-tab],[data-act],[data-done],[data-nudge],[data-swap],[data-units],[data-bar],[data-rest],[data-diag],[data-rmx],[data-addset],[data-newtrack],[data-delcustom],[data-pick],[data-addpick],[data-day],[data-hopen],[data-hnudge],[data-haddset],[data-hrmset],[data-hrmex],[data-rot],[data-newicon]");
+  const t = e.target.closest("[data-tab],[data-act],[data-done],[data-nudge],[data-swap],[data-units],[data-bar],[data-rest],[data-diag],[data-rmx],[data-addset],[data-newtrack],[data-delcustom],[data-pick],[data-addpick],[data-day],[data-hopen],[data-hnudge],[data-haddset],[data-hrmset],[data-hrmex],[data-rot],[data-newicon],[data-effort],[data-mins],[data-hadd],[data-figure]");
   if(!t) return;
 
   if(t.dataset.diag){
@@ -2405,6 +2543,25 @@ document.addEventListener("click", e=>{
 
   if(t.dataset.pick){ pick.sel = (pick.sel === t.dataset.pick ? null : t.dataset.pick); render(); return; }
 
+  if(t.dataset.effort){
+    const rec = targetRec();
+    if(rec){
+      const n = Number(t.dataset.effort);
+      rec.effort = (rec.effort === n) ? null : n;
+      save(); render();
+    }
+    return;
+  }
+
+  if(t.dataset.mins){
+    const rec = targetRec();
+    if(rec){
+      rec.minutes = Math.max(0, (Number(rec.minutes) || 0) + Number(t.dataset.mins));
+      save(); render();
+    }
+    return;
+  }
+
   if(t.dataset.rot){
     previewIdx = Number(t.dataset.rot); previewOpen = true;
     histIdx = null; histList = false; render(); return;
@@ -2419,8 +2576,25 @@ document.addEventListener("click", e=>{
     previewOpen = false; render(); return;
   }
 
+  if(t.dataset.hadd){
+    const h = S.history[histIdx];
+    const exId = t.dataset.hadd;
+    if(h && !h.entries.some(e => e.exId === exId)){
+      const f = findEx(exId);
+      const cfg = TRACK[f.track];
+      h.entries.push({
+        slot: f.slot || null, exId: exId, track: f.track,
+        extra: !f.slot, name: f.ex.name,
+        sets: [{w: f.track === "load" ? 0 : cfg.aDef, r: cfg.bDef, done:true}]
+      });
+      histAdd = false;
+      save(); render();
+    }
+    return;
+  }
+
   if(t.dataset.hopen !== undefined){
-    histIdx = Number(t.dataset.hopen); histList = false; render(); return;
+    histIdx = Number(t.dataset.hopen); histList = false; histAdd = false; render(); return;
   }
 
   if(t.dataset.hnudge){
@@ -2494,6 +2668,7 @@ document.addEventListener("click", e=>{
     save(); render(); return;
   }
 
+  if(t.dataset.figure){ S.figure = t.dataset.figure; save(); render(); return; }
   if(t.dataset.units){ S.units = t.dataset.units; save(); render(); return; }
   if(t.dataset.bar){ S.bar = Math.max(0, S.bar + Number(t.dataset.bar) * 2.5); save(); render(); return; }
 
@@ -2529,6 +2704,11 @@ document.addEventListener("click", e=>{
     if(S.current) addExtraToSession(id); else { pick.sel = id; render(); }
     return;
   }
+  if(act === "clearEffort"){
+    const rec = targetRec();
+    if(rec){ rec.effort = null; save(); render(); }
+    return;
+  }
   if(act === "logPast"){
     const d = new Date(); d.setDate(d.getDate() - 1);
     pick = {open:true, sel:null, when:dayKey(d)};
@@ -2536,7 +2716,8 @@ document.addEventListener("click", e=>{
     render(); return;
   }
   if(act === "histList"){ histList = true; histDay = null; histIdx = null; previewOpen = false; render(); return; }
-  if(act === "closeHist"){ histIdx = null; histList = false; histDay = null; render(); return; }
+  if(act === "toggleHistAdd"){ histAdd = !histAdd; render(); return; }
+  if(act === "closeHist"){ histIdx = null; histList = false; histDay = null; histAdd = false; render(); return; }
   if(act === "delSession"){
     const h = S.history[histIdx];
     if(h && confirm("Delete " + sessionTitle(h) + " from " + niceDate(h.date) + "? This cannot be undone.")){
@@ -2587,6 +2768,10 @@ document.addEventListener("input", e=>{
     save();
   }
   if(t.hasAttribute("data-when")){ pick.when = t.value || null; render(); }
+  if(t.hasAttribute("data-minsin")){
+    const rec = targetRec();
+    if(rec){ rec.minutes = Math.max(0, Number(t.value) || 0); save(); }
+  }
   if(t.hasAttribute("data-hdate")){
     const h = S.history[histIdx];
     if(h && t.value){
