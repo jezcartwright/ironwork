@@ -441,6 +441,28 @@ button.tile:active{transform:translateY(2px)}
   display:flex;align-items:center;justify-content:center}
 .ico-opt.on{background:var(--orange);color:#FFFFFF}
 .whenrow{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.derived{font-family:var(--mono);font-size:12px;color:var(--orange-deep);
+  background:var(--orange-pale);border-radius:6px;padding:6px 10px;margin-top:8px;display:inline-block}
+.tags .tag{cursor:pointer}
+.hits{border:1px solid var(--rule);border-radius:8px;overflow:hidden;margin-bottom:10px}
+.hit{display:block;width:100%;text-align:left;padding:10px 11px;border-bottom:1px solid var(--paper-2);color:var(--ink)}
+.hit:last-child{border-bottom:0}
+.hit b{display:block;font-size:14px;font-weight:500}
+.hit span{font-family:var(--mono);font-size:11px;color:var(--slate)}
+.hit:active{background:var(--paper-2)}
+.chosen{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  background:var(--paper-2);border-radius:8px;padding:11px}
+.chosen b{font-size:15px;font-weight:600}
+.tees{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
+.tee-b{padding:10px;border-radius:9px;background:var(--paper-2);text-align:left;color:var(--ink)}
+.tee-b.on{background:var(--orange);color:#FFFFFF}
+.tee-b b{display:block;font-size:13px;font-weight:600}
+.tee-b span{font-family:var(--mono);font-size:10px;color:var(--slate)}
+.tee-b.on span{color:var(--orange-pale)}
+.prof-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:12px}
+.prof{padding:11px 8px;border-radius:9px;background:var(--paper-2);color:var(--ink);font-size:13px}
+.prof.on{background:var(--orange);color:#FFFFFF}
+
 .rpe{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin-top:8px}
 .rpe-c{aspect-ratio:1;border-radius:6px;background:var(--paper-2);color:var(--slate);
   font-family:var(--mono);font-size:12px;font-weight:600;display:flex;
@@ -461,6 +483,31 @@ button.tile:active{transform:translateY(2px)}
   display:flex;align-items:center;justify-content:center}
 .ico-opt.on{background:var(--orange);color:#FFFFFF}
 .whenrow{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.derived{font-family:var(--mono);font-size:12px;color:var(--orange-deep);
+  background:var(--orange-pale);border-radius:6px;padding:6px 10px;margin-top:8px;display:inline-block}
+.feel{display:flex;gap:6px}
+.feel-b{flex:1;padding:11px 4px;border-radius:9px;background:var(--paper-2);color:var(--slate);font-size:13px}
+.feel-b.on{background:var(--orange);color:#FFFFFF}
+.tags .tag{cursor:pointer}
+.hits{border:1px solid var(--rule);border-radius:8px;overflow:hidden;margin-bottom:10px}
+.hit{display:block;width:100%;text-align:left;padding:10px 11px;border-bottom:1px solid var(--paper-2);color:var(--ink)}
+.hit:last-child{border-bottom:0}
+.hit b{display:block;font-size:14px;font-weight:500}
+.hit span{font-family:var(--mono);font-size:11px;color:var(--slate)}
+.hit:active{background:var(--paper-2)}
+.chosen{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  background:var(--paper-2);border-radius:8px;padding:11px}
+.chosen b{font-size:15px;font-weight:600}
+.tees{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
+.tee-b{padding:10px;border-radius:9px;background:var(--paper-2);text-align:left;color:var(--ink)}
+.tee-b.on{background:var(--orange);color:#FFFFFF}
+.tee-b b{display:block;font-size:13px;font-weight:600}
+.tee-b span{font-family:var(--mono);font-size:10px;color:var(--slate)}
+.tee-b.on span{color:var(--orange-pale)}
+.prof-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:12px}
+.prof{padding:11px 8px;border-radius:9px;background:var(--paper-2);color:var(--ink);font-size:13px}
+.prof.on{background:var(--orange);color:#FFFFFF}
+
 .rpe{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin-top:8px}
 .rpe-c{aspect-ratio:1;border-radius:6px;background:var(--paper-2);color:var(--slate);
   font-family:var(--mono);font-size:12px;font-weight:600;display:flex;
@@ -710,43 +757,88 @@ const DELOAD_EVERY = 16;  // sessions between deloads
    time = minutes × effort, distance = distance × minutes.
    ============================================================ */
 const EXTRAS = [
-  {id:"x-run",     name:"Run",                    cat:"Aerobic — steady",   track:"distance"},
-  {id:"x-cycle",   name:"Cycling",                cat:"Aerobic — steady",   track:"distance"},
-  {id:"x-row-erg", name:"Rowing machine",         cat:"Aerobic — steady",   track:"distance"},
-  {id:"x-swim",    name:"Swim",                   cat:"Aerobic — steady",   track:"distance"},
-  {id:"x-walk",    name:"Brisk or incline walk",  cat:"Aerobic — steady",   track:"time"},
-  {id:"x-skip",    name:"Skipping",               cat:"Aerobic — steady",   track:"time"},
+  {id:"x-run",     name:"Run",                    cat:"Aerobic — steady",   profile:"distance"},
+  {id:"x-cycle",   name:"Cycling",                cat:"Aerobic — steady",   profile:"distance"},
+  {id:"x-row-erg", name:"Rowing machine",         cat:"Aerobic — steady",   profile:"distance"},
+  {id:"x-swim",    name:"Swim",                   cat:"Aerobic — steady",   profile:"distance"},
+  {id:"x-walk",    name:"Brisk or incline walk",  cat:"Aerobic — steady",   profile:"distance"},
+  {id:"x-skip",    name:"Skipping",               cat:"Aerobic — steady",   profile:"duration"},
 
-  {id:"x-intervals", name:"Bike or rower intervals", cat:"Aerobic — intervals", track:"time"},
-  {id:"x-hill",      name:"Hill sprints",            cat:"Aerobic — intervals", track:"time"},
-  {id:"x-shuttle",   name:"Shuttle runs",            cat:"Aerobic — intervals", track:"time"},
-  {id:"x-stairs",    name:"Stair climbing",          cat:"Aerobic — intervals", track:"time"},
+  {id:"x-intervals", name:"Bike or rower intervals", cat:"Aerobic — intervals", profile:"intervals"},
+  {id:"x-hill",      name:"Hill sprints",            cat:"Aerobic — intervals", profile:"intervals"},
+  {id:"x-shuttle",   name:"Shuttle runs",            cat:"Aerobic — intervals", profile:"intervals"},
+  {id:"x-stairs",    name:"Stair climbing",          cat:"Aerobic — intervals", profile:"duration"},
 
-  {id:"x-burpee",     name:"Burpees",            cat:"Conditioning", track:"time"},
-  {id:"x-mtn",        name:"Mountain climbers",  cat:"Conditioning", track:"time"},
-  {id:"x-bw-circuit", name:"Bodyweight circuit", cat:"Conditioning", track:"time"},
-  {id:"x-battle",     name:"Sled, bag or bike finisher", cat:"Conditioning", track:"time"},
+  {id:"x-burpee",     name:"Burpees",            cat:"Conditioning", profile:"intervals"},
+  {id:"x-mtn",        name:"Mountain climbers",  cat:"Conditioning", profile:"duration"},
+  {id:"x-bw-circuit", name:"Bodyweight circuit", cat:"Conditioning", profile:"intervals"},
+  {id:"x-battle",     name:"Sled, bag or bike finisher", cat:"Conditioning", profile:"duration"},
 
-  {id:"x-calf",      name:"Calf raise",       cat:"Strength extras", track:"load"},
-  {id:"x-shrug",     name:"Barbell shrug",    cat:"Strength extras", track:"load"},
-  {id:"x-lateral",   name:"Lateral raise",    cat:"Strength extras", track:"load"},
-  {id:"x-facepull",  name:"Cable face pull",  cat:"Strength extras", track:"load"},
-  {id:"x-rear-fly",  name:"Rear delt fly",    cat:"Strength extras", track:"load"},
-  {id:"x-deadhang",  name:"Dead hang",        cat:"Strength extras", track:"time"},
-  {id:"x-plank",     name:"Plank",            cat:"Strength extras", track:"time"},
-  {id:"x-side-plank",name:"Side plank",       cat:"Strength extras", track:"time"},
+  {id:"x-golf",    name:"Golf",             cat:"Sport", profile:"golf"},
+  {id:"x-tennis",  name:"Tennis or padel",  cat:"Sport", profile:"sport"},
+  {id:"x-football",name:"Football",         cat:"Sport", profile:"sport"},
+  {id:"x-ski",     name:"Skiing",           cat:"Sport", profile:"sport"},
 
-  {id:"x-mobility", name:"Mobility flow",      cat:"Mobility & recovery", track:"time"},
-  {id:"x-hip-flow", name:"Hip mobility",       cat:"Mobility & recovery", track:"time"},
-  {id:"x-thoracic", name:"Thoracic mobility",  cat:"Mobility & recovery", track:"time"},
-  {id:"x-stretch",  name:"Stretch session",    cat:"Mobility & recovery", track:"time"},
-  {id:"x-yoga",     name:"Yoga",               cat:"Mobility & recovery", track:"time"}
+  {id:"x-calf",      name:"Calf raise",       cat:"Strength extras", profile:"strength"},
+  {id:"x-shrug",     name:"Barbell shrug",    cat:"Strength extras", profile:"strength"},
+  {id:"x-lateral",   name:"Lateral raise",    cat:"Strength extras", profile:"strength"},
+  {id:"x-facepull",  name:"Cable face pull",  cat:"Strength extras", profile:"strength"},
+  {id:"x-rear-fly",  name:"Rear delt fly",    cat:"Strength extras", profile:"strength"},
+  {id:"x-deadhang",  name:"Dead hang",        cat:"Strength extras", profile:"duration"},
+  {id:"x-plank",     name:"Plank",            cat:"Strength extras", profile:"duration"},
+  {id:"x-side-plank",name:"Side plank",       cat:"Strength extras", profile:"duration"},
+
+  {id:"x-mobility", name:"Mobility flow",      cat:"Mobility & recovery", profile:"duration"},
+  {id:"x-hip-flow", name:"Hip mobility",       cat:"Mobility & recovery", profile:"duration"},
+  {id:"x-thoracic", name:"Thoracic mobility",  cat:"Mobility & recovery", profile:"duration"},
+  {id:"x-stretch",  name:"Stretch session",    cat:"Mobility & recovery", profile:"duration"},
+  {id:"x-yoga",     name:"Yoga",               cat:"Mobility & recovery", profile:"duration"}
 ];
 
+/* Each profile decides what a set looks like and what extra detail is worth
+   keeping. Only what you would actually look back at. */
+const PROFILES = {
+  distance:{
+    label:"Distance & time", setLabel:"leg",
+    a:{unit:()=>S.units === "lb" ? "mi" : "km", step:0.1, def:5},
+    b:{unit:()=>"min", step:1, def:30},
+    pace:true, where:"Where", feel:["Hard","OK","Good"]
+  },
+  duration:{
+    label:"Time", setLabel:"block",
+    a:{unit:()=>"min", step:1, def:20},
+    where:"Where", feel:["Hard","OK","Good"]
+  },
+  intervals:{
+    label:"Rounds & time", setLabel:"block",
+    a:{unit:()=>"rounds", step:1, def:8},
+    b:{unit:()=>"min", step:1, def:20},
+    where:"Where", feel:["Hard","OK","Good"]
+  },
+  sport:{
+    label:"Time played", setLabel:"session",
+    a:{unit:()=>"min", step:5, def:60},
+    where:"Where", feel:["Badly","OK","Well"]
+  },
+  golf:{
+    label:"Round of golf", golf:true, feel:["Badly","OK","Well"]
+  },
+  strength:{
+    label:"Weight & reps", setLabel:"set",
+    a:{unit:()=>S.units, step:null, def:0},
+    b:{unit:()=>"reps", step:1, def:10}
+  }
+};
+
+/* history written before profiles existed used three fixed tracks */
+const TRACK_TO_PROFILE = {load:"strength", time:"duration", distance:"distance"};
+function profileOf(x){
+  return x.profile || TRACK_TO_PROFILE[x.track] || "duration";
+}
+
+/* kept so older records still render */
 const TRACK = {
-  load:     {a:()=>S.units, b:"rep", aStep:null, bStep:1, aDef:0,  bDef:10, label:"Weight and reps"},
-  time:     {a:()=>"min",   b:"RPE", aStep:1,    bStep:1, aDef:20, bDef:6, bMax:10, label:"Time and effort"},
-  distance: {a:()=>"km",    b:"min", aStep:0.5,  bStep:1, aDef:5,  bDef:30, label:"Distance and time"}
+  load:{label:"Weight and reps"}, time:{label:"Time and effort"}, distance:{label:"Distance and time"}
 };
 
 function allExtras(){ return EXTRAS.concat(S.custom || []); }
@@ -755,10 +847,10 @@ function allExtras(){ return EXTRAS.concat(S.custom || []); }
 function findEx(exId){
   for(const k in SLOTS){
     const f = SLOTS[k].pool.find(x => x.id === exId);
-    if(f) return {ex:f, label:SLOTS[k].label, track:"load", slot:k};
+    if(f) return {ex:f, label:SLOTS[k].label, track:"load", profile:"strength", slot:k};
   }
   const e = allExtras().find(x => x.id === exId);
-  if(e) return {ex:e, label:e.cat, track:e.track};
+  if(e) return {ex:e, label:e.cat, track:e.track, profile:profileOf(e)};
   return null;
 }
 
@@ -954,7 +1046,7 @@ let restTimer = null, restLeft = 0, restLabel = "";
 
 function blankState(){
   return {
-    v:1, units:"kg", bar:20, figure:"m",
+    v:1, units:"kg", bar:20, figure:"m", courses:[],
     sessionIndex:0,
     nudge:{},          // slotId -> manual variant offset
     custom:[],         // exercises you have added yourself
@@ -1209,7 +1301,8 @@ function startOpen(when){
 
 function finishSession(){
   const c = S.current;
-  const done = c.entries.reduce((n,e)=> n + e.sets.filter(s=>s.done).length, 0);
+  const done = c.entries.reduce((n,e)=> n + e.sets.filter(s=>s.done).length, 0)
+    + c.entries.filter(e => e.meta && (e.meta.score || e.meta.course)).length;
   if(done === 0){
     if(!confirm("No sets logged. Discard this session?")) return;
     S.current = null; save(); render(); return;
@@ -1226,10 +1319,16 @@ function finishSession(){
           ? e.sets.reduce((m,x)=> m + (e.track === "time" ? x.w : x.r), 0) : 0), 0)
       : Math.round((Date.now() - c.startedAt) / 60000),
     entries: c.entries.map(e=>({
-      slot:e.slot, exId:e.exId, track:e.track || "load", extra:!!e.extra, name:e.name,
+      slot:e.slot, exId:e.exId, track:e.track || "load", profile:entryProfile(e), extra:!!e.extra, name:e.name, meta:e.meta || {},
       sets:e.sets.filter(s=>s.done).map(s=>({w:Number(s.w)||0, r:Number(s.r)||0, done:true}))
-    })).filter(e=>e.sets.length)
+    })).filter(e => e.sets.length || (e.meta && (e.meta.score || e.meta.course)))
   };
+  /* any golf course played is remembered, however it was entered */
+  rec.entries.forEach(e=>{
+    const m = e.meta;
+    if(m && m.course) rememberCourse({name:m.course, tees:m.tees || []});
+  });
+
   S.history.push(rec);
   addOpen = false;
   if(!c.open) S.sessionIndex = c.index + 1;
@@ -1395,6 +1494,13 @@ function effortWord(n){
 }
 
 /* the record the effort and duration controls are editing */
+function ctxEntry(ctx){
+  const bits = String(ctx).split(":");
+  if(bits[0] === "cur" && S.current) return S.current.entries.find(e => e.exId === bits.slice(1).join(":"));
+  if(bits[0] === "hist" && histIdx !== null) return S.history[histIdx].entries[Number(bits[1])];
+  return null;
+}
+
 function targetRec(){ return summaryRec || (histIdx !== null ? S.history[histIdx] : null); }
 
 function effortBlock(rec){
@@ -1419,6 +1525,21 @@ function durationBlock(rec){
       '<span class="unit">min</span>' +
       '<button class="step" data-mins="1" aria-label="More">+</button>' +
     '</div>';
+}
+
+function entryLine(e){
+  const P = PROFILES[entryProfile(e)] || PROFILES.duration;
+  const m = e.meta || {};
+  if(P.golf){
+    const par = golfPar(m);
+    return (m.score ? m.score + (par ? " (" + vsPar(m.score, par) + ")" : "") : "round") +
+      (m.course ? " · " + m.course : "");
+  }
+  const a = e.sets.reduce((n,x)=> n + (Number(x.w)||0), 0);
+  const b = e.sets.reduce((n,x)=> n + (Number(x.r)||0), 0);
+  if(P.pace) return fmt(Math.round(a*10)/10) + " " + P.a.unit() + " in " + fmt(b) + " min · " + paceOf(e);
+  if(entryProfile(e) === "strength") return e.sets.length + " sets";
+  return fmt(a) + " " + P.a.unit();
 }
 
 function sessionTitle(h){
@@ -1456,7 +1577,9 @@ function viewHistList(){
           icon(r.h.open && r.h.entries[0] ? iconFor(r.h.entries[0].exId) : "barbell", 18) + '</span>' +
         '<span style="flex:1;min-width:0">' +
           '<b>' + esc(sessionTitle(r.h)) + (r.h.open ? ' <span class="tag-open">open</span>' : '') + '</b>' +
-          '<span>' + recDateLabel(r.h) + ' · ' + sets + ' sets · ' + (r.h.minutes || 0) + ' min' +
+          '<span>' + recDateLabel(r.h) +
+          (r.h.open && r.h.entries[0] ? ' · ' + esc(entryLine(r.h.entries[0]))
+            : ' · ' + sets + ' sets · ' + (r.h.minutes || 0) + ' min') +
           (r.h.effort ? ' · ' + r.h.effort + '/10' : '') + '</span>' +
         '</span>' +
         '<span class="chev-r">›</span></button>';
@@ -1467,25 +1590,30 @@ function viewHistList(){
 
 /* ---------- history: one session, editable ---------- */
 function histRows(ei, entry){
-  const cfg = TRACK[entry.track || "load"];
-  const aUnit = cfg.a(), bUnit = cfg.b;
-  return entry.sets.map((st, si)=>
+  const P = PROFILES[entryProfile(entry)] || PROFILES.duration;
+  if(P.golf) return "";
+  const f = findEx(entry.exId);
+  const exKind = (f && f.ex && f.ex.kind) ? f.ex.kind : null;
+  const cell = (kind, si, val, cfg)=>{
+    return '<div class="field grow">' +
+      '<button class="step" data-hnudge="' + kind + ':-1:' + ei + ':' + si + '" aria-label="Less">−</button>' +
+      '<input type="number" inputmode="decimal" data-hin="' + kind + ':' + ei + ':' + si + '" value="' + val + '" aria-label="' + cfg.unit() + '">' +
+      '<span class="unit">' + cfg.unit() + '</span>' +
+      '<button class="step" data-hnudge="' + kind + ':1:' + ei + ':' + si + '" aria-label="More">+</button>' +
+    '</div>';
+  };
+  let out = entry.sets.map((st, si)=>
     '<div class="set">' +
       '<span class="set-n">' + (si + 1) + '</span>' +
-      '<div class="field grow">' +
-        '<button class="step" data-hnudge="w:-1:' + ei + ':' + si + '" aria-label="Less">−</button>' +
-        '<input type="number" inputmode="decimal" data-hin="w:' + ei + ':' + si + '" value="' + st.w + '" aria-label="' + aUnit + '">' +
-        '<span class="unit">' + aUnit + '</span>' +
-        '<button class="step" data-hnudge="w:1:' + ei + ':' + si + '" aria-label="More">+</button>' +
-      '</div>' +
-      '<div class="field" style="width:116px">' +
-        '<button class="step" data-hnudge="r:-1:' + ei + ':' + si + '" aria-label="Less">−</button>' +
-        '<input type="number" inputmode="decimal" data-hin="r:' + ei + ':' + si + '" value="' + st.r + '" aria-label="' + bUnit + '">' +
-        '<span class="unit">' + bUnit + '</span>' +
-        '<button class="step" data-hnudge="r:1:' + ei + ':' + si + '" aria-label="More">+</button>' +
-      '</div>' +
-      '<button class="tick-btn rm" data-hrmset="' + ei + ':' + si + '" aria-label="Delete set ' + (si+1) + '">×</button>' +
+      cell("w", si, st.w, P.a) +
+      (P.b ? cell("r", si, st.r, P.b) : "") +
+      '<button class="tick-btn rm" data-hrmset="' + ei + ':' + si + '" aria-label="Delete">×</button>' +
     '</div>').join("");
+  if(P.pace){
+    const p = paceOf(entry);
+    if(p) out += '<div class="derived">' + p + '</div>';
+  }
+  return out;
 }
 
 function viewHistory(){
@@ -1526,8 +1654,11 @@ function viewHistory(){
         '</div>' +
         '<button class="mini" data-hrmex="' + ei + '">Remove</button>' +
       '</div>' +
-      '<div class="bar-line"></div><div class="sets">' + histRows(ei, entry) + '</div>' +
-      '<div style="margin-top:10px"><button class="mini" data-haddset="' + ei + '">Add a set</button></div>' +
+      (PROFILES[entryProfile(entry)].golf ? "" :
+        '<div class="bar-line"></div><div class="sets">' + histRows(ei, entry) + '</div>' +
+        '<div style="margin-top:10px"><button class="mini" data-haddset="' + ei + '">Add a ' +
+          esc(PROFILES[entryProfile(entry)].setLabel || "set") + '</button></div>') +
+      metaBlock(entry, "hist:" + ei) +
     '</div></div>';
   });
 
@@ -1883,7 +2014,7 @@ const ICON_WORDS = [
 function guessIcon(name, track){
   const n = String(name || "");
   for(const pair of ICON_WORDS){ if(pair[0].test(n)) return pair[1]; }
-  return track === "distance" ? "run" : track === "load" ? "dumbbell" : "clock";
+  return track === "distance" ? "run" : track === "strength" ? "dumbbell" : track === "golf" ? "golf" : track === "sport" ? "ball" : "clock";
 }
 
 /* the shortlist offered when creating an exercise */
@@ -1926,43 +2057,228 @@ function addExtraToSession(exId){
   const cfg = TRACK[tr];
   const lp = lastPerf(exId);
   const seed = lp ? lp.entry.sets.filter(s=>s.done).slice(-1)[0] : null;
+  const P = PROFILES[f.profile] || PROFILES.duration;
   S.current.entries.push({
-    extra:true, exId:exId, name:f.ex.name, track:tr,
-    sets:[{w: seed ? seed.w : cfg.aDef, r: seed ? seed.r : cfg.bDef, done:false}]
+    extra:true, exId:exId, name:f.ex.name, track:tr, profile:f.profile, meta:{},
+    sets: P.golf ? [] : [{
+      w: seed ? seed.w : (P.a ? P.a.def : 0),
+      r: seed ? seed.r : (P.b ? P.b.def : 0), done:false}]
   });
   save(); render();
 }
 
 /* ---------- set rows, adapted to what is being tracked ---------- */
+function entryProfile(entry){
+  return entry.profile || TRACK_TO_PROFILE[entry.track] || "duration";
+}
+
+function paceOf(entry){
+  const done = entry.sets.filter(s => s.done !== false);
+  const km = done.reduce((n,s)=> n + (Number(s.w)||0), 0);
+  const min = done.reduce((n,s)=> n + (Number(s.r)||0), 0);
+  if(!km || !min) return "";
+  const p = min / km;
+  const mm = Math.floor(p), ss = Math.round((p - mm) * 60);
+  return mm + ":" + String(ss).padStart(2,"0") + " /" + (S.units === "lb" ? "mi" : "km");
+}
+
+function field(kind, id, val, cfg, exKind){
+  let st = cfg.step;
+  if(st === null){ st = exKind ? step(exKind) : 2.5; }
+  return '<div class="field grow">' +
+    '<button class="step" data-nudge="' + kind + ':-1:' + id + '" aria-label="Less">−</button>' +
+    '<input type="number" inputmode="decimal" data-in="' + kind + ':' + id + '" value="' + val + '" aria-label="' + cfg.unit() + '">' +
+    '<span class="unit">' + cfg.unit() + '</span>' +
+    '<button class="step" data-nudge="' + kind + ':1:' + id + '" aria-label="More">+</button>' +
+  '</div>';
+}
+
 function setRows(entry, rest){
-  const tr = entry.track || "load";
-  const cfg = TRACK[tr];
-  const aUnit = cfg.a(), bUnit = cfg.b;
+  const P = PROFILES[entryProfile(entry)] || PROFILES.duration;
+  if(P.golf) return "";
+  const f = findEx(entry.exId);
+  const exKind = (f && f.ex && f.ex.kind) ? f.ex.kind : null;
   let out = "";
   entry.sets.forEach((st, si)=>{
     const id = entry.exId + ":" + si;
     out += '<div class="set ' + (st.done ? "done" : "") + '">' +
       '<span class="set-n">' + (si + 1) + '</span>' +
-      '<div class="field grow">' +
-        '<button class="step" data-nudge="w:-1:' + id + '" aria-label="Less">−</button>' +
-        '<input type="number" inputmode="decimal" data-in="w:' + id + '" value="' + st.w + '" aria-label="' + aUnit + ' for set ' + (si+1) + '">' +
-        '<span class="unit">' + aUnit + '</span>' +
-        '<button class="step" data-nudge="w:1:' + id + '" aria-label="More">+</button>' +
-      '</div>' +
-      '<div class="field" style="width:116px">' +
-        '<button class="step" data-nudge="r:-1:' + id + '" aria-label="Less">−</button>' +
-        '<input type="number" inputmode="decimal" data-in="r:' + id + '" value="' + st.r + '" aria-label="' + bUnit + ' for set ' + (si+1) + '">' +
-        '<span class="unit">' + bUnit + '</span>' +
-        '<button class="step" data-nudge="r:1:' + id + '" aria-label="More">+</button>' +
-      '</div>' +
-      '<button class="tick-btn" data-done="' + id + ':' + rest + '" aria-label="Mark set ' + (si+1) + ' complete"></button>' +
+      field("w", id, st.w, P.a, exKind) +
+      (P.b ? field("r", id, st.r, P.b, exKind) : "") +
+      '<button class="tick-btn" data-done="' + id + ':' + rest + '" aria-label="Mark complete"></button>' +
     '</div>';
   });
+  if(P.pace){
+    const p = paceOf(entry);
+    if(p) out += '<div class="derived">' + p + '</div>';
+  }
   return out;
 }
 
+/* ---------- the detail that is not a set: how it went, where, golf ---------- */
+function placesUsed(){
+  const seen = [];
+  S.history.forEach(h => h.entries.forEach(e=>{
+    if(e.meta && e.meta.where && !seen.includes(e.meta.where)) seen.push(e.meta.where);
+  }));
+  return seen.slice(-6).reverse();
+}
+
+function metaBlock(entry, ctx){
+  const P = PROFILES[entryProfile(entry)] || PROFILES.duration;
+  const m = entry.meta || (entry.meta = {});
+  let out = "";
+
+  if(P.golf) out += golfBlock(entry, ctx);
+
+  if(P.where){
+    const places = placesUsed().filter(x => x !== m.where);
+    out += '<p class="eyebrow" style="margin-top:14px">' + esc(P.where) + '</p>' +
+      '<input class="pick" style="margin-bottom:6px" data-meta="where:' + ctx + '" ' +
+        'placeholder="Optional" value="' + esc(m.where || "") + '">' +
+      (places.length ? '<div class="tags" style="margin-bottom:4px">' +
+        places.map(x=>'<button class="tag" data-place="' + esc(x) + ':' + ctx + '">' + esc(x) + '</button>').join("") +
+        '</div>' : "");
+  }
+
+  if(P.feel){
+    out += '<p class="eyebrow" style="margin-top:14px">How it went</p><div class="feel">' +
+      P.feel.map((w,i)=>{
+        const val = ["low","mid","high"][i];
+        return '<button class="feel-b' + (m.feel === val ? " on" : "") + '" data-feel="' + val + ':' + ctx + '">' + esc(w) + '</button>';
+      }).join("") + '</div>';
+  }
+  return out;
+}
+
+/* ============================================================
+   GOLF — courses from your own book first, OpenGolfAPI as a shortcut.
+   The API is free and needs no key. Data is ODbL, attributed in Setup.
+   ============================================================ */
+const GOLF_API = "https://api.opengolfapi.org/v1";
+let courseQ = "", courseHits = [], courseBusy = false, courseErr = "";
+
+function myCourses(){ return (S.courses || []); }
+
+function rememberCourse(c){
+  if(!S.courses) S.courses = [];
+  const i = S.courses.findIndex(x => x.name.toLowerCase() === c.name.toLowerCase());
+  if(i >= 0) S.courses[i] = c; else S.courses.push(c);
+  save();
+}
+
+async function searchCourses(q){
+  courseQ = q; courseErr = "";
+  const local = myCourses().filter(c => c.name.toLowerCase().indexOf(q.toLowerCase()) !== -1)
+                           .map(c => ({id:"local:" + c.name, name:c.name, city:c.city || "", state:c.state || "", local:true}));
+  if(q.length < 3){ courseHits = local; render(); return; }
+  courseHits = local; courseBusy = true; render();
+  try{
+    const r = await fetch(GOLF_API + "/courses/search?q=" + encodeURIComponent(q));
+    if(!r.ok) throw new Error("lookup failed");
+    const d = await r.json();
+    const remote = (d.courses || []).slice(0, 8)
+      .filter(c => !local.some(l => l.name.toLowerCase() === c.name.toLowerCase()))
+      .map(c => ({id:c.id, name:c.name, city:c.city || "", state:c.state || "", par:c.par}));
+    courseHits = local.concat(remote);
+  }catch(e){
+    courseErr = "Could not reach the course lookup. You can still type it in.";
+  }
+  courseBusy = false; render();
+}
+
+async function pickCourse(entry, hit, ctx){
+  const m = entry.meta || (entry.meta = {});
+  if(hit.local){
+    const c = myCourses().find(x => "local:" + x.name === hit.id);
+    m.course = c.name; m.tees = c.tees || []; m.tee = null;
+  }else{
+    m.course = hit.name; m.tees = []; m.tee = null;
+    courseBusy = true; render();
+    try{
+      const r = await fetch(GOLF_API + "/courses/" + encodeURIComponent(hit.id));
+      const d = await r.json();
+      const src = d.tees || (d.course && d.course.tees) || [];
+      m.tees = src.map(t=>({
+        name: t.tee_name || t.name || t.color || "Tee",
+        par: Number(t.par_total || t.par || hit.par || 0) || null,
+        yards: Number(t.total_yards || t.yards || 0) || null
+      })).filter(t => t.name);
+    }catch(e){ courseErr = "Course found, but the tee details would not load."; }
+    courseBusy = false;
+    rememberCourse({name:m.course, city:hit.city, state:hit.state, tees:m.tees});
+  }
+  courseQ = ""; courseHits = [];
+  save(); render();
+}
+
+function golfBlock(entry, ctx){
+  const m = entry.meta || (entry.meta = {});
+  let out = "";
+
+  if(!m.course){
+    out += '<p class="eyebrow">Course</p>' +
+      '<input class="pick" data-coursesearch="' + ctx + '" placeholder="Start typing a course name" value="' + esc(courseQ) + '">' +
+      (courseBusy ? '<p class="lede" style="font-size:12px;margin:0 0 8px">Looking…</p>' : "") +
+      (courseErr ? '<div class="warn">' + esc(courseErr) + '</div>' : "") +
+      (courseHits.length
+        ? '<div class="hits">' + courseHits.map((c,i)=>
+            '<button class="hit" data-coursepick="' + i + ':' + ctx + '">' +
+              '<b>' + esc(c.name) + '</b>' +
+              '<span>' + esc([c.city, c.state].filter(Boolean).join(", ")) +
+              (c.local ? " · played before" : "") + '</span></button>').join("") + '</div>'
+        : "") +
+      (courseQ.length >= 3 && !courseBusy
+        ? '<button class="mini" data-courseown="' + ctx + '">Use “' + esc(courseQ) + '” as typed</button>'
+        : "");
+    return out;
+  }
+
+  out += '<p class="eyebrow">Course</p>' +
+    '<div class="chosen"><b>' + esc(m.course) + '</b>' +
+    '<button class="mini" data-courseclear="' + ctx + '">Change</button></div>';
+
+  const tees = m.tees || [];
+  out += '<p class="eyebrow" style="margin-top:14px">Tee</p>';
+  if(tees.length){
+    out += '<div class="tees">' + tees.map((t,i)=>
+      '<button class="tee-b' + (m.tee === i ? " on" : "") + '" data-tee="' + i + ':' + ctx + '">' +
+        '<b>' + esc(t.name) + '</b>' +
+        '<span>' + (t.par ? "par " + t.par : "") + (t.yards ? " · " + t.yards + "y" : "") + '</span>' +
+      '</button>').join("") + '</div>';
+  }else{
+    out += '<input class="pick" data-meta="teename:' + ctx + '" placeholder="Which tees? Optional" value="' + esc(m.teeName || "") + '">';
+  }
+
+  out += '<p class="eyebrow" style="margin-top:14px">Holes</p>' +
+    '<div class="feel">' +
+      ['9','18'].map(n=>'<button class="feel-b' + ((m.holes || 18) == n ? " on" : "") + '" data-holes="' + n + ':' + ctx + '">' + n + '</button>').join("") +
+    '</div>';
+
+  const par = golfPar(m);
+  out += '<p class="eyebrow" style="margin-top:14px">Score</p>' +
+    '<div class="field" style="width:170px">' +
+      '<button class="step" data-score="-1:' + ctx + '" aria-label="Less">−</button>' +
+      '<input type="number" inputmode="numeric" data-scorein="' + ctx + '" value="' + (m.score || "") + '" aria-label="Score">' +
+      '<button class="step" data-score="1:' + ctx + '" aria-label="More">+</button>' +
+    '</div>' +
+    (m.score && par ? '<p class="derived" style="margin-top:8px">' + esc(vsPar(m.score, par)) + ' · par ' + par + '</p>' : "");
+  return out;
+}
+
+function golfPar(m){
+  const t = (m.tees || [])[m.tee];
+  const full = t && t.par ? t.par : null;
+  if(!full) return null;
+  return (m.holes || 18) == 9 ? Math.round(full / 2) : full;
+}
+function vsPar(score, par){
+  const d = Number(score) - par;
+  return d === 0 ? "level par" : (d > 0 ? "+" + d : String(d));
+}
+
 /* ---------- extras panel ---------- */
-let newExtra = {open:false, name:"", track:"time", icon:null, showIcons:false};
+let newExtra = {open:false, name:"", profile:"duration", icon:null, showIcons:false};
 let pick = {open:false, sel:null, when:null};   // when = YYYY-MM-DD for a past session
 let addOpen = false;
 let histIdx = null;    // history entry being viewed / edited
@@ -1976,7 +2292,7 @@ function newExtraForm(){
   if(!newExtra.open){
     return '<button class="btn btn-ghost" data-act="openNew">Create a new exercise</button>';
   }
-  const chosen = newExtra.icon || guessIcon(newExtra.name, newExtra.track);
+  const chosen = newExtra.icon || guessIcon(newExtra.name, newExtra.profile);
   return '<hr class="rule">' +
     '<p class="eyebrow">New exercise</p>' +
     '<div class="newrow">' +
@@ -1991,9 +2307,10 @@ function newExtraForm(){
           icon(k, 20) + '</button>').join("") + '</div>'
       : "") +
     '<p class="eyebrow" style="margin-bottom:8px">What gets logged</p>' +
-    '<div class="seg" style="margin-bottom:12px">' +
-      Object.keys(TRACK).map(k=>
-        '<button data-newtrack="' + k + '" class="' + (newExtra.track === k ? "on" : "") + '">' + esc(TRACK[k].label) + '</button>'
+    '<div class="prof-grid">' +
+      Object.keys(PROFILES).map(k=>
+        '<button data-newtrack="' + k + '" class="prof' + (newExtra.profile === k ? " on" : "") + '">' +
+        esc(PROFILES[k].label) + '</button>'
       ).join("") +
     '</div>' +
     '<button class="btn btn-quiet" data-act="saveNew">Save exercise</button>' +
@@ -2064,11 +2381,14 @@ function extrasPanel(){
       const name = entry.name || (f ? f.ex.name : "Exercise");
       html += '<div class="ex" style="padding-top:' + (n ? 16 : 12) + 'px;margin-top:' + (n ? 16 : 0) + 'px">' +
         '<div class="ex-head"><div style="flex:1;min-width:0">' +
-          '<p class="ex-pattern">' + esc(TRACK[entry.track].label) + '</p>' +
+          '<p class="ex-pattern">' + esc((PROFILES[entryProfile(entry)] || PROFILES.duration).label) + '</p>' +
           '<h3 class="ex-name" style="cursor:default">' + esc(name) + '</h3>' +
         '</div><button class="mini" data-rmx="' + entry.exId + '">Remove</button></div>' +
-        '<div class="bar-line"></div><div class="sets">' + setRows(entry, 60) + '</div>' +
-        '<div style="margin-top:10px"><button class="mini" data-addset="' + entry.exId + '">Add another set</button></div>' +
+        (PROFILES[entryProfile(entry)].golf ? "" :
+          '<div class="bar-line"></div><div class="sets">' + setRows(entry, 60) + '</div>' +
+          '<div style="margin-top:10px"><button class="mini" data-addset="' + entry.exId + '">Add another ' +
+            esc(PROFILES[entryProfile(entry)].setLabel || "set") + '</button></div>') +
+        metaBlock(entry, "cur:" + entry.exId) +
       '</div>';
     });
     html += '</div></div>';
@@ -2207,7 +2527,7 @@ function viewSummary(){
   const title = rec.open ? (rec.title || "Open session") : (sess ? sess.title : "Session");
   const sets = rec.entries.reduce((n,e)=> n + e.sets.length, 0);
   const vol = rec.entries.reduce((n,e)=> n + ((e.track||"load")==="load" ? e.sets.reduce((m,s)=> m + s.w * s.r, 0) : 0), 0);
-  const cardio = rec.entries.filter(e => (e.track||"load") !== "load");
+  const cardio = rec.entries.filter(e => entryProfile(e) !== "strength");
 
   let pbs = [];
   rec.entries.forEach(e=>{
@@ -2240,9 +2560,8 @@ function viewSummary(){
     (cardio.length ? '<hr class="rule"><p class="eyebrow">Also logged</p>' +
       cardio.map(e=>{
         const f = findEx(e.exId);
-        const a = e.sets.reduce((n,s)=> n + s.w, 0);
         return '<p class="lede" style="margin-top:4px">' + esc(f ? f.ex.name : e.name || "Added work") +
-          ' — ' + fmt(Math.round(a*10)/10) + ' ' + (e.track === "distance" ? "km" : "min") + '</p>';
+          ' — ' + esc(entryLine(e)) + '</p>';
       }).join("") : "") +
     (pbs.length ? '<hr class="rule"><p class="pb">Personal best</p>' +
       pbs.map(p=>'<p class="lede" style="margin-top:4px">' + esc(p) + '</p>').join("") : "") +
@@ -2280,7 +2599,7 @@ function viewProgress(){
     if(!hist.length) return;
     const name = f ? f.ex.name : "Removed exercise";
     const label = (f && f.slot && SLOT_SESSION[f.slot]) ? SLOT_SESSION[f.slot] : (f ? f.label : "Added");
-    const tr = f ? f.track : "load";
+    const tr = f ? (f.profile === "distance" ? "distance" : f.profile === "strength" ? "load" : "time") : "load";
     const cur = hist[hist.length - 1], first = hist[0];
 
     let head, sub, series;
@@ -2398,7 +2717,7 @@ function viewLibrary(){
       allExtras().filter(x => x.cat === cat).map(x=>
         '<li style="cursor:default">' + esc(x.name) +
         '<span style="font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);margin-left:8px">' +
-          (x.track === "distance" ? "km · min" : x.track === "time" ? "min · RPE" : S.units + " · reps") + '</span>' +
+          esc((PROFILES[profileOf(x)] || PROFILES.duration).label) + '</span>' +
         (x.cat === "Yours" ? ' <button class="mini" data-delcustom="' + x.id + '" style="margin-left:8px">Delete</button>' : "") +
         '</li>').join("") +
       '</ul></div>').join("") +
@@ -2443,6 +2762,10 @@ function viewSettings(){
     '<p class="lede">Set the safety arms one hole below your bottom position on every barbell lift. That is what makes training alone to a genuine limit reasonable.</p>' +
   '</div></div>' +
   '<div class="panel"><div class="pad">' +
+    '<p class="eyebrow">Course lookup</p>' +
+    '<p class="lede" style="margin-bottom:14px">Golf course names and tee details come from OpenGolfAPI (opengolfapi.org), free and open under ODbL. Courses you play are saved to your account, so they work offline afterwards.</p>' +
+  '</div></div>' +
+  '<div class="panel"><div class="pad">' +
     '<p class="eyebrow">Data</p>' +
     '<p class="lede" style="margin-bottom:14px">Your history is kept on this device and copied to your account, so a lost phone is not a lost log.</p>' +
     '<button class="btn btn-ghost" data-act="export">Copy my history as JSON</button>' +
@@ -2462,7 +2785,7 @@ function setVal(id, field, val){
 }
 
 document.addEventListener("click", e=>{
-  const t = e.target.closest("[data-tab],[data-act],[data-done],[data-nudge],[data-swap],[data-units],[data-bar],[data-rest],[data-diag],[data-rmx],[data-addset],[data-newtrack],[data-delcustom],[data-pick],[data-addpick],[data-day],[data-hopen],[data-hnudge],[data-haddset],[data-hrmset],[data-hrmex],[data-rot],[data-newicon],[data-effort],[data-mins],[data-hadd],[data-figure]");
+  const t = e.target.closest("[data-tab],[data-act],[data-done],[data-nudge],[data-swap],[data-units],[data-bar],[data-rest],[data-diag],[data-rmx],[data-addset],[data-newtrack],[data-delcustom],[data-pick],[data-addpick],[data-day],[data-hopen],[data-hnudge],[data-haddset],[data-hrmset],[data-hrmex],[data-rot],[data-newicon],[data-effort],[data-mins],[data-hadd],[data-figure],[data-feel],[data-place],[data-coursepick],[data-courseown],[data-courseclear],[data-tee],[data-holes],[data-score]");
   if(!t) return;
 
   if(t.dataset.diag){
@@ -2496,19 +2819,15 @@ document.addEventListener("click", e=>{
   if(t.dataset.nudge){
     const [field, dir, exId, si] = t.dataset.nudge.split(":");
     const entry = S.current.entries.find(x => x.exId === exId);
-    const tr = entry.track || "load";
-    const cfg = TRACK[tr];
+    const P = PROFILES[entryProfile(entry)] || PROFILES.duration;
+    const cfg = field === "w" ? P.a : P.b;
+    if(!cfg) return;
     const set = entry.sets[Number(si)];
-    if(field === "w"){
-      let st = cfg.aStep;
-      if(st === null){ const f = findEx(exId); st = step(f.ex.kind); }
-      const cur = Number(set.w) || 0;
-      set.w = Math.max(0, Math.round((cur + Number(dir) * st) / st) * st);
-    }else{
-      let v = (Number(set.r) || 0) + Number(dir) * cfg.bStep;
-      if(cfg.bMax) v = Math.min(cfg.bMax, v);
-      set.r = Math.max(0, v);
-    }
+    let st = cfg.step;
+    if(st === null){ const f = findEx(exId); st = f && f.ex.kind ? step(f.ex.kind) : 2.5; }
+    const cur = Number(field === "w" ? set.w : set.r) || 0;
+    const v = Math.max(0, Math.round((cur + Number(dir) * st) / st) * st);
+    if(field === "w") set.w = v; else set.r = v;
     save(); render(); return;
   }
 
@@ -2521,7 +2840,8 @@ document.addEventListener("click", e=>{
   if(t.dataset.addset){
     const entry = S.current.entries.find(x => x.exId === t.dataset.addset);
     const last = entry.sets[entry.sets.length - 1];
-    entry.sets.push({w:last ? last.w : TRACK[entry.track].aDef, r:last ? last.r : TRACK[entry.track].bDef, done:false});
+    const P = PROFILES[entryProfile(entry)] || PROFILES.duration;
+    entry.sets.push({w: last ? last.w : (P.a ? P.a.def : 0), r: last ? last.r : (P.b ? P.b.def : 0), done:false});
     save(); render(); return;
   }
 
@@ -2542,6 +2862,66 @@ document.addEventListener("click", e=>{
   }
 
   if(t.dataset.pick){ pick.sel = (pick.sel === t.dataset.pick ? null : t.dataset.pick); render(); return; }
+
+  if(t.dataset.feel){
+    const [val, ...c] = t.dataset.feel.split(":");
+    const e = ctxEntry(c.join(":"));
+    if(e){ e.meta = e.meta || {}; e.meta.feel = (e.meta.feel === val ? null : val); save(); render(); }
+    return;
+  }
+
+  if(t.dataset.place){
+    const bits = t.dataset.place.split(":");
+    const val = bits[0], e = ctxEntry(bits.slice(1).join(":"));
+    if(e){ e.meta = e.meta || {}; e.meta.where = val; save(); render(); }
+    return;
+  }
+
+  if(t.dataset.coursepick){
+    const bits = t.dataset.coursepick.split(":");
+    const e = ctxEntry(bits.slice(1).join(":"));
+    if(e) pickCourse(e, courseHits[Number(bits[0])], bits.slice(1).join(":"));
+    return;
+  }
+
+  if(t.dataset.courseown){
+    const e = ctxEntry(t.dataset.courseown);
+    if(e && courseQ.trim()){
+      e.meta = e.meta || {};
+      e.meta.course = courseQ.trim(); e.meta.tees = []; e.meta.tee = null;
+      rememberCourse({name:e.meta.course, tees:[]});
+      courseQ = ""; courseHits = [];
+      save(); render();
+    }
+    return;
+  }
+
+  if(t.dataset.courseclear){
+    const e = ctxEntry(t.dataset.courseclear);
+    if(e){ e.meta.course = null; e.meta.tees = []; e.meta.tee = null; courseQ = ""; courseHits = []; save(); render(); }
+    return;
+  }
+
+  if(t.dataset.tee){
+    const bits = t.dataset.tee.split(":");
+    const e = ctxEntry(bits.slice(1).join(":"));
+    if(e){ e.meta.tee = (e.meta.tee === Number(bits[0]) ? null : Number(bits[0])); save(); render(); }
+    return;
+  }
+
+  if(t.dataset.holes){
+    const bits = t.dataset.holes.split(":");
+    const e = ctxEntry(bits.slice(1).join(":"));
+    if(e){ e.meta.holes = Number(bits[0]); save(); render(); }
+    return;
+  }
+
+  if(t.dataset.score){
+    const bits = t.dataset.score.split(":");
+    const e = ctxEntry(bits.slice(1).join(":"));
+    if(e){ e.meta.score = Math.max(0, (Number(e.meta.score) || 0) + Number(bits[0])); save(); render(); }
+    return;
+  }
 
   if(t.dataset.effort){
     const rec = targetRec();
@@ -2581,11 +2961,11 @@ document.addEventListener("click", e=>{
     const exId = t.dataset.hadd;
     if(h && !h.entries.some(e => e.exId === exId)){
       const f = findEx(exId);
-      const cfg = TRACK[f.track];
+      const P = PROFILES[f.profile] || PROFILES.duration;
       h.entries.push({
-        slot: f.slot || null, exId: exId, track: f.track,
-        extra: !f.slot, name: f.ex.name,
-        sets: [{w: f.track === "load" ? 0 : cfg.aDef, r: cfg.bDef, done:true}]
+        slot: f.slot || null, exId: exId, profile: f.profile, track: f.track,
+        extra: !f.slot, name: f.ex.name, meta:{},
+        sets: P.golf ? [] : [{w: P.a ? P.a.def : 0, r: P.b ? P.b.def : 0, done:true}]
       });
       histAdd = false;
       save(); render();
@@ -2600,17 +2980,15 @@ document.addEventListener("click", e=>{
   if(t.dataset.hnudge){
     const [field, dir, ei, si] = t.dataset.hnudge.split(":");
     const entry = S.history[histIdx].entries[Number(ei)];
-    const cfg = TRACK[entry.track || "load"];
+    const P = PROFILES[entryProfile(entry)] || PROFILES.duration;
+    const cfg = field === "w" ? P.a : P.b;
+    if(!cfg) return;
     const set = entry.sets[Number(si)];
-    if(field === "w"){
-      let st = cfg.aStep;
-      if(st === null){ const f = findEx(entry.exId); st = f ? step(f.ex.kind) : 2.5; }
-      set.w = Math.max(0, Math.round(((Number(set.w)||0) + Number(dir)*st) / st) * st);
-    }else{
-      let v = (Number(set.r)||0) + Number(dir)*cfg.bStep;
-      if(cfg.bMax) v = Math.min(cfg.bMax, v);
-      set.r = Math.max(0, v);
-    }
+    let st = cfg.step;
+    if(st === null){ const f = findEx(entry.exId); st = f && f.ex.kind ? step(f.ex.kind) : 2.5; }
+    const cur = Number(set[field === "w" ? "w" : "r"]) || 0;
+    const v = Math.max(0, Math.round((cur + Number(dir)*st) / st) * st);
+    if(field === "w") set.w = v; else set.r = v;
     save(); render(); return;
   }
 
@@ -2649,7 +3027,7 @@ document.addEventListener("click", e=>{
   }
 
   if(t.dataset.newicon){ newExtra.icon = t.dataset.newicon; newExtra.showIcons = false; render(); return; }
-  if(t.dataset.newtrack){ newExtra.track = t.dataset.newtrack; render(); return; }
+  if(t.dataset.newtrack){ newExtra.profile = t.dataset.newtrack; render(); return; }
 
   if(t.dataset.done){
     const parts = t.dataset.done.split(":");
@@ -2690,16 +3068,16 @@ document.addEventListener("click", e=>{
     return;
   }
   if(act === "whenToday"){ pick.when = null; render(); return; }
-  if(act === "openNew"){ newExtra = {open:true, name:"", track:"time", icon:null, showIcons:false}; render(); return; }
+  if(act === "openNew"){ newExtra = {open:true, name:"", profile:"duration", icon:null, showIcons:false}; render(); return; }
   if(act === "cancelNew"){ newExtra.open = false; newExtra.showIcons = false; render(); return; }
   if(act === "toggleIcons"){ newExtra.showIcons = !newExtra.showIcons; render(); return; }
   if(act === "saveNew"){
     const name = (newExtra.name || "").trim();
     if(!name){ alert("Give the exercise a name first."); return; }
     const id = "c-" + name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") + "-" + Date.now().toString(36).slice(-4);
-    S.custom.push({id:id, name:name, cat:"Yours", track:newExtra.track,
-                   icon: newExtra.icon || guessIcon(name, newExtra.track)});
-    newExtra = {open:false, name:"", track:"time", icon:null, showIcons:false};
+    S.custom.push({id:id, name:name, cat:"Yours", profile:newExtra.profile,
+                   icon: newExtra.icon || guessIcon(name, newExtra.profile)});
+    newExtra = {open:false, name:"", profile:"duration", icon:null, showIcons:false};
     save();
     if(S.current) addExtraToSession(id); else { pick.sel = id; render(); }
     return;
@@ -2767,6 +3145,21 @@ document.addEventListener("input", e=>{
     setVal(exId + ":" + si, field, t.value === "" ? "" : Number(t.value));
     save();
   }
+  if(t.dataset.coursesearch !== undefined){
+    clearTimeout(window.__courseTimer);
+    const q = t.value;
+    courseQ = q;
+    window.__courseTimer = setTimeout(()=> searchCourses(q), 350);
+  }
+  if(t.dataset.meta){
+    const [key, ...c] = t.dataset.meta.split(":");
+    const e = ctxEntry(c.join(":"));
+    if(e){ e.meta = e.meta || {}; e.meta[key === "teename" ? "teeName" : key] = t.value; save(); }
+  }
+  if(t.dataset.scorein !== undefined){
+    const e = ctxEntry(t.dataset.scorein);
+    if(e){ e.meta = e.meta || {}; e.meta.score = Math.max(0, Number(t.value) || 0); save(); }
+  }
   if(t.hasAttribute("data-when")){ pick.when = t.value || null; render(); }
   if(t.hasAttribute("data-minsin")){
     const rec = targetRec();
@@ -2788,9 +3181,9 @@ document.addEventListener("input", e=>{
     save();
   }
   if(t.dataset.new === "name"){
-    const before = newExtra.icon || guessIcon(newExtra.name, newExtra.track);
+    const before = newExtra.icon || guessIcon(newExtra.name, newExtra.profile);
     newExtra.name = t.value;
-    const after = newExtra.icon || guessIcon(newExtra.name, newExtra.track);
+    const after = newExtra.icon || guessIcon(newExtra.name, newExtra.profile);
     if(after !== before){
       const host = document.querySelector(".newico");
       if(host) host.innerHTML = icon(after, 24);
