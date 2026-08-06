@@ -369,6 +369,13 @@ h2.head{
   padding-bottom:11px;border-bottom:1px solid var(--paper-2)}
 
 .varrow{padding:12px 0;border-bottom:1px solid var(--paper-2)}
+.slotnote{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--slate);margin:0 0 7px}
+.varone{padding:5px 0 5px 11px;border-left:2px solid var(--paper-2)}
+.varone.now{border-left-color:var(--orange)}
+.nowtag{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--orange-deep);background:var(--orange-pale);padding:2px 6px;border-radius:2px;
+  margin-left:7px;vertical-align:3px}
 .varrow:last-of-type{border-bottom:0}
 .varhead{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
 .rotates{font-size:12px;color:var(--slate);margin:4px 0 0;line-height:1.5}
@@ -1727,7 +1734,7 @@ function viewHistory(){
       '<span class="eyebrow" style="margin:0">Date</span>' +
       '<input type="date" class="pick" style="margin:0;width:auto" data-hdate value="' + esc(recDay(h)) + '" max="' + dayKey(new Date()) + '">' +
     '</div>' +
-    '<hr class="rule">' + effortBlock(h) + (golfOnly(h) ? "" : durationBlock(h)) +
+    (golfOnly(h) ? "" : '<hr class="rule">' + effortBlock(h) + durationBlock(h)) +
     '<p class="lede" style="margin-top:14px">Corrections save straight away and feed back into what the app suggests next time.</p>' +
   '</div></div>';
 
@@ -2183,6 +2190,7 @@ function addExtraToSession(exId){
       w: seed ? seed.w : (P.a ? P.a.def : 0),
       r: seed ? seed.r : (P.b ? P.b.def : 0), done:false}]
   });
+  addOpen = false;
   save(); render();
 }
 
@@ -2253,7 +2261,8 @@ function metaBlock(entry, ctx){
   const m = entry.meta || (entry.meta = {});
   let out = "";
 
-  if(P.golf) out += golfBlock(entry, ctx);
+  /* golf renders its own complete card, including how it went and effort */
+  if(P.golf) return golfBlock(entry, ctx);
 
   if(P.where){
     const places = placesUsed().filter(x => x !== m.where);
@@ -2593,7 +2602,7 @@ function viewOpen(){
       '</div>' +
       '<p class="lede" style="margin-top:6px">' + (c.retro
         ? "Enter what you actually did. It will be filed on that date, not today."
-        : "Logged and tracked exactly like a programme session, but it does not use a slot — the next one on the rotation is still waiting for you.") + '</p>' +
+        : "Does not use a programme slot — the next session on the rotation is still waiting for you.") + '</p>' +
     '</div></div>' +
     extrasPanel() +
     finishPanel();
@@ -2709,7 +2718,7 @@ function viewSummary(){
       '<div><span class="n">' + sets + '</span><span class="l">Sets</span></div>' +
       '<div><span class="n">' + Math.round(vol) + '</span><span class="l">Volume ' + S.units + '</span></div>' +
     '</div>' +
-    '<hr class="rule">' + effortBlock(rec) + (golfOnly(rec) ? "" : durationBlock(rec)) +
+    (golfOnly(rec) ? "" : '<hr class="rule">' + effortBlock(rec) + durationBlock(rec)) +
     (cardio.length ? '<hr class="rule"><p class="eyebrow">Also logged</p>' +
       cardio.map(e=>{
         const f = findEx(e.exId);
@@ -2829,6 +2838,7 @@ function viewLibrary(){
     '<p class="eyebrow">The programme</p>' +
     '<h2 class="head">How the week works</h2>' +
     '<p class="lede" style="margin-top:8px">Three sessions on rotation, every other day. Each one is full body, so across a week nothing gets missed and nothing gets hammered.</p>' +
+    '<p class="lede" style="margin-top:8px;font-size:13px">' + Object.keys(SLOTS).reduce((n,k)=> n + SLOTS[k].pool.length, 0) + ' exercises in the programme, plus ' + allExtras().length + ' add-ons.</p>' +
   '</div></div>';
 
   SESSIONS.forEach((x, n)=>{
@@ -2836,24 +2846,29 @@ function viewLibrary(){
     let rows = "";
     x.blocks.forEach(b => b.items.forEach(item=>{
       const cur = variantFor(item.slot, upcoming);
-      const others = SLOTS[item.slot].pool.filter(v => v.id !== cur.id).map(v => v.name);
+      const pool = SLOTS[item.slot].pool;
+      const ordered = [cur].concat(pool.filter(v => v.id !== cur.id));
       rows += '<div class="varrow">' +
-        '<div class="varhead">' +
-          '<button class="ex-name" style="font-size:17px" data-diag="' + cur.id + '">' + esc(cur.name) +
-            '<span class="chev">' + infoIcon(!!openDiag[cur.id]) + '</span></button>' +
-          '<span class="prow-n">' + item.sets + ' × ' + item.lo + '–' + item.hi + '</span>' +
-        '</div>' +
-        '<p class="rotates">Rotates with ' + esc(others.join(", ")) + '</p>' +
-        (openDiag[cur.id] ? '<p class="cue">' + esc(cur.cue) + '</p>' + diagram(cur.id) : "") +
+        '<p class="slotnote">' + item.sets + ' \u00d7 ' + item.lo + '\u2013' + item.hi +
+          ' \u00b7 ' + pool.length + ' variations</p>' +
+        ordered.map(v=>
+          '<div class="varone' + (v.id === cur.id ? " now" : "") + '">' +
+            '<button class="ex-name" style="font-size:16px" data-diag="' + v.id + '">' + esc(v.name) +
+              (v.id === cur.id ? '<span class="nowtag">in use</span>' : '') +
+              '<span class="chev">' + infoIcon(!!openDiag[v.id]) + '</span></button>' +
+            (openDiag[v.id] ? '<p class="cue">' + esc(v.cue) + '</p>' + diagram(v.id) : "") +
+          '</div>').join("") +
       '</div>';
     }));
 
+    const count = x.blocks.reduce((t,b)=> t + b.items.reduce((u,it)=> u + SLOTS[it.slot].pool.length, 0), 0);
     html += '<div class="panel"><div class="pad">' +
       '<h2 class="head">' + esc(x.title) + '</h2>' +
       '<p class="lede" style="margin-top:6px">' + esc(x.blurb) + '</p>' +
       '<p class="lede" style="margin-top:8px;font-size:13px">' + esc(x.trains) + '</p>' +
       '<div class="tags" style="margin-top:10px">' + x.tags.map(t=>'<span class="tag">' + esc(t) + '</span>').join("") + '</div>' +
-      '<hr class="rule">' + rows +
+      '<p class="eyebrow" style="margin-top:16px">All ' + count + ' exercises \u00b7 tap any for how it is done</p>' +
+      rows +
       '<p class="lede" style="margin-top:12px;font-size:12px">Every four cycles each lift swaps to the next variation, so the training stays comparable but never repeats.</p>' +
     '</div></div>';
   });
@@ -3083,6 +3098,8 @@ document.addEventListener("click", e=>{
     if(e){
       e.meta = e.meta || {};
       e.meta.effort = (e.meta.effort === n) ? null : n;
+      const rec = targetRec();
+      if(rec && golfOnly(rec)) rec.effort = e.meta.effort;
       save(); render();
     }
     return;
