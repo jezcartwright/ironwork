@@ -1070,7 +1070,7 @@ function diagram(exId){
 /* ============================================================
    STATE
    ============================================================ */
-const BUILD = "26";
+const BUILD = "27";
 const KEY = "ironwork:v1";
 let S = null;
 let tab = "train";
@@ -2142,6 +2142,21 @@ const ICON_WORDS = [
   [/\b(sauna|breath|meditat|recovery|rest|massage|physio)\b/i, "heart"]
 ];
 
+/* What should this activity record? Used for exercises you create yourself,
+   and to correct ones created before a profile existed. */
+const PROFILE_WORDS = [
+  [/\bgolf\b|\b(nine|18|eighteen) holes\b|driving range/i, "golf"],
+  [/\b(run|jog|sprint|parkrun|marathon|cycl|bike ride|ride|row|erg|swim|hike|walk|ski)\b/i, "distance"],
+  [/\b(tennis|padel|squash|badminton|pickleball|football|soccer|rugby|basketball|hockey|cricket|match|game)\b/i, "sport"],
+  [/\b(hiit|interval|tabata|circuit|amrap|emom|round)\b/i, "intervals"],
+  [/\b(curl|press|raise|row machine|shrug|fly|extension|squat|deadlift|lunge)\b/i, "strength"]
+];
+function guessProfile(name){
+  const n = String(name || "");
+  for(const pair of PROFILE_WORDS){ if(pair[0].test(n)) return pair[1]; }
+  return null;
+}
+
 function guessIcon(name, track){
   const n = String(name || "");
   for(const pair of ICON_WORDS){ if(pair[0].test(n)) return pair[1]; }
@@ -2205,7 +2220,14 @@ function entryProfile(entry){
      profile existed carries a stale one, and would otherwise render with
      the wrong fields for ever. */
   const f = findEx(entry.exId);
+  if(f && f.ex && f.ex.cat === "Yours"){
+    /* one you created: an explicit choice wins, otherwise read the name */
+    if(f.ex.profileSet && f.ex.profile) return f.ex.profile;
+    return guessProfile(f.ex.name) || f.ex.profile || "duration";
+  }
   if(f && f.profile) return f.profile;
+  const guess = guessProfile(entry.name);
+  if(guess) return guess;
   return entry.profile || TRACK_TO_PROFILE[entry.track] || "duration";
 }
 
@@ -2902,7 +2924,15 @@ function viewLibrary(){
         '<li style="cursor:default">' + esc(x.name) +
         '<span style="font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);margin-left:8px">' +
           esc((PROFILES[profileOf(x)] || PROFILES.duration).label) + '</span>' +
-        (x.cat === "Yours" ? ' <button class="mini" data-delcustom="' + x.id + '" style="margin-left:8px">Delete</button>' : "") +
+        (x.cat === "Yours"
+          ? '<div class="seg" style="margin:7px 0 4px">' +
+              Object.keys(PROFILES).map(k=>
+                '<button data-setprofile="' + k + ':' + x.id + '" class="' +
+                  ((PROFILES[entryProfile({exId:x.id, name:x.name})] === PROFILES[k]) ? "on" : "") + '">' +
+                  esc(PROFILES[k].label) + '</button>').join("") +
+            '</div>' +
+            '<button class="mini" data-delcustom="' + x.id + '">Delete</button>'
+          : "") +
         '</li>').join("") +
       '</ul></div>').join("") +
   '</div></div>';
@@ -2971,7 +3001,7 @@ function setVal(id, field, val){
 }
 
 document.addEventListener("click", e=>{
-  const t = e.target.closest("[data-tab],[data-act],[data-done],[data-nudge],[data-swap],[data-units],[data-bar],[data-rest],[data-diag],[data-rmx],[data-addset],[data-newtrack],[data-delcustom],[data-pick],[data-addpick],[data-day],[data-hopen],[data-hnudge],[data-haddset],[data-hrmset],[data-hrmex],[data-rot],[data-newicon],[data-effort],[data-mins],[data-hadd],[data-figure],[data-feel],[data-place],[data-coursepick],[data-courseown],[data-courseclear],[data-tee],[data-holes],[data-score],[data-geffort],[data-parstep]");
+  const t = e.target.closest("[data-tab],[data-act],[data-done],[data-nudge],[data-swap],[data-units],[data-bar],[data-rest],[data-diag],[data-rmx],[data-addset],[data-newtrack],[data-delcustom],[data-pick],[data-addpick],[data-day],[data-hopen],[data-hnudge],[data-haddset],[data-hrmset],[data-hrmex],[data-rot],[data-newicon],[data-effort],[data-mins],[data-hadd],[data-figure],[data-feel],[data-place],[data-coursepick],[data-courseown],[data-courseclear],[data-tee],[data-holes],[data-score],[data-geffort],[data-parstep],[data-setprofile]");
   if(!t) return;
 
   if(t.dataset.diag){
@@ -3029,6 +3059,13 @@ document.addEventListener("click", e=>{
     const P = PROFILES[entryProfile(entry)] || PROFILES.duration;
     entry.sets.push({w: last ? last.w : (P.a ? P.a.def : 0), r: last ? last.r : (P.b ? P.b.def : 0), done:false});
     save(); render(); return;
+  }
+
+  if(t.dataset.setprofile){
+    const bits = t.dataset.setprofile.split(":");
+    const ex = (S.custom || []).find(x => x.id === bits.slice(1).join(":"));
+    if(ex){ ex.profile = bits[0]; ex.profileSet = true; save(); render(); }
+    return;
   }
 
   if(t.dataset.delcustom){
@@ -3288,7 +3325,7 @@ document.addEventListener("click", e=>{
     const name = (newExtra.name || "").trim();
     if(!name){ alert("Give the exercise a name first."); return; }
     const id = "c-" + name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") + "-" + Date.now().toString(36).slice(-4);
-    S.custom.push({id:id, name:name, cat:"Yours", profile:newExtra.profile,
+    S.custom.push({id:id, name:name, cat:"Yours", profile:newExtra.profile, profileSet:true,
                    icon: newExtra.icon || guessIcon(name, newExtra.profile)});
     newExtra = {open:false, name:"", profile:"duration", icon:null, showIcons:false};
     save();
