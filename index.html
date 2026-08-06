@@ -1576,6 +1576,12 @@ function ctxEntry(ctx){
   return null;
 }
 
+/* a session that is only golf has no meaningful duration */
+function golfOnly(rec){
+  return !!rec && !!rec.entries && rec.entries.length > 0 &&
+    rec.entries.every(e => entryProfile(e) === "golf");
+}
+
 function targetRec(){ return summaryRec || (histIdx !== null ? S.history[histIdx] : null); }
 
 function effortBlock(rec){
@@ -1706,15 +1712,22 @@ function viewHistory(){
       '<button class="mini" data-act="closeHist">Done</button>' +
     '</div>' +
     '<div class="meta">' +
-      '<div><span class="n">' + (h.minutes || 0) + '<span style="font-size:12px">min</span></span><span class="l">Elapsed</span></div>' +
-      '<div><span class="n">' + sets + '</span><span class="l">Sets</span></div>' +
+      (golfOnly(h)
+        ? (function(){
+            const g = h.entries[0].meta || {};
+            const par = golfPar(g);
+            return '<div><span class="n">' + (g.score || "—") + '</span><span class="l">Score</span></div>' +
+              '<div><span class="n">' + (g.score && par ? esc(vsPar(g.score, par)) : "—") + '</span><span class="l">Against par</span></div>';
+          })()
+        : '<div><span class="n">' + (h.minutes || 0) + '<span style="font-size:12px">min</span></span><span class="l">Elapsed</span></div>' +
+          '<div><span class="n">' + sets + '</span><span class="l">Sets</span></div>') +
       '<div><span class="n">' + (h.effort ? h.effort + '<span style="font-size:12px">/10</span>' : '—') + '</span><span class="l">Effort</span></div>' +
     '</div>' +
     '<div class="whenrow" style="margin-top:14px">' +
       '<span class="eyebrow" style="margin:0">Date</span>' +
       '<input type="date" class="pick" style="margin:0;width:auto" data-hdate value="' + esc(recDay(h)) + '" max="' + dayKey(new Date()) + '">' +
     '</div>' +
-    '<hr class="rule">' + effortBlock(h) + durationBlock(h) +
+    '<hr class="rule">' + effortBlock(h) + (golfOnly(h) ? "" : durationBlock(h)) +
     '<p class="lede" style="margin-top:14px">Corrections save straight away and feed back into what the app suggests next time.</p>' +
   '</div></div>';
 
@@ -2175,6 +2188,11 @@ function addExtraToSession(exId){
 
 /* ---------- set rows, adapted to what is being tracked ---------- */
 function entryProfile(entry){
+  /* The exercise definition is the authority. An entry logged before a
+     profile existed carries a stale one, and would otherwise render with
+     the wrong fields for ever. */
+  const f = findEx(entry.exId);
+  if(f && f.profile) return f.profile;
   return entry.profile || TRACK_TO_PROFILE[entry.track] || "duration";
 }
 
@@ -2691,7 +2709,7 @@ function viewSummary(){
       '<div><span class="n">' + sets + '</span><span class="l">Sets</span></div>' +
       '<div><span class="n">' + Math.round(vol) + '</span><span class="l">Volume ' + S.units + '</span></div>' +
     '</div>' +
-    '<hr class="rule">' + effortBlock(rec) + durationBlock(rec) +
+    '<hr class="rule">' + effortBlock(rec) + (golfOnly(rec) ? "" : durationBlock(rec)) +
     (cardio.length ? '<hr class="rule"><p class="eyebrow">Also logged</p>' +
       cardio.map(e=>{
         const f = findEx(e.exId);
