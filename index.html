@@ -336,6 +336,23 @@ h2.head{
 .setting:last-of-type{border-bottom:0}
 .setting label{font-size:14px;font-weight:500}
 .setting .hint{font-size:12px;color:var(--slate);display:block;font-weight:400;margin-top:2px}
+.xstrip{display:flex;gap:6px;margin:10px 0 0}
+.xcell{flex:1;min-width:0;background:var(--paper-2);border-radius:11px;padding:9px 3px;
+  display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--ink);
+  transition:transform .08s ease}
+.xcell:active{transform:translateY(2px)}
+.xico{color:var(--orange-deep);display:block}
+.xcell b{font-family:var(--mono);font-size:13px;font-weight:600;line-height:1}
+.xcell b i{font-style:normal;font-size:9px;color:var(--slate);margin-left:1px}
+.xcell span:last-child{font-family:var(--mono);font-size:9px;letter-spacing:.04em;color:var(--slate)}
+
+.avgrow{display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:1px solid var(--paper-2)}
+.avgrow:last-of-type{border-bottom:0}
+.avgrow b{display:block;font-size:14px;font-weight:500;line-height:1.2}
+.avgrow span span{font-family:var(--mono);font-size:11px;color:var(--slate)}
+.avgnum{font-family:var(--mono);font-size:18px;font-weight:600;white-space:nowrap}
+.avgnum i{font-style:normal;font-size:11px;color:var(--slate);margin-left:2px}
+
 .rot-strip{display:flex;gap:6px;margin:10px 0 0}
 .rot{flex:1;min-width:0;text-align:center;padding:10px 3px;border-radius:11px;
   background:var(--paper-2);display:flex;flex-direction:column;align-items:center;gap:2px;
@@ -762,6 +779,7 @@ const EXTRAS = [
   {id:"x-row-erg", name:"Rowing machine",         cat:"Aerobic — steady",   profile:"distance"},
   {id:"x-swim",    name:"Swim",                   cat:"Aerobic — steady",   profile:"distance"},
   {id:"x-walk",    name:"Brisk or incline walk",  cat:"Aerobic — steady",   profile:"distance"},
+  {id:"x-spin",    name:"Exercise bike",          cat:"Aerobic — steady",   profile:"duration"},
   {id:"x-skip",    name:"Skipping",               cat:"Aerobic — steady",   profile:"duration"},
 
   {id:"x-intervals", name:"Bike or rower intervals", cat:"Aerobic — intervals", profile:"intervals"},
@@ -1476,6 +1494,47 @@ function slotPerf(slotId){
   return out;
 }
 
+/* the headline number for an activity, by profile */
+function entryHeadline(e){
+  const prof = entryProfile(e);
+  const m = e.meta || {};
+  if(prof === "golf"){
+    return m.score ? {v:Number(m.score), unit:"", word:"score"} : null;
+  }
+  if(prof === "distance"){
+    const km = e.sets.reduce((n,x)=> n + (Number(x.w)||0), 0);
+    return km ? {v:km, unit:"km", word:"distance"} : null;
+  }
+  if(prof === "strength") return null;
+  const mins = e.sets.reduce((n,x)=> n + (Number(x.w)||0), 0);
+  return mins ? {v:mins, unit:"min", word:"time"} : null;
+}
+
+/* every non-programme activity, averaged over everything logged */
+function activityAverages(){
+  const by = {};
+  S.history.forEach(h => h.entries.forEach(e=>{
+    if(!e.extra) return;
+    const hd = entryHeadline(e);
+    if(!hd) return;
+    const k = e.exId;
+    if(!by[k]) by[k] = {exId:k, name:e.name, unit:hd.unit, word:hd.word, total:0, n:0, last:h.date};
+    by[k].total += hd.v; by[k].n++;
+    if(new Date(h.date) > new Date(by[k].last)) by[k].last = h.date;
+  }));
+  return Object.values(by)
+    .map(x=>({...x, avg:x.total / x.n}))
+    .sort((a,b)=> new Date(b.last) - new Date(a.last));
+}
+
+/* the most recent sessions containing anything other than the programme */
+function recentExtraSessions(n){
+  return S.history
+    .map((h,i)=>({h:h, i:i}))
+    .filter(r => r.h.entries.some(e => e.extra))
+    .slice(-n).reverse();
+}
+
 function extrasTally(){
   let km = 0, mins = 0, count = 0;
   S.history.forEach(h => h.entries.forEach(e=>{
@@ -1812,15 +1871,26 @@ function viewHome(){
   /* ---- anything waiting to be filled in ---- */
   const unrated = S.history.filter(h => !h.effort && daysSinceKey(recDay(h)) <= 7);
   if(unrated.length){
-    const one = unrated[unrated.length - 1];
-    const idx = S.history.indexOf(one);
+    const recent = unrated.slice(-3).reverse();
+    const more = unrated.length - recent.length;
     html += '<div class="panel"><div class="pad">' +
-      '<p class="eyebrow">Still to fill in</p>' +
-      '<p class="lede" style="margin-bottom:12px">' +
-        (unrated.length === 1
-          ? esc(sessionTitle(one)) + ' on ' + esc(recDateLabel(one)) + ' has no effort recorded.'
-          : unrated.length + ' recent sessions have no effort recorded.') + '</p>' +
-      '<button class="btn btn-quiet" data-hopen="' + idx + '">Add it to ' + esc(sessionTitle(one)) + '</button>' +
+      '<p class="eyebrow">Effort not recorded</p>' +
+      '<p class="lede" style="margin-bottom:10px">Tap a session to say how hard it felt.</p>' +
+      recent.map(h=>{
+        const idx = S.history.indexOf(h);
+        const sets = h.entries.reduce((n,e)=> n + e.sets.length, 0);
+        return '<button class="histrow" data-hopen="' + idx + '">' +
+          '<span class="ex-icon' + (h.open ? "" : " lead") + '">' +
+            icon(h.open && h.entries[0] ? iconFor(h.entries[0].exId) : "barbell", 18) + '</span>' +
+          '<span style="flex:1;min-width:0">' +
+            '<b>' + esc(sessionTitle(h)) + '</b>' +
+            '<span>' + esc(recDateLabel(h)) + ' · ' + sets + ' sets</span>' +
+          '</span><span class="chev-r">›</span></button>';
+      }).join("") +
+      (more > 0
+        ? '<div style="margin-top:12px"><button class="btn btn-ghost" data-act="histList">' +
+          more + ' more without effort</button></div>'
+        : "") +
     '</div></div>';
   }
 
@@ -1892,16 +1962,36 @@ function viewHome(){
   }
 
   /* ---- everything else you have logged ---- */
-  const tally = extrasTally();
-  if(tally.count){
+  const avgs = activityAverages();
+  const recentX = recentExtraSessions(5);
+  if(avgs.length || recentX.length){
     html += '<div class="panel"><div class="pad">' +
-      '<p class="eyebrow">Everything else</p>' +
-      '<div class="meta" style="border-top:0;margin-top:0">' +
-        '<div><span class="n">' + fmt(Math.round(tally.km * 10) / 10) + '</span><span class="l">km covered</span></div>' +
-        '<div><span class="n">' + fmt(Math.round(tally.mins)) + '</span><span class="l">min added work</span></div>' +
-        '<div><span class="n">' + tally.count + '</span><span class="l">entries</span></div>' +
-      '</div>' +
-    '</div></div>';
+      '<p class="eyebrow">Everything else</p>';
+
+    if(recentX.length){
+      html += '<div class="xstrip">' + recentX.map(r=>{
+        const first = r.h.entries.find(e => e.extra) || r.h.entries[0];
+        const hd = entryHeadline(first);
+        return '<button class="xcell" data-hopen="' + r.i + '">' +
+          '<span class="xico">' + icon(iconFor(first.exId), 20) + '</span>' +
+          '<b>' + (hd ? fmt(Math.round(hd.v * 10) / 10) + (hd.unit ? '<i>' + hd.unit + '</i>' : "") : "—") + '</b>' +
+          '<span>' + esc(keyDate(recDay(r.h)).toLocaleDateString("en-GB", {day:"numeric", month:"short"})) + '</span>' +
+        '</button>';
+      }).join("") + '</div>';
+    }
+
+    if(avgs.length){
+      html += '<p class="eyebrow" style="margin-top:16px">Averages</p>' +
+        avgs.slice(0, 6).map(a=>
+          '<div class="avgrow">' +
+            '<span class="ex-icon">' + icon(iconFor(a.exId), 17) + '</span>' +
+            '<span style="flex:1;min-width:0"><b>' + esc(a.name) + '</b>' +
+            '<span>' + a.n + (a.n === 1 ? " time" : " times") + ' · ' + esc(a.word) + '</span></span>' +
+            '<span class="avgnum">' + fmt(Math.round(a.avg * 10) / 10) +
+              (a.unit ? '<i>' + a.unit + '</i>' : "") + '</span>' +
+          '</div>').join("");
+    }
+    html += '</div></div>';
   }
 
   /* ---- first run ---- */
@@ -1971,7 +2061,7 @@ function icon(name, px){
     'fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + '</svg>';
 }
 const EXTRA_ICON = {
-  "x-run":"run","x-cycle":"bike","x-row-erg":"row","x-swim":"swim","x-walk":"walk","x-skip":"skip",
+  "x-run":"run","x-cycle":"bike","x-spin":"bike","x-row-erg":"row","x-swim":"swim","x-walk":"walk","x-skip":"skip",
   "x-intervals":"bolt","x-hill":"mountain","x-shuttle":"bolt","x-stairs":"stairs",
   "x-burpee":"bolt","x-mtn":"bolt","x-bw-circuit":"clock","x-battle":"bolt",
   "x-calf":"dumbbell","x-shrug":"barbell","x-lateral":"dumbbell","x-facepull":"cable","x-rear-fly":"dumbbell",
