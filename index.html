@@ -1067,7 +1067,7 @@ function diagram(exId){
 /* ============================================================
    STATE
    ============================================================ */
-const BUILD = "23";
+const BUILD = "25";
 const KEY = "ironwork:v1";
 let S = null;
 let tab = "train";
@@ -2960,7 +2960,7 @@ function setVal(id, field, val){
 }
 
 document.addEventListener("click", e=>{
-  const t = e.target.closest("[data-tab],[data-act],[data-done],[data-nudge],[data-swap],[data-units],[data-bar],[data-rest],[data-diag],[data-rmx],[data-addset],[data-newtrack],[data-delcustom],[data-pick],[data-addpick],[data-day],[data-hopen],[data-hnudge],[data-haddset],[data-hrmset],[data-hrmex],[data-rot],[data-newicon],[data-effort],[data-mins],[data-hadd],[data-figure],[data-feel],[data-place],[data-coursepick],[data-courseown],[data-courseclear],[data-tee],[data-holes],[data-score]");
+  const t = e.target.closest("[data-tab],[data-act],[data-done],[data-nudge],[data-swap],[data-units],[data-bar],[data-rest],[data-diag],[data-rmx],[data-addset],[data-newtrack],[data-delcustom],[data-pick],[data-addpick],[data-day],[data-hopen],[data-hnudge],[data-haddset],[data-hrmset],[data-hrmex],[data-rot],[data-newicon],[data-effort],[data-mins],[data-hadd],[data-figure],[data-feel],[data-place],[data-coursepick],[data-courseown],[data-courseclear],[data-tee],[data-holes],[data-score],[data-geffort],[data-parstep]");
   if(!t) return;
 
   if(t.dataset.diag){
@@ -3236,8 +3236,10 @@ document.addEventListener("click", e=>{
     const set = entry.sets[si];
     set.done = !set.done;
     if(set.done){
-      const ex = SLOTS[entry.slot].pool.find(x => x.id === exId);
-      startRest(rest, "Rest · " + ex.name);
+      /* extras have no slot, so resolve the name the general way */
+      const f = findEx(exId);
+      const label = entry.name || (f ? f.ex.name : "Rest");
+      startRest(rest, "Rest · " + label);
       /* carry the load forward to the remaining sets */
       for(let k = si + 1; k < entry.sets.length; k++){
         if(!entry.sets[k].done) entry.sets[k].w = set.w;
