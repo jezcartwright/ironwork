@@ -1070,7 +1070,7 @@ function diagram(exId){
 /* ============================================================
    STATE
    ============================================================ */
-const BUILD = "27";
+const BUILD = "29";
 const KEY = "ironwork:v1";
 let S = null;
 let tab = "train";
@@ -1557,10 +1557,11 @@ function activityAverages(){
 
 /* the most recent sessions containing anything other than the programme */
 function recentExtraSessions(n){
+  /* oldest to newest, left to right, so the most recent sits on the right */
   return S.history
     .map((h,i)=>({h:h, i:i}))
     .filter(r => r.h.entries.some(e => e.extra))
-    .slice(-n).reverse();
+    .slice(-n);
 }
 
 function extrasTally(){
@@ -1646,17 +1647,28 @@ function niceDate(d){
 function recDateLabel(h){ return keyDate(recDay(h)).toLocaleDateString("en-GB", {weekday:"short", day:"numeric", month:"short"}); }
 
 function viewHistList(){
-  const rows = S.history.map((h, i)=>({h:h, i:i}))
-    .filter(r => !histDay || recDay(r.h) === histDay)
+  const all = S.history.map((h, i)=>({h:h, i:i}))
+    .filter(r => !histDay || recDay(r.h) === histDay);
+  const nWeights = all.filter(r => !r.h.open).length;
+  const nOpen    = all.filter(r => r.h.open).length;
+
+  const rows = all
+    .filter(r => histFilter === "all"
+      || (histFilter === "weights" && !r.h.open)
+      || (histFilter === "aerobic" && r.h.open))
     .reverse();
 
   let html = '<div class="panel"><div class="pad">' +
     '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">' +
       '<div><p class="eyebrow">' + (histDay ? esc(keyDate(histDay).toLocaleDateString("en-GB", {weekday:"short", day:"numeric", month:"short"})) : "Everything logged") + '</p>' +
-      '<h1 class="session-title">' + (histDay ? "That day" : "Past sessions") + '</h1></div>' +
+      '<h1 class="session-title">' + (histDay ? "That day" : "All sessions") + '</h1></div>' +
       '<button class="mini" data-act="closeHist">Done</button>' +
     '</div>' +
-    '<p class="lede" style="margin-top:6px;margin-bottom:14px">Tap a session to review it, or to correct anything that went in wrong.</p>' +
+    '<div class="seg" style="margin:12px 0 14px">' +
+      [["all","Everything",all.length],["weights","Weights",nWeights],["aerobic","Aerobic",nOpen]].map(f=>
+        '<button data-histfilter="' + f[0] + '" class="' + (histFilter === f[0] ? "on" : "") + '">' +
+          f[1] + ' <span style="opacity:.65">' + f[2] + '</span></button>').join("") +
+    '</div>' +
     '<button class="btn btn-quiet" data-act="logPast">Log something from a past date</button>' +
     '<div style="height:14px"></div>';
 
@@ -2221,8 +2233,10 @@ function entryProfile(entry){
      the wrong fields for ever. */
   const f = findEx(entry.exId);
   if(f && f.ex && f.ex.cat === "Yours"){
-    /* one you created: an explicit choice wins, otherwise read the name */
-    if(f.ex.profileSet && f.ex.profile) return f.ex.profile;
+    /* One you created. A change made deliberately in the Library is final.
+       Otherwise the name decides, because a choice made while typing the
+       name is a guess, not a decision. */
+    if(f.ex.profileLocked && f.ex.profile) return f.ex.profile;
     return guessProfile(f.ex.name) || f.ex.profile || "duration";
   }
   if(f && f.profile) return f.profile;
@@ -2476,6 +2490,7 @@ let histList = false;
 let previewOpen = false;
 let previewIdx = null;   // which session index the preview is showing
 let histAdd = false;     // adding an exercise to a past session
+let histFilter = "all";  // all | weights | aerobic
 
 function newExtraForm(){
   if(!newExtra.open){
@@ -2847,19 +2862,29 @@ function viewProgress(){
   });
 
   const totalVol = S.history.reduce((n,h)=> n + h.entries.reduce((m,e)=> m + ((e.track||"load")==="load" ? e.sets.reduce((k,s)=> k + s.w*s.r, 0) : 0), 0), 0);
-  const recent = S.history.slice(-8).reverse().map(h=>{
+  const recent = S.history.slice().reverse().map((h)=>{
+    const i = S.history.indexOf(h);
     const sess = SESSIONS.find(s => s.key === h.key);
     const label = h.open ? (h.title || "Open session") : (sess ? sess.title : "Session");
     const d = keyDate(recDay(h));
-    return '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--paper-2);font-size:13px">' +
-      '<span>' + esc(label) + (h.open ? ' <span style="font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--slate)">open</span>' : "") + '</span>' +
-      '<span style="font-family:var(--mono);font-size:12px;color:var(--slate)">' +
-        d.toLocaleDateString("en-GB", {day:"numeric", month:"short"}) + ' · ' + h.minutes + ' min' +
-        (h.effort ? ' · ' + h.effort + '/10' : '') + '</span></div>';
+    const first = h.entries[0];
+    const gOnly = golfOnly(h);
+    const detail = gOnly
+      ? (((first || {}).meta || {}).score ? "score " + ((first.meta).score) : "round")
+      : (h.open ? (h.minutes ? h.minutes + " min" : "logged")
+                : h.entries.reduce((n,e)=> n + e.sets.length, 0) + " sets · " + (h.minutes || 0) + " min");
+    return '<button class="histrow" data-hopen="' + i + '">' +
+      '<span class="ex-icon' + (h.open ? "" : " lead") + '">' +
+        icon(h.open && first ? iconFor(first.exId) : "barbell", 18) + '</span>' +
+      '<span style="flex:1;min-width:0">' +
+        '<b>' + esc(label) + '</b>' +
+        '<span>' + d.toLocaleDateString("en-GB", {day:"numeric", month:"short"}) + ' · ' + esc(detail) +
+          (h.effort ? ' · ' + h.effort + '/10' : '') + '</span>' +
+      '</span><span class="chev-r">›</span></button>';
   }).join("");
 
   return '<div class="panel"><div class="pad">' +
-      '<p class="eyebrow">Standing</p>' +
+      '<p class="eyebrow">Every session · ' + S.history.filter(h=>!h.open).length + ' weights, ' + S.history.filter(h=>h.open).length + ' aerobic</p>' +
       '<h2 class="head">' + S.history.length + ' sessions, ' + Math.round(totalVol).toLocaleString("en-GB") + ' ' + S.units + ' moved</h2>' +
       '<hr class="rule">' + recent +
     '</div></div>' +
@@ -3001,7 +3026,7 @@ function setVal(id, field, val){
 }
 
 document.addEventListener("click", e=>{
-  const t = e.target.closest("[data-tab],[data-act],[data-done],[data-nudge],[data-swap],[data-units],[data-bar],[data-rest],[data-diag],[data-rmx],[data-addset],[data-newtrack],[data-delcustom],[data-pick],[data-addpick],[data-day],[data-hopen],[data-hnudge],[data-haddset],[data-hrmset],[data-hrmex],[data-rot],[data-newicon],[data-effort],[data-mins],[data-hadd],[data-figure],[data-feel],[data-place],[data-coursepick],[data-courseown],[data-courseclear],[data-tee],[data-holes],[data-score],[data-geffort],[data-parstep],[data-setprofile]");
+  const t = e.target.closest("[data-tab],[data-act],[data-done],[data-nudge],[data-swap],[data-units],[data-bar],[data-rest],[data-diag],[data-rmx],[data-addset],[data-newtrack],[data-delcustom],[data-pick],[data-addpick],[data-day],[data-hopen],[data-hnudge],[data-haddset],[data-hrmset],[data-hrmex],[data-rot],[data-newicon],[data-effort],[data-mins],[data-hadd],[data-figure],[data-feel],[data-place],[data-coursepick],[data-courseown],[data-courseclear],[data-tee],[data-holes],[data-score],[data-geffort],[data-parstep],[data-setprofile],[data-histfilter]");
   if(!t) return;
 
   if(t.dataset.diag){
@@ -3064,7 +3089,7 @@ document.addEventListener("click", e=>{
   if(t.dataset.setprofile){
     const bits = t.dataset.setprofile.split(":");
     const ex = (S.custom || []).find(x => x.id === bits.slice(1).join(":"));
-    if(ex){ ex.profile = bits[0]; ex.profileSet = true; save(); render(); }
+    if(ex){ ex.profile = bits[0]; ex.profileLocked = true; save(); render(); }
     return;
   }
 
@@ -3221,6 +3246,8 @@ document.addEventListener("click", e=>{
     return;
   }
 
+  if(t.dataset.histfilter){ histFilter = t.dataset.histfilter; render(); return; }
+
   if(t.dataset.hopen !== undefined){
     histIdx = Number(t.dataset.hopen); histList = false; histAdd = false; render(); return;
   }
@@ -3325,7 +3352,7 @@ document.addEventListener("click", e=>{
     const name = (newExtra.name || "").trim();
     if(!name){ alert("Give the exercise a name first."); return; }
     const id = "c-" + name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") + "-" + Date.now().toString(36).slice(-4);
-    S.custom.push({id:id, name:name, cat:"Yours", profile:newExtra.profile, profileSet:true,
+    S.custom.push({id:id, name:name, cat:"Yours", profile:newExtra.profile,
                    icon: newExtra.icon || guessIcon(name, newExtra.profile)});
     newExtra = {open:false, name:"", profile:"duration", icon:null, showIcons:false};
     save();
@@ -3345,7 +3372,7 @@ document.addEventListener("click", e=>{
   }
   if(act === "histList"){ histList = true; histDay = null; histIdx = null; previewOpen = false; render(); return; }
   if(act === "toggleHistAdd"){ histAdd = !histAdd; render(); return; }
-  if(act === "closeHist"){ histIdx = null; histList = false; histDay = null; histAdd = false; render(); return; }
+  if(act === "closeHist"){ histIdx = null; histList = false; histDay = null; histAdd = false; histFilter = "all"; render(); return; }
   if(act === "delSession"){
     const h = S.history[histIdx];
     if(h && confirm("Delete " + sessionTitle(h) + " from " + niceDate(h.date) + "? This cannot be undone.")){
