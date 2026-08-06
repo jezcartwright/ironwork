@@ -434,6 +434,9 @@ h2.head{
 }
 .add-big:active{transform:translateY(2px)}
 .add-big.on{background:var(--paper-2);color:var(--ink);border:1px solid var(--rule)}
+.add-big.quiet{background:none;border:1px solid var(--rule);color:var(--slate);
+  padding:13px 15px;font-size:14px;font-weight:500}
+.add-big.quiet:active{background:var(--paper-2)}
 .opt.used{background:var(--orange-pale);color:var(--orange-deep)}
 
 .opt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:16px}
@@ -1067,7 +1070,7 @@ function diagram(exId){
 /* ============================================================
    STATE
    ============================================================ */
-const BUILD = "25";
+const BUILD = "26";
 const KEY = "ironwork:v1";
 let S = null;
 let tab = "train";
@@ -2539,16 +2542,19 @@ function extrasPanel(){
 
   if(extras.length){
     html += '<div class="panel"><div class="pad">' +
-      '<p class="eyebrow">' + (c.open ? "This session" : "Also logged") + '</p>';
+      (c.open ? "" : '<p class="eyebrow">Also logged</p>');
     extras.forEach((entry, n)=>{
       const f = findEx(entry.exId);
       const name = entry.name || (f ? f.ex.name : "Exercise");
-      html += '<div class="ex" style="padding-top:' + (n ? 16 : 12) + 'px;margin-top:' + (n ? 16 : 0) + 'px">' +
-        '<div class="ex-head"><div style="flex:1;min-width:0">' +
-          ((PROFILES[entryProfile(entry)] || PROFILES.duration).golf ? "" :
-            '<p class="ex-pattern">' + esc((PROFILES[entryProfile(entry)] || PROFILES.duration).label) + '</p>') +
-          '<h3 class="ex-name" style="cursor:default">' + esc(name) + '</h3>' +
-        '</div><button class="mini" data-rmx="' + entry.exId + '">Remove</button></div>' +
+      const isGolf = (PROFILES[entryProfile(entry)] || PROFILES.duration).golf;
+      html += '<div class="ex" style="padding-top:' + (n ? 16 : 0) + 'px;margin-top:' + (n ? 16 : 0) + 'px">' +
+        '<div class="ex-head">' +
+          '<span class="ex-icon lead">' + icon(iconFor(entry.exId), 19) + '</span>' +
+          '<div style="flex:1;min-width:0">' +
+            (isGolf ? "" :
+              '<p class="ex-pattern">' + esc((PROFILES[entryProfile(entry)] || PROFILES.duration).label) + '</p>') +
+            '<h3 class="ex-name" style="cursor:default;font-size:' + (isGolf ? 26 : 22) + 'px">' + esc(name) + '</h3>' +
+          '</div><button class="mini" data-rmx="' + entry.exId + '">Remove</button></div>' +
         (PROFILES[entryProfile(entry)].golf ? "" :
           '<div class="bar-line"></div><div class="sets">' + setRows(entry, 60) + '</div>' +
           '<div style="margin-top:10px"><button class="mini" data-addset="' + entry.exId + '">Add another ' +
@@ -2559,8 +2565,9 @@ function extrasPanel(){
     html += '</div></div>';
   }
 
+  const hasSomething = extras.length > 0 || !c.open;
   html += '<div class="panel"><div class="pad">' +
-    '<button class="add-big' + (addOpen ? " on" : "") + '" data-act="toggleAdd">' +
+    '<button class="add-big' + (addOpen ? " on" : "") + (hasSomething ? " quiet" : "") + '" data-act="toggleAdd">' +
       '<svg viewBox="0 0 24 24" style="width:22px;height:22px;flex:0 0 22px" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" aria-hidden="true">' +
         (addOpen ? '<path d="M5 12h14"/>' : '<path d="M12 5v14M5 12h14"/>') + '</svg>' +
       '<span style="flex:1">' + (addOpen ? "Close" : "Aerobic Session") + '</span>' +
@@ -2592,23 +2599,27 @@ function extrasPanel(){
 /* ---------- live session ---------- */
 function viewOpen(){
   const c = S.current;
-  const named = c.entries.length ? c.entries.map(e => e.name).join(" · ") : null;
   if(!c.entries.length) addOpen = true;
-  return storageWarn() +
+
+  /* With something logged, the activity card carries the name and icon, so a
+     separate header would just repeat it. Only show one when nothing is chosen. */
+  const header = c.entries.length ? "" :
     '<div class="panel"><div class="pad">' +
       '<p class="eyebrow">' + (c.retro
         ? "Logging " + esc(keyDate(c.retro).toLocaleDateString("en-GB", {weekday:"long", day:"numeric", month:"long"}))
-        : "Aerobic &amp; open session · in progress") + '</p>' +
-      '<div style="display:flex;align-items:center;gap:11px;margin:6px 0 4px">' +
-        (c.entries.length ? '<span style="color:var(--orange)">' + icon(iconFor(c.entries[0].exId), 30) + '</span>' : "") +
-        '<h1 class="session-title" style="margin:0">' + esc(named || "Choose what you are doing") + '</h1>' +
-      '</div>' +
+        : "Aerobic &amp; open session") + '</p>' +
+      '<h1 class="session-title" style="margin:0">Choose what you are doing</h1>' +
       '<p class="lede" style="margin-top:6px">' + (c.retro
         ? "Enter what you actually did. It will be filed on that date, not today."
         : "Does not use a programme slot — the next session on the rotation is still waiting for you.") + '</p>' +
-    '</div></div>' +
-    extrasPanel() +
-    finishPanel();
+    '</div></div>';
+
+  const note = c.entries.length && c.retro
+    ? '<div class="panel"><div class="pad"><p class="eyebrow" style="margin:0">Logging ' +
+      esc(keyDate(c.retro).toLocaleDateString("en-GB", {weekday:"long", day:"numeric", month:"long"})) + '</p></div></div>'
+    : "";
+
+  return storageWarn() + header + note + extrasPanel() + finishPanel();
 }
 
 function finishPanel(){
