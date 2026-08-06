@@ -1067,6 +1067,7 @@ function diagram(exId){
 /* ============================================================
    STATE
    ============================================================ */
+const BUILD = "22";
 const KEY = "ironwork:v1";
 let S = null;
 let tab = "train";
@@ -1428,7 +1429,8 @@ const esc = t => String(t).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&
 
 function render(){
   document.getElementById("mastSub").textContent =
-    !cloudOK ? "Offline" : S.current ? "Session in progress" : "Session " + (S.sessionIndex + 1);
+    (!cloudOK ? "Offline" : S.current ? "Session in progress" : "Session " + (S.sessionIndex + 1)) +
+    "  ·  b" + BUILD;
   document.querySelectorAll(".nav button").forEach(b=>{
     b.classList.toggle("on", b.dataset.tab === tab);
   });
@@ -2543,7 +2545,8 @@ function extrasPanel(){
       const name = entry.name || (f ? f.ex.name : "Exercise");
       html += '<div class="ex" style="padding-top:' + (n ? 16 : 12) + 'px;margin-top:' + (n ? 16 : 0) + 'px">' +
         '<div class="ex-head"><div style="flex:1;min-width:0">' +
-          '<p class="ex-pattern">' + esc((PROFILES[entryProfile(entry)] || PROFILES.duration).label) + '</p>' +
+          ((PROFILES[entryProfile(entry)] || PROFILES.duration).golf ? "" :
+            '<p class="ex-pattern">' + esc((PROFILES[entryProfile(entry)] || PROFILES.duration).label) + '</p>') +
           '<h3 class="ex-name" style="cursor:default">' + esc(name) + '</h3>' +
         '</div><button class="mini" data-rmx="' + entry.exId + '">Remove</button></div>' +
         (PROFILES[entryProfile(entry)].golf ? "" :
@@ -2612,9 +2615,11 @@ function finishPanel(){
   const c = S.current;
   const done = c.entries.reduce((n,e)=> n + e.sets.filter(s=>s.done).length, 0);
   const total = c.entries.reduce((n,e)=> n + e.sets.length, 0);
+  const onlyGolf = c.entries.length > 0 && c.entries.every(e => entryProfile(e) === "golf");
   return '<div class="panel"><div class="pad">' +
-    '<p class="eyebrow">' + done + ' of ' + total + ' sets logged · ' +
-      Math.round((Date.now() - c.startedAt)/60000) + ' minutes elapsed</p>' +
+    (onlyGolf ? "" :
+      '<p class="eyebrow">' + done + ' of ' + total + ' sets logged · ' +
+        Math.round((Date.now() - c.startedAt)/60000) + ' minutes elapsed</p>') +
     '<button class="btn" data-act="finish">Finish session</button>' +
     '<div style="height:10px"></div>' +
     '<button class="btn btn-ghost" data-act="abandon">Discard this session</button>' +
@@ -2934,7 +2939,7 @@ function viewSettings(){
     '<p class="lede" style="margin-bottom:14px">Golf course names and tee details come from OpenGolfAPI (opengolfapi.org), free and open under ODbL. Courses you play are saved to your account, so they work offline afterwards.</p>' +
   '</div></div>' +
   '<div class="panel"><div class="pad">' +
-    '<p class="eyebrow">Data</p>' +
+    '<p class="eyebrow">Data · build ' + BUILD + '</p>' +
     '<p class="lede" style="margin-bottom:14px">Your history is kept on this device and copied to your account, so a lost phone is not a lost log.</p>' +
     '<button class="btn btn-ghost" data-act="export">Copy my history as JSON</button>' +
     '<div style="height:8px"></div>' +
