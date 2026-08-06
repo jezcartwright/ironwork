@@ -8,7 +8,7 @@
    Exercise artwork stays cache-first — those files never change under a given
    name, and there are 262 of them. */
 
-const VERSION = "25";
+const VERSION = "26";
 const SHELL   = "ironwork-shell-v" + VERSION;
 const ART     = "ironwork-art-v1";
 
