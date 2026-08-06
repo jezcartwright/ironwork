@@ -470,6 +470,8 @@ button.tile:active{transform:translateY(2px)}
 .chosen{display:flex;align-items:center;justify-content:space-between;gap:10px;
   background:var(--paper-2);border-radius:8px;padding:11px}
 .chosen b{font-size:15px;font-weight:600}
+.teerow{display:flex;gap:9px;align-items:center}
+.teerow .pick{flex:1;min-width:0}
 .tees{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
 .tee-b{padding:10px;border-radius:9px;background:var(--paper-2);text-align:left;color:var(--ink)}
 .tee-b.on{background:var(--orange);color:#FFFFFF}
@@ -515,6 +517,8 @@ button.tile:active{transform:translateY(2px)}
 .chosen{display:flex;align-items:center;justify-content:space-between;gap:10px;
   background:var(--paper-2);border-radius:8px;padding:11px}
 .chosen b{font-size:15px;font-weight:600}
+.teerow{display:flex;gap:9px;align-items:center}
+.teerow .pick{flex:1;min-width:0}
 .tees{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
 .tee-b{padding:10px;border-radius:9px;background:var(--paper-2);text-align:left;color:var(--ink)}
 .tee-b.on{background:var(--orange);color:#FFFFFF}
@@ -1341,10 +1345,22 @@ function finishSession(){
       sets:e.sets.filter(s=>s.done).map(s=>({w:Number(s.w)||0, r:Number(s.r)||0, done:true}))
     })).filter(e => e.sets.length || (e.meta && (e.meta.score || e.meta.course)))
   };
+  /* a round's effort stands as the session's, unless one is already set */
+  if(!rec.effort){
+    const withEffort = rec.entries.find(e => e.meta && e.meta.effort);
+    if(withEffort) rec.effort = withEffort.meta.effort;
+  }
+
   /* any golf course played is remembered, however it was entered */
   rec.entries.forEach(e=>{
     const m = e.meta;
-    if(m && m.course) rememberCourse({name:m.course, tees:m.tees || []});
+    if(m && m.course){
+      let tees = m.tees || [];
+      if(!tees.length && m.parManual){
+        tees = [{name: m.teeName || "Default", par: Number(m.parManual)}];
+      }
+      rememberCourse({name:m.course, tees:tees});
+    }
   });
 
   S.history.push(rec);
@@ -2306,9 +2322,10 @@ function golfBlock(entry, ctx){
   const m = entry.meta || (entry.meta = {});
   let out = "";
 
+  /* the course is required — nothing else appears until one is chosen */
   if(!m.course){
-    out += '<p class="eyebrow">Course</p>' +
-      '<input class="pick" data-coursesearch="' + ctx + '" placeholder="Start typing a course name" value="' + esc(courseQ) + '">' +
+    out += '<p class="eyebrow">Course · required</p>' +
+      '<input class="pick" data-coursesearch="' + ctx + '" placeholder="Start typing a course name" value="' + esc(courseQ) + '" autocomplete="off">' +
       (courseBusy ? '<p class="lede" style="font-size:12px;margin:0 0 8px">Looking…</p>' : "") +
       (courseErr ? '<div class="warn">' + esc(courseErr) + '</div>' : "") +
       (courseHits.length
@@ -2320,7 +2337,8 @@ function golfBlock(entry, ctx){
         : "") +
       (courseQ.length >= 3 && !courseBusy
         ? '<button class="mini" data-courseown="' + ctx + '">Use “' + esc(courseQ) + '” as typed</button>'
-        : "");
+        : "") +
+      '<p class="lede" style="font-size:12px;margin-top:10px">Pick the course and the tees, and the par comes with it.</p>';
     return out;
   }
 
@@ -2328,39 +2346,66 @@ function golfBlock(entry, ctx){
     '<div class="chosen"><b>' + esc(m.course) + '</b>' +
     '<button class="mini" data-courseclear="' + ctx + '">Change</button></div>';
 
+  /* tees carry the par */
   const tees = m.tees || [];
-  out += '<p class="eyebrow" style="margin-top:14px">Tee</p>';
+  out += '<p class="eyebrow" style="margin-top:16px">Tees played</p>';
   if(tees.length){
     out += '<div class="tees">' + tees.map((t,i)=>
       '<button class="tee-b' + (m.tee === i ? " on" : "") + '" data-tee="' + i + ':' + ctx + '">' +
         '<b>' + esc(t.name) + '</b>' +
-        '<span>' + (t.par ? "par " + t.par : "") + (t.yards ? " · " + t.yards + "y" : "") + '</span>' +
+        '<span>' + (t.par ? "par " + t.par : "par unknown") + (t.yards ? " · " + t.yards + "y" : "") + '</span>' +
       '</button>').join("") + '</div>';
   }else{
-    out += '<input class="pick" data-meta="teename:' + ctx + '" placeholder="Which tees? Optional" value="' + esc(m.teeName || "") + '">';
+    out += '<div class="teerow">' +
+      '<input class="pick" style="margin:0" data-meta="teename:' + ctx + '" placeholder="Which tees?" value="' + esc(m.teeName || "") + '">' +
+      '<div class="field" style="width:118px">' +
+        '<button class="step" data-parstep="-1:' + ctx + '" aria-label="Less">−</button>' +
+        '<input type="number" inputmode="numeric" data-parin="' + ctx + '" value="' + (m.parManual || "") + '" placeholder="par" aria-label="Par">' +
+        '<button class="step" data-parstep="1:' + ctx + '" aria-label="More">+</button>' +
+      '</div>' +
+    '</div>' +
+    '<p class="lede" style="font-size:12px;margin-top:6px">No scorecard on file for this course. Enter the par once and it is remembered.</p>';
   }
 
-  out += '<p class="eyebrow" style="margin-top:14px">Holes</p>' +
-    '<div class="feel">' +
-      ['9','18'].map(n=>'<button class="feel-b' + ((m.holes || 18) == n ? " on" : "") + '" data-holes="' + n + ':' + ctx + '">' + n + '</button>').join("") +
-    '</div>';
-
+  /* score */
   const par = golfPar(m);
-  out += '<p class="eyebrow" style="margin-top:14px">Score</p>' +
+  out += '<p class="eyebrow" style="margin-top:16px">Overall score</p>' +
     '<div class="field" style="width:170px">' +
       '<button class="step" data-score="-1:' + ctx + '" aria-label="Less">−</button>' +
       '<input type="number" inputmode="numeric" data-scorein="' + ctx + '" value="' + (m.score || "") + '" aria-label="Score">' +
       '<button class="step" data-score="1:' + ctx + '" aria-label="More">+</button>' +
     '</div>' +
-    (m.score && par ? '<p class="derived" style="margin-top:8px">' + esc(vsPar(m.score, par)) + ' · par ' + par + '</p>' : "");
+    (m.score && par
+      ? '<p class="derived" style="margin-top:8px">' + esc(vsPar(m.score, par)) + ' · par ' + par + '</p>'
+      : (par ? '<p class="lede" style="font-size:12px;margin-top:8px">Par ' + par + '</p>' : ""));
+
+  /* how it went */
+  out += '<p class="eyebrow" style="margin-top:16px">How did you get on</p>' +
+    '<div class="feel">' +
+      [["bad","Badly"],["mid","OK"],["good","Well"]].map(f=>
+        '<button class="feel-b' + (m.feel === f[0] ? " on" : "") + '" data-feel="' + f[0] + ':' + ctx + '">' + f[1] + '</button>'
+      ).join("") +
+    '</div>';
+
+  /* effort, on the round itself */
+  const eff = m.effort || 0;
+  let cells = "";
+  for(let n = 1; n <= 10; n++){
+    cells += '<button class="rpe-c' + (n <= eff ? " on" : "") + (n === eff ? " tip" : "") +
+      '" data-geffort="' + n + ':' + ctx + '" aria-label="Effort ' + n + ' out of 10">' + n + '</button>';
+  }
+  out += '<p class="eyebrow" style="margin-top:16px">Effort</p>' +
+    '<div class="rpe">' + cells + '</div>' +
+    '<p class="lede" style="font-size:13px;margin-top:7px">' +
+      (eff ? '<b>' + eff + '/10</b> · ' + esc(effortWord(eff)) : 'Walked it, buggy, or somewhere between.') + '</p>';
+
   return out;
 }
 
 function golfPar(m){
   const t = (m.tees || [])[m.tee];
-  const full = t && t.par ? t.par : null;
-  if(!full) return null;
-  return (m.holes || 18) == 9 ? Math.round(full / 2) : full;
+  const full = (t && t.par) ? t.par : (Number(m.parManual) || null);
+  return full || null;
 }
 function vsPar(score, par){
   const d = Number(score) - par;
@@ -3010,6 +3055,29 @@ document.addEventListener("click", e=>{
     const bits = t.dataset.score.split(":");
     const e = ctxEntry(bits.slice(1).join(":"));
     if(e){ e.meta.score = Math.max(0, (Number(e.meta.score) || 0) + Number(bits[0])); save(); render(); }
+    return;
+  }
+
+  if(t.dataset.geffort){
+    const parts = t.dataset.geffort.split(":");
+    const n = Number(parts[0]);
+    const e = ctxEntry(parts.slice(1).join(":"));
+    if(e){
+      e.meta = e.meta || {};
+      e.meta.effort = (e.meta.effort === n) ? null : n;
+      save(); render();
+    }
+    return;
+  }
+
+  if(t.dataset.parstep){
+    const parts = t.dataset.parstep.split(":");
+    const e = ctxEntry(parts.slice(1).join(":"));
+    if(e){
+      e.meta = e.meta || {};
+      e.meta.parManual = Math.max(0, (Number(e.meta.parManual) || 70) + Number(parts[0]));
+      save(); render();
+    }
     return;
   }
 
