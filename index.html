@@ -1067,7 +1067,7 @@ function diagram(exId){
 /* ============================================================
    STATE
    ============================================================ */
-const BUILD = "22";
+const BUILD = "23";
 const KEY = "ironwork:v1";
 let S = null;
 let tab = "train";
@@ -2943,6 +2943,8 @@ function viewSettings(){
     '<p class="lede" style="margin-bottom:14px">Your history is kept on this device and copied to your account, so a lost phone is not a lost log.</p>' +
     '<button class="btn btn-ghost" data-act="export">Copy my history as JSON</button>' +
     '<div style="height:8px"></div>' +
+    '<button class="btn btn-ghost" data-act="forceUpdate">Force an update now</button>' +
+    '<div style="height:8px"></div>' +
     '<button class="btn btn-ghost" data-act="reset">Erase everything and start over</button>' +
   '</div></div>';
 }
@@ -3329,6 +3331,22 @@ document.addEventListener("click", e=>{
     const txt = JSON.stringify(S.history, null, 2);
     navigator.clipboard ? navigator.clipboard.writeText(txt).then(()=>alert("History copied to the clipboard.")) : alert(txt);
   }
+  if(act === "forceUpdate"){
+    (async ()=>{
+      try{
+        if(window.caches){
+          const keys = await caches.keys();
+          await Promise.all(keys.filter(k => k.indexOf("art") === -1).map(k => caches.delete(k)));
+        }
+        if(navigator.serviceWorker){
+          const regs = await navigator.serviceWorker.getRegistrations();
+          await Promise.all(regs.map(r => r.unregister()));
+        }
+      }catch(e){}
+      location.reload(true);
+    })();
+    return;
+  }
   if(act === "reset"){
     if(confirm("Erase every session, weight and record? This cannot be undone.")){
       S = blankState(); summaryRec = null; save(); render();
@@ -3394,7 +3412,30 @@ document.addEventListener("input", e=>{
    BOOT
    ============================================================ */
 if("serviceWorker" in navigator){
-  window.addEventListener("load", ()=>{ navigator.serviceWorker.register("sw.js").catch(()=>{}); });
+  window.addEventListener("load", ()=>{
+    navigator.serviceWorker.register("sw.js").then(reg=>{
+      /* look for a newer app every time the page opens, and on returning to it */
+      reg.update();
+      document.addEventListener("visibilitychange", ()=>{
+        if(!document.hidden) reg.update();
+      });
+      reg.addEventListener("updatefound", ()=>{
+        const sw = reg.installing;
+        if(!sw) return;
+        sw.addEventListener("statechange", ()=>{
+          if(sw.state === "installed" && navigator.serviceWorker.controller){
+            sw.postMessage("skipWaiting");
+          }
+        });
+      });
+    }).catch(()=>{});
+    let reloaded = false;
+    navigator.serviceWorker.addEventListener("controllerchange", ()=>{
+      if(reloaded) return;
+      reloaded = true;
+      location.reload();
+    });
+  });
 }
 
 window.ironworkSignedIn = async function(uid, profile){
