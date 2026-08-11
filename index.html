@@ -310,6 +310,7 @@ h2.head{
 .rbx.on{background:var(--orange);color:#FFFFFF}
 .rbx.late{background:var(--orange-deep);color:#FFFFFF}
 .rbx.next{background:var(--paper);border:2px solid var(--orange);color:var(--orange-deep)}
+.rbx.due{color:#8C857A;font-weight:400}
 .rbx.on:active,.rbx.late:active,.rgb:active{transform:translateY(2px)}
 .rgb{height:36px;border-radius:3px;background:var(--green);color:#FFFFFF;border:0;font-family:var(--ui);
   display:flex;align-items:center;justify-content:center;gap:5px;font-size:12px;font-weight:600;padding:0}
@@ -1086,7 +1087,7 @@ function diagram(exId){
 /* ============================================================
    STATE
    ============================================================ */
-const BUILD = "31";
+const BUILD = "33";
 const KEY = "ironwork:v1";
 let S = null;
 let tab = "train";
@@ -1571,6 +1572,21 @@ function blockAlongside(i){
   return Object.keys(groups).map(k=> groups[k]).sort((a,c)=> c.n - a.n).slice(0, 3);
 }
 
+/* the day a not-yet-done session falls due: every other day from the last
+   one actually logged, so slipping shifts the whole tail rather than leaving
+   a schedule you are already behind */
+function dueDay(n){
+  let lastDay = null, lastIdx = null;
+  S.history.forEach(h=>{
+    if(h.open || typeof h.index !== "number") return;
+    if(lastIdx === null || h.index > lastIdx){ lastIdx = h.index; lastDay = recDay(h); }
+  });
+  const from = lastDay || dayKey(new Date());
+  const base = lastIdx === null ? n : n - lastIdx;
+  const d = keyDate(from); d.setDate(d.getDate() + base * 2);
+  return dayKey(d);
+}
+
 function shortDate(key){
   return keyDate(key).toLocaleDateString("en-US", {month:"short", day:"numeric"});
 }
@@ -1992,15 +2008,12 @@ function viewHome(){
   const i = S.sessionIndex;
   const sess = sessionAt(i);
   const strength = S.history.filter(h => !h.open);
-  const opens = S.history.filter(h => h.open);
   const last = strength[strength.length - 1];
   const days = last ? daysSinceKey(recDay(last)) : null;
   const totalSets = S.history.reduce((n,h)=> n + h.entries.reduce((m,e)=> m + e.sets.length, 0), 0);
   const totalMins = S.history.reduce((n,h)=> n + (h.minutes || 0), 0);
   const totalVol = S.history.reduce((n,h)=> n + h.entries.reduce((m,e)=>
     m + ((e.track||"load")==="load" ? e.sets.reduce((k,s)=> k + s.w*s.r, 0) : 0), 0), 0);
-  const last28 = strength.filter(h => daysSinceKey(recDay(h)) < 28).length;
-  const open28 = opens.filter(h => daysSinceKey(recDay(h)) < 28).length;
 
   const readiness = days === null
     ? "First session. Start light enough that the last set still looks like the first."
@@ -2095,10 +2108,15 @@ function viewHome(){
           esc(shortDate(day)) +
           (late ? '<small>+' + (gap - 2) + ' day' + (gap - 2 > 1 ? "s" : "") + '</small>' : "") +
           '</button>';
-      }else if(n === i){
-        cells += '<div class="rbx next">Today</div>';
       }else{
-        cells += '<div class="rbx"></div>';
+        const due   = dueDay(n);
+        const today = dayKey(new Date());
+        if(n === i){
+          cells += '<div class="rbx next">' +
+            (due <= today ? "Today" : esc(shortDate(due))) + '</div>';
+        }else{
+          cells += '<div class="rbx due">' + esc(shortDate(due)) + '</div>';
+        }
       }
     }
   }
@@ -2118,7 +2136,8 @@ function viewHome(){
     '<p class="lede" style="margin-top:4px">' +
       (nDone >= 9 ? "Block complete. Everything advances next session."
        : nDone === 0 ? "Nothing logged in this block yet."
-       : (9 - nDone) + " session" + (9 - nDone > 1 ? "s" : "") + " until every exercise advances.") + '</p>' +
+       : (9 - nDone) + " session" + (9 - nDone > 1 ? "s" : "") + " until every exercise advances" +
+         ", on " + esc(shortDate(dueDay(bb.end + 1))) + " at this cadence.") + '</p>' +
     '<div class="rgrid">' + cells + '</div>' +
     '<div class="rkey">' +
       '<span><i style="background:var(--orange)"></i>Programme</span>' +
@@ -2128,32 +2147,12 @@ function viewHome(){
     '<p class="lede" style="font-size:12px;margin-top:10px">Nine sessions — each exercise three times — then every slot moves on. Aerobic and open sessions sit alongside and do not use a slot. Tap anything to look inside.</p>' +
   '</div></div>';
 
-  /* ---- rhythm ---- */
-  const cad = cadence(28);
-  html += '<div class="panel"><div class="pad">' +
-    '<p class="eyebrow">Rhythm · last 28 days</p>' +
-    '<h2 class="head">' + last28 + ' of 14 programme sessions</h2>' +
-    '<p class="lede" style="margin-top:4px">' +
-      (last28 >= 13 ? "Bang on the every-other-day cadence."
-       : last28 >= 9 ? "Close to cadence. One more session a fortnight closes the gap."
-       : last28 >= 4 ? "Below the every-other-day target. Consistency beats intensity here."
-       : strength.length ? "Sparse fortnight. Getting back to a fixed rhythm matters more than the loads."
-       : "Nothing logged yet — the strip fills in as you train.") +
-      (open28 ? " Plus " + open28 + " open session" + (open28 > 1 ? "s" : "") + "." : "") + '</p>' +
-    '<div class="cad">' + cad.map(d=>{
-      const cls = (d.s ? "on " : d.o ? "open " : "") + (d.today ? "today" : "");
-      return (d.s || d.o)
-        ? '<button class="' + cls + '" data-day="' + d.key + '" title="' + d.key + ' — tap to open" aria-label="Sessions on ' + d.key + '"></button>'
-        : '<i class="' + cls + '" title="' + d.key + '"></i>';
-    }).join("") + '</div>' +
-    '<div class="cad-l"><span>28 days ago</span><span>Today</span></div>' +
-    '<p class="lede" style="font-size:12px;margin-top:8px">Solid bars are programme sessions, outlined are open ones. Tap any bar to review or correct that session.</p>' +
-    '<div class="meta">' +
+  /* ---- totals ---- */
+  html += '<div class="panel"><div class="pad"><div class="meta" style="margin-top:0">' +
       '<div><button class="n numlink" data-act="histList">' + strength.length + '</button><span class="l">Programme</span></div>' +
       '<div><span class="n">' + totalMins + '</span><span class="l">Minutes</span></div>' +
       '<div><span class="n">' + totalSets + '</span><span class="l">Sets</span></div>' +
-    '</div>' +
-  '</div></div>';
+    '</div></div></div>';
 
   /* ---- movement on the three primaries ---- */
   if(S.history.length){
