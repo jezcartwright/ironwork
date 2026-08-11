@@ -311,6 +311,7 @@ h2.head{
 .rbx.late{background:var(--orange-deep);color:#FFFFFF}
 .rbx.next{background:var(--paper);border:2px solid var(--orange);color:var(--orange-deep)}
 .rbx.due{color:#8C857A;font-weight:400}
+.rbx.due:active,.rbx.next:active{transform:translateY(2px)}
 .rbx.on:active,.rbx.late:active,.rgb:active{transform:translateY(2px)}
 .rgb{height:36px;border-radius:3px;background:var(--green);color:#FFFFFF;border:0;font-family:var(--ui);
   display:flex;align-items:center;justify-content:center;gap:5px;font-size:12px;font-weight:600;padding:0}
@@ -1087,7 +1088,10 @@ function diagram(exId){
 /* ============================================================
    STATE
    ============================================================ */
-const BUILD = "33";
+const BUILD = "34";
+/* the masthead and Setup show this as v3.4 — one number, formatted on the way out */
+const VERSION = (function(){ const n = String(BUILD).padStart(2, "0");
+  return "v" + n.slice(0, -1) + "." + n.slice(-1); })();
 const KEY = "ironwork:v1";
 let S = null;
 let tab = "train";
@@ -1450,7 +1454,7 @@ const esc = t => String(t).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&
 function render(){
   document.getElementById("mastSub").textContent =
     (!cloudOK ? "Offline" : S.current ? "Session in progress" : "Session " + (S.sessionIndex + 1)) +
-    "  ·  b" + BUILD;
+    "  ·  " + VERSION;
   document.querySelectorAll(".nav button").forEach(b=>{
     b.classList.toggle("on", b.dataset.tab === tab);
   });
@@ -2111,12 +2115,11 @@ function viewHome(){
       }else{
         const due   = dueDay(n);
         const today = dayKey(new Date());
-        if(n === i){
-          cells += '<div class="rbx next">' +
-            (due <= today ? "Today" : esc(shortDate(due))) + '</div>';
-        }else{
-          cells += '<div class="rbx due">' + esc(shortDate(due)) + '</div>';
-        }
+        const nm    = sessionAt(n).title;
+        const lab   = (n === i && due <= today) ? "Today" : shortDate(due);
+        cells += '<button class="rbx ' + (n === i ? "next" : "due") + '" data-rot="' + n + '" ' +
+          'aria-label="' + esc(nm) + ' due ' + esc(shortDate(due)) + ', see what is coming">' +
+          esc(lab) + '</button>';
       }
     }
   }
@@ -2132,15 +2135,15 @@ function viewHome(){
 
   html += '<div class="panel"><div class="pad">' +
     '<p class="eyebrow">Rhythm · variation ' + (varNo + 1) + ' of 4</p>' +
-    '<h2 class="head">' + nDone + ' of 9 programme' + (nAlso ? ' · ' + nAlso + ' alongside' : "") + '</h2>' +
+    '<h2 class="head">' + nDone + ' of 9 sessions' + (nAlso ? ' · ' + nAlso + ' alongside' : "") + '</h2>' +
     '<p class="lede" style="margin-top:4px">' +
       (nDone >= 9 ? "Block complete. Everything advances next session."
        : nDone === 0 ? "Nothing logged in this block yet."
-       : (9 - nDone) + " session" + (9 - nDone > 1 ? "s" : "") + " until every exercise advances" +
+       : (9 - nDone) + " to go until every exercise advances" +
          ", on " + esc(shortDate(dueDay(bb.end + 1))) + " at this cadence.") + '</p>' +
     '<div class="rgrid">' + cells + '</div>' +
     '<div class="rkey">' +
-      '<span><i style="background:var(--orange)"></i>Programme</span>' +
+      '<span><i style="background:var(--orange)"></i>Sessions</span>' +
       '<span><i style="background:var(--green)"></i>Alongside</span>' +
       '<span><i style="background:var(--orange-deep)"></i>Ran late</span>' +
     '</div>' +
@@ -2149,7 +2152,7 @@ function viewHome(){
 
   /* ---- totals ---- */
   html += '<div class="panel"><div class="pad"><div class="meta" style="margin-top:0">' +
-      '<div><button class="n numlink" data-act="histList">' + strength.length + '</button><span class="l">Programme</span></div>' +
+      '<div><button class="n numlink" data-act="histList">' + strength.length + '</button><span class="l">Sessions</span></div>' +
       '<div><span class="n">' + totalMins + '</span><span class="l">Minutes</span></div>' +
       '<div><span class="n">' + totalSets + '</span><span class="l">Sets</span></div>' +
     '</div></div></div>';
@@ -3189,7 +3192,7 @@ function viewSettings(){
     '<p class="lede" style="margin-bottom:14px">Golf course names and tee details come from OpenGolfAPI (opengolfapi.org), free and open under ODbL. Courses you play are saved to your account, so they work offline afterwards.</p>' +
   '</div></div>' +
   '<div class="panel"><div class="pad">' +
-    '<p class="eyebrow">Data · build ' + BUILD + '</p>' +
+    '<p class="eyebrow">Data · ' + VERSION + '</p>' +
     '<p class="lede" style="margin-bottom:14px">Your history is kept on this device and copied to your account, so a lost phone is not a lost log.</p>' +
     '<button class="btn btn-ghost" data-act="export">Copy my history as JSON</button>' +
     '<div style="height:8px"></div>' +
