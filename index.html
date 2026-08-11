@@ -301,6 +301,22 @@ h2.head{
 .libslot li.cur{color:var(--ink);font-weight:600}
 .libslot li.cur::before{content:"";position:absolute;left:0;top:12px;width:8px;height:8px;background:var(--orange);border-radius:1px}
 
+.rgrid{display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:5px;margin:12px 0 0;align-items:center}
+.rgl{font-family:var(--mono);font-size:8.5px;letter-spacing:.06em;color:var(--slate);text-align:center}
+.rbx{height:42px;border-radius:3px;background:var(--paper-3);border:0;padding:0;font-family:var(--ui);
+  font-size:11.5px;font-weight:600;color:var(--slate);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:1px}
+.rbx small{font-family:var(--mono);font-size:8px;font-weight:400;opacity:.85}
+.rbx.on{background:var(--orange);color:#FFFFFF}
+.rbx.late{background:var(--orange-deep);color:#FFFFFF}
+.rbx.next{background:var(--paper);border:2px solid var(--orange);color:var(--orange-deep)}
+.rbx.on:active,.rbx.late:active,.rgb:active{transform:translateY(2px)}
+.rgb{height:36px;border-radius:3px;background:var(--green);color:#FFFFFF;border:0;font-family:var(--ui);
+  display:flex;align-items:center;justify-content:center;gap:5px;font-size:12px;font-weight:600;padding:0}
+.rgb.none{background:var(--paper-3);color:var(--slate)}
+.rkey{display:flex;gap:12px;margin-top:12px;font-size:10.5px;color:var(--slate);align-items:center;flex-wrap:wrap}
+.rkey i{width:9px;height:9px;border-radius:2px;display:inline-block;margin-right:4px;vertical-align:-1px}
+.histrow.inblock{background:var(--green-pale)}
 .cad{display:flex;gap:3px;margin:14px 0 5px}
 .cad i{flex:1;height:32px;background:var(--paper-2);border-radius:1px;display:block}
 .cad i.on{background:var(--orange)}
@@ -1070,7 +1086,7 @@ function diagram(exId){
 /* ============================================================
    STATE
    ============================================================ */
-const BUILD = "30";
+const BUILD = "31";
 const KEY = "ironwork:v1";
 let S = null;
 let tab = "train";
@@ -1442,6 +1458,7 @@ function render(){
   if(tab === "train"){
     v.innerHTML = S.current ? viewSession()
       : histIdx !== null ? viewHistory()
+      : histEx ? viewHistEx()
       : histList ? viewHistList()
       : previewOpen ? viewPreview()
       : pick.open ? viewPicker()
@@ -1493,6 +1510,74 @@ function loggedElsewhere(h){
    9am now is one day, not zero */
 function daysBetween(a, b){
   return Math.round((startOfDay(b) - startOfDay(a)) / 86400000);
+}
+
+/* the nine-session block the rotation is currently inside */
+function blockBounds(i){
+  const start = Math.floor(i / (ROTATE_EVERY * 3)) * (ROTATE_EVERY * 3);
+  return {start: start, end: start + (ROTATE_EVERY * 3) - 1};
+}
+
+/* programme sessions logged inside the block, keyed by session index */
+function blockSessions(i){
+  const b = blockBounds(i);
+  const byIndex = {};
+  S.history.forEach((h, idx)=>{
+    if(h.open) return;
+    if(typeof h.index !== "number") return;
+    if(h.index < b.start || h.index > b.end) return;
+    byIndex[h.index] = {h:h, i:idx};
+  });
+  return byIndex;
+}
+
+/* the first day the block was trained — anything since counts as alongside */
+function blockStartDay(i){
+  const done = blockSessions(i);
+  const keys = Object.keys(done).map(Number).sort((a,c)=> a - c);
+  if(keys.length) return recDay(done[keys[0]].h);
+
+  /* nothing logged in this block yet — the window opens the day after the
+     last session of the previous one, so aerobic work still shows */
+  const b = blockBounds(i);
+  let prev = null;
+  S.history.forEach(h=>{
+    if(h.open || typeof h.index !== "number" || h.index >= b.start) return;
+    const k = recDay(h);
+    if(!prev || k > prev) prev = k;
+  });
+  if(prev){
+    const d = keyDate(prev); d.setDate(d.getDate() + 1);
+    return dayKey(d);
+  }
+
+  /* no programme history at all — count everything logged so far */
+  let first = null;
+  S.history.forEach(h=>{ const k = recDay(h); if(!first || k < first) first = k; });
+  return first || dayKey(new Date());
+}
+
+/* open sessions logged since the block began, grouped by exercise */
+function blockAlongside(i){
+  const from = blockStartDay(i);
+  const groups = {};
+  S.history.forEach(h=>{
+    if(!h.open || !h.entries.length) return;
+    if(recDay(h) < from) return;
+    const e = h.entries[0];
+    const g = groups[e.exId] || (groups[e.exId] = {exId:e.exId, name:e.name || "Session", n:0});
+    g.n++;
+  });
+  return Object.keys(groups).map(k=> groups[k]).sort((a,c)=> c.n - a.n).slice(0, 3);
+}
+
+function shortDate(key){
+  return keyDate(key).toLocaleDateString("en-US", {month:"short", day:"numeric"});
+}
+
+/* days between two YYYY-MM-DD keys */
+function daysBetween(a, b){
+  return Math.round((keyDate(b) - keyDate(a)) / 86400000);
 }
 
 function cadence(days){
@@ -1645,6 +1730,42 @@ function niceDate(d){
   return new Date(d).toLocaleDateString("en-GB", {weekday:"short", day:"numeric", month:"short"});
 }
 function recDateLabel(h){ return keyDate(recDay(h)).toLocaleDateString("en-GB", {weekday:"short", day:"numeric", month:"short"}); }
+
+/* every session of one activity, with the current block picked out */
+function viewHistEx(){
+  const from = blockStartDay(S.sessionIndex);
+  const rows = S.history.map((h, idx)=>({h:h, i:idx}))
+    .filter(r => r.h.open && r.h.entries.length && r.h.entries[0].exId === histEx)
+    .reverse();
+
+  if(!rows.length){ histEx = null; return viewHome(); }
+
+  const name    = rows[0].h.entries[0].name || "Activity";
+  const inBlock = rows.filter(r => recDay(r.h) >= from);
+
+  let html = '<div class="panel"><div class="pad">' +
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">' +
+      '<div><p class="eyebrow" style="color:var(--green)">Every one logged</p>' +
+      '<h1 class="session-title">' + esc(name) + '</h1></div>' +
+      '<button class="mini" data-act="closeHist">Done</button>' +
+    '</div>' +
+    '<p class="lede" style="margin-top:8px">' + rows.length + ' in total' +
+      (inBlock.length ? ' · ' + inBlock.length + ' since this block began, shaded below.' : '.') + '</p>' +
+    '<div style="height:12px"></div>';
+
+  rows.forEach(r=>{
+    const here = recDay(r.h) >= from;
+    html += '<button class="histrow' + (here ? " inblock" : "") + '" data-hopen="' + r.i + '">' +
+      '<span class="ex-icon">' + icon(iconFor(histEx), 18) + '</span>' +
+      '<span style="flex:1;min-width:0">' +
+        '<b>' + esc(recDateLabel(r.h)) + '</b>' +
+        '<span>' + esc(entryLine(r.h.entries[0])) +
+        (r.h.effort ? ' · ' + r.h.effort + '/10' : '') + '</span>' +
+      '</span><span class="chev-r">\u203a</span></button>';
+  });
+
+  return html + '</div></div>';
+}
 
 function viewHistList(){
   const all = S.history.map((h, i)=>({h:h, i:i}))
@@ -1946,6 +2067,66 @@ function viewHome(){
         : "") +
     '</div></div>';
   }
+
+  /* ---- the nine-session block ---- */
+  const bb    = blockBounds(i);
+  const bDone = blockSessions(i);
+  const bAlso = blockAlongside(i);
+  const nDone = Object.keys(bDone).length;
+  const nAlso = bAlso.reduce((n,g)=> n + g.n, 0);
+  const varNo = Math.floor(cycleAt(bb.start) / ROTATE_EVERY) % 4;
+
+  let cells = '<span class="rgl"></span>' +
+    SESSIONS.map(x => '<span class="rgl">' + esc(x.title.toUpperCase()) + '</span>').join("");
+
+  let prevDay = null;
+  for(let c = 0; c < ROTATE_EVERY; c++){
+    cells += '<span class="rgl">' + (c + 1) + '</span>';
+    for(let p = 0; p < 3; p++){
+      const n   = bb.start + c * 3 + p;
+      const rec = bDone[n];
+      if(rec){
+        const day  = recDay(rec.h);
+        const gap  = prevDay ? daysBetween(prevDay, day) : 2;
+        const late = gap > 2;
+        prevDay = day;
+        cells += '<button class="rbx ' + (late ? "late" : "on") + '" data-hopen="' + rec.i + '" ' +
+          'aria-label="' + esc(sessionTitle(rec.h)) + ' on ' + esc(shortDate(day)) + '">' +
+          esc(shortDate(day)) +
+          (late ? '<small>+' + (gap - 2) + ' day' + (gap - 2 > 1 ? "s" : "") + '</small>' : "") +
+          '</button>';
+      }else if(n === i){
+        cells += '<div class="rbx next">Today</div>';
+      }else{
+        cells += '<div class="rbx"></div>';
+      }
+    }
+  }
+
+  cells += '<span class="rgl" style="color:var(--green)">ALSO</span>';
+  for(let p = 0; p < 3; p++){
+    const g = bAlso[p];
+    cells += g
+      ? '<button class="rgb" data-histex="' + esc(g.exId) + '" aria-label="Every ' + esc(g.name) + '">' +
+          '<span style="display:flex">' + icon(iconFor(g.exId), 14) + '</span>' + g.n + '</button>'
+      : '<div class="rgb none">·</div>';
+  }
+
+  html += '<div class="panel"><div class="pad">' +
+    '<p class="eyebrow">Rhythm · variation ' + (varNo + 1) + ' of 4</p>' +
+    '<h2 class="head">' + nDone + ' of 9 programme' + (nAlso ? ' · ' + nAlso + ' alongside' : "") + '</h2>' +
+    '<p class="lede" style="margin-top:4px">' +
+      (nDone >= 9 ? "Block complete. Everything advances next session."
+       : nDone === 0 ? "Nothing logged in this block yet."
+       : (9 - nDone) + " session" + (9 - nDone > 1 ? "s" : "") + " until every exercise advances.") + '</p>' +
+    '<div class="rgrid">' + cells + '</div>' +
+    '<div class="rkey">' +
+      '<span><i style="background:var(--orange)"></i>Programme</span>' +
+      '<span><i style="background:var(--green)"></i>Alongside</span>' +
+      '<span><i style="background:var(--orange-deep)"></i>Ran late</span>' +
+    '</div>' +
+    '<p class="lede" style="font-size:12px;margin-top:10px">Nine sessions — each exercise three times — then every slot moves on. Aerobic and open sessions sit alongside and do not use a slot. Tap anything to look inside.</p>' +
+  '</div></div>';
 
   /* ---- rhythm ---- */
   const cad = cadence(28);
@@ -2488,6 +2669,7 @@ let newExtra = {open:false, name:"", profile:"duration", icon:null, showIcons:fa
 let pick = {open:false, sel:null, when:null};   // when = YYYY-MM-DD for a past session
 let addOpen = false;
 let histIdx = null;    // history entry being viewed / edited
+let histEx  = null;    // one activity's whole history, opened from the Rhythm grid
 let histDay = null;    // filter the list to one day
 let histList = false;
 let previewOpen = false;
@@ -3029,7 +3211,7 @@ function setVal(id, field, val){
 }
 
 document.addEventListener("click", e=>{
-  const t = e.target.closest("[data-tab],[data-act],[data-done],[data-nudge],[data-swap],[data-units],[data-bar],[data-rest],[data-diag],[data-rmx],[data-addset],[data-newtrack],[data-delcustom],[data-pick],[data-addpick],[data-day],[data-hopen],[data-hnudge],[data-haddset],[data-hrmset],[data-hrmex],[data-rot],[data-newicon],[data-effort],[data-mins],[data-hadd],[data-figure],[data-feel],[data-place],[data-coursepick],[data-courseown],[data-courseclear],[data-tee],[data-holes],[data-score],[data-geffort],[data-parstep],[data-setprofile],[data-histfilter]");
+  const t = e.target.closest("[data-tab],[data-act],[data-done],[data-nudge],[data-swap],[data-units],[data-bar],[data-rest],[data-diag],[data-rmx],[data-addset],[data-newtrack],[data-delcustom],[data-pick],[data-addpick],[data-day],[data-hopen],[data-hnudge],[data-haddset],[data-hrmset],[data-hrmex],[data-rot],[data-newicon],[data-effort],[data-mins],[data-hadd],[data-figure],[data-feel],[data-place],[data-coursepick],[data-courseown],[data-courseclear],[data-tee],[data-holes],[data-score],[data-geffort],[data-parstep],[data-setprofile],[data-histfilter],[data-histex]");
   if(!t) return;
 
   if(t.dataset.diag){
@@ -3038,7 +3220,7 @@ document.addEventListener("click", e=>{
     render(); return;
   }
 
-  if(t.dataset.tab){ summaryRec = null; histIdx = null; histList = false; histDay = null; previewOpen = false; previewIdx = null; tab = t.dataset.tab; render(); return; }
+  if(t.dataset.tab){ summaryRec = null; histIdx = null; histEx = null; histList = false; histDay = null; previewOpen = false; previewIdx = null; tab = t.dataset.tab; render(); return; }
 
   if(t.dataset.rest){
     if(t.dataset.rest === "add"){ restLeft += 30; drawRest(); }
@@ -3223,6 +3405,11 @@ document.addEventListener("click", e=>{
     histIdx = null; histList = false; render(); return;
   }
 
+  if(t.dataset.histex){
+    histEx = t.dataset.histex; histIdx = null; histList = false; histDay = null;
+    previewOpen = false; tab = "train"; render(); return;
+  }
+
   if(t.dataset.day){
     const key = t.dataset.day;
     const hits = S.history.map((h,i)=>({h:h,i:i})).filter(r => recDay(r.h) === key);
@@ -3375,7 +3562,7 @@ document.addEventListener("click", e=>{
   }
   if(act === "histList"){ histList = true; histDay = null; histIdx = null; previewOpen = false; render(); return; }
   if(act === "toggleHistAdd"){ histAdd = !histAdd; render(); return; }
-  if(act === "closeHist"){ histIdx = null; histList = false; histDay = null; histAdd = false; histFilter = "all"; render(); return; }
+  if(act === "closeHist"){ histIdx = null; histEx = null; histList = false; histDay = null; histAdd = false; histFilter = "all"; render(); return; }
   if(act === "delSession"){
     const h = S.history[histIdx];
     if(h && confirm("Delete " + sessionTitle(h) + " from " + niceDate(h.date) + "? This cannot be undone.")){
