@@ -829,20 +829,20 @@ const EXTRAS = [
   {id:"x-run",     name:"Run",                    cat:"Aerobic — steady",   profile:"distance", tile:true},
   {id:"x-cycle",   name:"Bike",                   cat:"Aerobic — steady",   profile:"distance", tile:true},
   {id:"x-row-erg", name:"Row",                    cat:"Aerobic — steady",   profile:"distance", tile:true},
-  {id:"x-swim",    name:"Swim",                   cat:"Aerobic — steady",   profile:"distance"},
+  {id:"x-swim",    name:"Swim",                   cat:"Aerobic — steady",   profile:"distance", hidden:true},
   {id:"x-walk",    name:"Walk",                   cat:"Aerobic — steady",   profile:"distance", tile:true},
-  {id:"x-spin",    name:"Exercise bike",          cat:"Aerobic — steady",   profile:"duration"},
-  {id:"x-skip",    name:"Skipping",               cat:"Aerobic — steady",   profile:"duration"},
+  {id:"x-spin",    name:"Exercise bike",          cat:"Aerobic — steady",   profile:"duration", hidden:true},
+  {id:"x-skip",    name:"Skipping",               cat:"Aerobic — steady",   profile:"duration", hidden:true},
 
   {id:"x-xcski",     name:"Cross-country ski",      cat:"Aerobic — steady",   profile:"distance", tile:true},
   {id:"x-cycle-int", name:"Bike intervals",         cat:"Aerobic — intervals", profile:"intervals", tile:true},
   {id:"x-run-int",   name:"Run intervals",          cat:"Aerobic — intervals", profile:"intervals", tile:true},
   {id:"x-xcski-int", name:"XC ski intervals",       cat:"Aerobic — intervals", profile:"intervals", tile:true},
   {id:"x-row-int",   name:"Row intervals",          cat:"Aerobic — intervals", profile:"intervals", tile:true},
-  {id:"x-intervals", name:"Bike or rower intervals", cat:"Aerobic — intervals", profile:"intervals"},
-  {id:"x-hill",      name:"Hill sprints",            cat:"Aerobic — intervals", profile:"intervals"},
-  {id:"x-shuttle",   name:"Shuttle runs",            cat:"Aerobic — intervals", profile:"intervals"},
-  {id:"x-stairs",    name:"Stair climbing",          cat:"Aerobic — intervals", profile:"duration"},
+  {id:"x-intervals", name:"Bike or rower intervals", cat:"Aerobic — intervals", profile:"intervals", hidden:true},
+  {id:"x-hill",      name:"Hill sprints",            cat:"Aerobic — intervals", profile:"intervals", hidden:true},
+  {id:"x-shuttle",   name:"Shuttle runs",            cat:"Aerobic — intervals", profile:"intervals", hidden:true},
+  {id:"x-stairs",    name:"Stair climbing",          cat:"Aerobic — intervals", profile:"duration", hidden:true},
 
   {id:"x-burpee",     name:"Burpees",            cat:"Conditioning", profile:"intervals"},
   {id:"x-mtn",        name:"Mountain climbers",  cat:"Conditioning", profile:"duration"},
@@ -852,8 +852,8 @@ const EXTRAS = [
   {id:"x-golf",    name:"Golf",             cat:"Sport", profile:"golf",  tile:true},
   {id:"x-tennis",  name:"Padel",            cat:"Sport", profile:"sport", tile:true},
   {id:"x-pickle",  name:"Pickleball",       cat:"Sport", profile:"sport", tile:true},
-  {id:"x-football",name:"Football",         cat:"Sport", profile:"sport"},
-  {id:"x-ski",     name:"Skiing",           cat:"Sport", profile:"sport"},
+  {id:"x-football",name:"Football",         cat:"Sport", profile:"sport", hidden:true},
+  {id:"x-ski",     name:"Skiing",           cat:"Sport", profile:"sport", hidden:true},
 
   {id:"x-calf",      name:"Calf raise",       cat:"Strength extras", profile:"strength"},
   {id:"x-shrug",     name:"Barbell shrug",    cat:"Strength extras", profile:"strength"},
@@ -1151,7 +1151,7 @@ function diagram(exId){
 /* ============================================================
    STATE
    ============================================================ */
-const BUILD = "37";
+const BUILD = "39";
 /* the masthead and Setup show this as v3.4 — one number, formatted on the way out */
 const VERSION = (function(){ const n = String(BUILD).padStart(2, "0");
   return "v" + n.slice(0, -1) + "." + n.slice(-1); })();
@@ -2870,7 +2870,7 @@ function viewPicker(){
   html += '<p class="eyebrow">Everything else</p>';
 
   cats.forEach(cat=>{
-    const inCat = allExtras().filter(x => x.cat === cat && !x.tile);
+    const inCat = allExtras().filter(x => x.cat === cat && !x.tile && !x.hidden);
     if(!inCat.length) return;
     html += '<p class="eyebrow">' + esc(cat) + '</p><div class="opt-grid">' +
       inCat.map(x=>
