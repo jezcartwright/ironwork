@@ -301,6 +301,26 @@ h2.head{
 .libslot li.cur{color:var(--ink);font-weight:600}
 .libslot li.cur::before{content:"";position:absolute;left:0;top:12px;width:8px;height:8px;background:var(--orange);border-radius:1px}
 
+.atiles{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:4px 0 16px}
+.atile{background:var(--green);border:0;border-radius:8px;padding:16px 8px 13px;display:flex;
+  flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:104px;cursor:pointer}
+.atile img{width:40px;height:40px;display:block}
+.atile b{color:#FFFFFF;font-size:13.5px;font-weight:600;text-align:center;line-height:1.3;font-family:var(--ui)}
+.atile:active{transform:translateY(2px)}
+.atile.on{outline:3px solid var(--orange);outline-offset:2px}
+.atile.mid{grid-column:1 / -1;justify-self:center;width:calc(50% - 4px)}
+.achosen{display:flex;align-items:center;gap:11px;margin:4px 0 14px}
+.abadge{width:56px;height:56px;border-radius:8px;background:var(--green);display:flex;
+  align-items:center;justify-content:center;flex:none}
+.abadge img{width:34px;height:34px;display:block}
+.amode{width:100%;background:var(--green);border:0;border-radius:8px;padding:14px 15px;text-align:left;
+  cursor:pointer;margin-bottom:8px;font-family:var(--ui)}
+.amode:active{transform:translateY(2px)}
+.amode b{color:#FFFFFF;font-size:15px;font-weight:600;display:block}
+.amode span{color:rgba(255,255,255,.82);font-size:11.5px;display:block;margin-top:2px;line-height:1.45}
+.amode.alt{background:var(--paper);border:1.5px solid var(--green)}
+.amode.alt b{color:var(--green)}
+.amode.alt span{color:#4A6B57}
 .rgrid{display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:5px;margin:12px 0 0;align-items:center}
 .rgl{font-family:var(--mono);font-size:8.5px;letter-spacing:.06em;color:var(--slate);text-align:center}
 .rbx{height:42px;border-radius:3px;background:var(--paper-3);border:0;padding:0;font-family:var(--ui);
@@ -806,14 +826,19 @@ const DELOAD_EVERY = 16;  // sessions between deloads
    time = minutes × effort, distance = distance × minutes.
    ============================================================ */
 const EXTRAS = [
-  {id:"x-run",     name:"Run",                    cat:"Aerobic — steady",   profile:"distance"},
-  {id:"x-cycle",   name:"Cycling",                cat:"Aerobic — steady",   profile:"distance"},
-  {id:"x-row-erg", name:"Rowing machine",         cat:"Aerobic — steady",   profile:"distance"},
+  {id:"x-run",     name:"Run",                    cat:"Aerobic — steady",   profile:"distance", tile:true},
+  {id:"x-cycle",   name:"Bike",                   cat:"Aerobic — steady",   profile:"distance", tile:true},
+  {id:"x-row-erg", name:"Row",                    cat:"Aerobic — steady",   profile:"distance", tile:true},
   {id:"x-swim",    name:"Swim",                   cat:"Aerobic — steady",   profile:"distance"},
-  {id:"x-walk",    name:"Brisk or incline walk",  cat:"Aerobic — steady",   profile:"distance"},
+  {id:"x-walk",    name:"Walk",                   cat:"Aerobic — steady",   profile:"distance", tile:true},
   {id:"x-spin",    name:"Exercise bike",          cat:"Aerobic — steady",   profile:"duration"},
   {id:"x-skip",    name:"Skipping",               cat:"Aerobic — steady",   profile:"duration"},
 
+  {id:"x-xcski",     name:"Cross-country ski",      cat:"Aerobic — steady",   profile:"distance", tile:true},
+  {id:"x-cycle-int", name:"Bike intervals",         cat:"Aerobic — intervals", profile:"intervals", tile:true},
+  {id:"x-run-int",   name:"Run intervals",          cat:"Aerobic — intervals", profile:"intervals", tile:true},
+  {id:"x-xcski-int", name:"XC ski intervals",       cat:"Aerobic — intervals", profile:"intervals", tile:true},
+  {id:"x-row-int",   name:"Row intervals",          cat:"Aerobic — intervals", profile:"intervals", tile:true},
   {id:"x-intervals", name:"Bike or rower intervals", cat:"Aerobic — intervals", profile:"intervals"},
   {id:"x-hill",      name:"Hill sprints",            cat:"Aerobic — intervals", profile:"intervals"},
   {id:"x-shuttle",   name:"Shuttle runs",            cat:"Aerobic — intervals", profile:"intervals"},
@@ -824,8 +849,9 @@ const EXTRAS = [
   {id:"x-bw-circuit", name:"Bodyweight circuit", cat:"Conditioning", profile:"intervals"},
   {id:"x-battle",     name:"Sled, bag or bike finisher", cat:"Conditioning", profile:"duration"},
 
-  {id:"x-golf",    name:"Golf",             cat:"Sport", profile:"golf"},
-  {id:"x-tennis",  name:"Tennis or padel",  cat:"Sport", profile:"sport"},
+  {id:"x-golf",    name:"Golf",             cat:"Sport", profile:"golf",  tile:true},
+  {id:"x-tennis",  name:"Padel",            cat:"Sport", profile:"sport", tile:true},
+  {id:"x-pickle",  name:"Pickleball",       cat:"Sport", profile:"sport", tile:true},
   {id:"x-football",name:"Football",         cat:"Sport", profile:"sport"},
   {id:"x-ski",     name:"Skiing",           cat:"Sport", profile:"sport"},
 
@@ -1125,7 +1151,7 @@ function diagram(exId){
 /* ============================================================
    STATE
    ============================================================ */
-const BUILD = "35";
+const BUILD = "37";
 /* the masthead and Setup show this as v3.4 — one number, formatted on the way out */
 const VERSION = (function(){ const n = String(BUILD).padStart(2, "0");
   return "v" + n.slice(0, -1) + "." + n.slice(-1); })();
@@ -2316,6 +2342,7 @@ const ICON_PATHS = {
   racquet:'<ellipse cx="9.6" cy="8.4" rx="5.6" ry="6.4"/><path d="M13.2 13.4l5.9 6.5M6.6 5.4l6 6M12.9 5.9l-6.2 5.9"/>',
   ball:'<circle cx="12" cy="12" r="8.6"/><path d="M12 6.3l3.9 2.9-1.5 4.6H9.6L8.1 9.2z"/>',
   golf:'<path d="M7.6 20.4h8.8M12 20.4V3.6l7.2 3.2L12 10"/>',
+  ski:'<path d="M3.8 20.2h16.4M7.4 4.4l7.8 14.2M17.4 5.6l-6.6 12"/><circle cx="16.6" cy="4.4" r="1.5"/>',
   kettlebell:'<path d="M9 6.6a3 3 0 0 1 6 0v1.3"/><path d="M12 8.4c3.6 0 6.1 2.9 6.1 6.2s-2.5 5.1-6.1 5.1-6.1-1.8-6.1-5.1S8.4 8.4 12 8.4z"/>',
   sled:'<path d="M4.8 15.6h10l2.4-6.2H7.2z"/><path d="M3.6 19.6h16.8M6.6 15.6v4M14.4 15.6v4"/>',
   music:'<path d="M9.2 17.6V5.4l10-2v12"/><ellipse cx="6.7" cy="17.8" rx="2.6" ry="2.1"/><ellipse cx="16.7" cy="15.8" rx="2.6" ry="2.1"/>',
@@ -2337,8 +2364,10 @@ function icon(name, px){
 }
 const EXTRA_ICON = {
   "x-run":"run","x-cycle":"bike","x-spin":"bike","x-row-erg":"row","x-swim":"swim","x-walk":"walk","x-skip":"skip",
-  "x-intervals":"bolt","x-hill":"mountain","x-shuttle":"bolt","x-stairs":"stairs",
-  "x-burpee":"bolt","x-mtn":"bolt","x-bw-circuit":"clock","x-battle":"bolt",
+  "x-intervals":"bike","x-hill":"mountain","x-shuttle":"run","x-stairs":"stairs",
+  "x-burpee":"bolt","x-mtn":"bolt","x-bw-circuit":"clock","x-battle":"sled",
+  "x-golf":"golf","x-tennis":"racquet","x-pickle":"racquet","x-football":"ball","x-ski":"ski",
+  "x-xcski":"ski","x-xcski-int":"ski","x-cycle-int":"bike","x-run-int":"run","x-row-int":"row",
   "x-calf":"dumbbell","x-shrug":"barbell","x-lateral":"dumbbell","x-facepull":"cable","x-rear-fly":"dumbbell",
   "x-deadhang":"pullbar","x-plank":"core","x-side-plank":"core",
   "x-mobility":"stretch","x-hip-flow":"stretch","x-thoracic":"stretch","x-stretch":"stretch","x-yoga":"yoga"
@@ -2419,6 +2448,68 @@ function iconFor(exId){
 }
 
 const PLUS = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" fill="none" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round"/></svg>';
+
+/* The aerobic tiles. Four activities are done two ways, so they ask a second
+   question; padel and pickleball share a racquet and ask which. Everything
+   else goes straight through. Art lives in icons/, drawn by an illustrator —
+   the SVG glyphs are still used everywhere outside this picker. */
+const A_TILES = [
+  {art:"bike",                 label:"Bike",   steady:"x-cycle",   intervals:"x-cycle-int"},
+  {art:"running",              label:"Run",    steady:"x-run",     intervals:"x-run-int"},
+  {art:"cross_country_skiing", label:"XC ski", steady:"x-xcski",   intervals:"x-xcski-int"},
+  {art:"rowing",               label:"Row",    steady:"x-row-erg", intervals:"x-row-int"},
+  {art:"walking",              label:"Walk",   id:"x-walk"},
+  {art:"golf",                 label:"Golf",   id:"x-golf"},
+  {art:"padel_pickleball",     label:"Padel or pickleball", mid:true,
+   choices:[{id:"x-tennis", label:"Padel",      note:"Records time played and effort."},
+            {id:"x-pickle", label:"Pickleball", note:"Records time played and effort."}]}
+];
+
+const A_BLURB = {
+  "x-cycle":"Road or turbo — one continuous effort. Records distance and time.",
+  "x-cycle-int":"Hard efforts with recovery between. Records rounds, work and rest.",
+  "x-run":"A single continuous run. Records distance and time, pace derived.",
+  "x-run-int":"Reps at pace with recovery. Records rounds, work and rest.",
+  "x-xcski":"One continuous ski. Records distance and time.",
+  "x-xcski-int":"Hard efforts with recovery between. Records rounds, work and rest.",
+  "x-row-erg":"A steady piece on the erg. Records distance and time.",
+  "x-row-int":"Intervals on the erg. Records rounds, work and rest."
+};
+
+function tileArt(art, px){
+  return '<img src="icons/' + art + '.png" alt="" width="' + px + '" height="' + px + '" ' +
+    'onerror="this.style.display=\'none\'">';
+}
+
+function aerobicTiles(){
+  if(pick.family !== null && pick.family !== undefined){
+    const t = A_TILES[pick.family];
+    if(t){
+      const opts = t.choices ||
+        [{id:t.steady, label:"Steady"}, {id:t.intervals, label:"Intervals"}];
+      return '<button class="back" data-act="clearFamily">\u2039 All activities</button>' +
+        '<div class="achosen"><span class="abadge">' + tileArt(t.art, 34) + '</span>' +
+          '<span><h2 class="session-title" style="font-size:20px">' + esc(t.label) + '</h2>' +
+          '<p class="lede" style="margin:2px 0 0">' +
+            (t.choices ? "Which one?" : "How are you doing it?") + '</p></span></div>' +
+        opts.map((o, n)=>
+          '<button class="amode' + (n ? " alt" : "") + '" data-pick="' + o.id + '">' +
+            '<b>' + esc(o.label) + '</b>' +
+            '<span>' + esc(o.note || A_BLURB[o.id] || "") + '</span>' +
+          '</button>').join("");
+    }
+  }
+  return '<div class="atiles">' + A_TILES.map((t, n)=>{
+    const sel = t.id ? pick.sel === t.id
+      : (t.choices ? t.choices.some(c => c.id === pick.sel)
+                   : pick.sel === t.steady || pick.sel === t.intervals);
+    const chosen = sel ? allExtras().find(x => x.id === pick.sel) : null;
+    return '<button class="atile' + (t.mid ? " mid" : "") + (sel ? " on" : "") + '" ' +
+      (t.id ? 'data-pick="' + t.id + '"' : 'data-family="' + n + '"') + '>' +
+      tileArt(t.art, 40) +
+      '<b>' + esc(chosen ? chosen.name : t.label) + '</b></button>';
+  }).join("") + '</div>';
+}
 
 function pickerOptions(disableIds, firstLabel){
   const cats = [];
@@ -2707,7 +2798,7 @@ function vsPar(score, par){
 
 /* ---------- extras panel ---------- */
 let newExtra = {open:false, name:"", profile:"duration", icon:null, showIcons:false};
-let pick = {open:false, sel:null, when:null};   // when = YYYY-MM-DD for a past session
+let pick = {open:false, sel:null, when:null, family:null};   // when = YYYY-MM-DD for a past session
 let addOpen = false;
 let histIdx = null;    // history entry being viewed / edited
 let histEx  = null;    // one activity's whole history, opened from the Rhythm grid
@@ -2772,9 +2863,17 @@ function viewPicker(){
     '</div>' +
     (past ? '<div class="warn">Logging for ' + esc(keyDate(when).toLocaleDateString("en-GB", {weekday:"long", day:"numeric", month:"long"})) + '. Enter what you actually did.</div>' : '');
 
+  html += aerobicTiles();
+
+  if(pick.family !== null && pick.family !== undefined) return html + '</div></div>';
+
+  html += '<p class="eyebrow">Everything else</p>';
+
   cats.forEach(cat=>{
+    const inCat = allExtras().filter(x => x.cat === cat && !x.tile);
+    if(!inCat.length) return;
     html += '<p class="eyebrow">' + esc(cat) + '</p><div class="opt-grid">' +
-      allExtras().filter(x => x.cat === cat).map(x=>
+      inCat.map(x=>
         '<button class="opt ' + (pick.sel === x.id ? "on" : "") + '" data-pick="' + x.id + '">' +
           icon(iconFor(x.id), 26) + '<b>' + esc(x.name) + '</b></button>').join("") +
     '</div>';
@@ -3252,7 +3351,7 @@ function setVal(id, field, val){
 }
 
 document.addEventListener("click", e=>{
-  const t = e.target.closest("[data-tab],[data-act],[data-done],[data-nudge],[data-swap],[data-units],[data-bar],[data-rest],[data-diag],[data-rmx],[data-addset],[data-newtrack],[data-delcustom],[data-pick],[data-addpick],[data-day],[data-hopen],[data-hnudge],[data-haddset],[data-hrmset],[data-hrmex],[data-rot],[data-newicon],[data-effort],[data-mins],[data-hadd],[data-figure],[data-feel],[data-place],[data-coursepick],[data-courseown],[data-courseclear],[data-tee],[data-holes],[data-score],[data-geffort],[data-parstep],[data-setprofile],[data-histfilter],[data-histex]");
+  const t = e.target.closest("[data-tab],[data-act],[data-done],[data-nudge],[data-swap],[data-units],[data-bar],[data-rest],[data-diag],[data-rmx],[data-addset],[data-newtrack],[data-delcustom],[data-pick],[data-addpick],[data-day],[data-hopen],[data-hnudge],[data-haddset],[data-hrmset],[data-hrmex],[data-rot],[data-newicon],[data-effort],[data-mins],[data-hadd],[data-figure],[data-feel],[data-place],[data-coursepick],[data-courseown],[data-courseclear],[data-tee],[data-holes],[data-score],[data-geffort],[data-parstep],[data-setprofile],[data-histfilter],[data-histex],[data-family]");
   if(!t) return;
 
   if(t.dataset.diag){
@@ -3335,7 +3434,8 @@ document.addEventListener("click", e=>{
     render(); return;
   }
 
-  if(t.dataset.pick){ pick.sel = (pick.sel === t.dataset.pick ? null : t.dataset.pick); render(); return; }
+  if(t.dataset.pick){
+    pick.family = null; pick.sel = (pick.sel === t.dataset.pick ? null : t.dataset.pick); render(); return; }
 
   if(t.dataset.feel){
     const [val, ...c] = t.dataset.feel.split(":");
@@ -3444,6 +3544,10 @@ document.addEventListener("click", e=>{
   if(t.dataset.rot){
     previewIdx = Number(t.dataset.rot); previewOpen = true;
     histIdx = null; histList = false; render(); return;
+  }
+
+  if(t.dataset.family){
+    pick.family = Number(t.dataset.family); render(); return;
   }
 
   if(t.dataset.histex){
@@ -3565,12 +3669,13 @@ document.addEventListener("click", e=>{
     return;
   }
   if(act === "toggleAdd"){ addOpen = !addOpen; newExtra.open = false; render(); return; }
-  if(act === "openPicker"){ pick = {open:true, sel:null, when:null}; newExtra.open = false; render(); return; }
-  if(act === "closePicker"){ pick = {open:false, sel:null, when:null}; newExtra.open = false; render(); return; }
+  if(act === "openPicker"){ pick = {open:true, sel:null, when:null, family:null}; newExtra.open = false; render(); return; }
+  if(act === "clearFamily"){ pick.family = null; render(); return; }
+  if(act === "closePicker"){ pick = {open:false, sel:null, when:null, family:null}; newExtra.open = false; render(); return; }
   if(act === "startPicked"){
     const chosen = pick.sel;
     const when = pick.when;
-    pick = {open:false, sel:null, when:null};
+    pick = {open:false, sel:null, when:null, family:null};
     startOpen(when && when !== dayKey(new Date()) ? when : null);
     if(chosen) addExtraToSession(chosen);
     return;
