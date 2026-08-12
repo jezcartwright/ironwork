@@ -893,6 +893,43 @@ const TRACK = {
 
 function allExtras(){ return EXTRAS.concat(S.custom || []); }
 
+/* A custom activity created before the matching built-in one existed leaves two
+   entries with the same name in the Library — one with all the history, one
+   unused. Fold the custom one onto the built-in, keeping every logged session,
+   and drop the duplicate. Runs on load; does nothing when there is nothing to
+   merge. */
+function mergeDuplicateExtras(){
+  if(!S.custom || !S.custom.length) return [];
+  const norm = n => String(n || "").trim().toLowerCase();
+  const merged = [];
+
+  S.custom.slice().forEach(mine =>{
+    const builtIn = EXTRAS.find(x => norm(x.name) === norm(mine.name));
+    if(!builtIn) return;
+
+    let moved = 0;
+    const repoint = e =>{
+      if(e.exId !== mine.id) return;
+      e.exId = builtIn.id;
+      e.name = builtIn.name;
+      delete e.profile;        // resolved from the definition at render time
+      delete e.profileLocked;
+      moved++;
+    };
+    S.history.forEach(h => h.entries.forEach(repoint));
+    if(S.current) S.current.entries.forEach(repoint);
+
+    S.custom = S.custom.filter(x => x.id !== mine.id);
+    merged.push({name: builtIn.name, from: mine.id, to: builtIn.id, moved: moved});
+  });
+
+  if(merged.length){
+    S.mergeLog = (S.mergeLog || []).concat(merged);
+    save();
+  }
+  return merged;
+}
+
 /* resolve any exercise id — programme or extra */
 function findEx(exId){
   for(const k in SLOTS){
@@ -1088,7 +1125,7 @@ function diagram(exId){
 /* ============================================================
    STATE
    ============================================================ */
-const BUILD = "34";
+const BUILD = "35";
 /* the masthead and Setup show this as v3.4 — one number, formatted on the way out */
 const VERSION = (function(){ const n = String(BUILD).padStart(2, "0");
   return "v" + n.slice(0, -1) + "." + n.slice(-1); })();
@@ -1144,6 +1181,7 @@ async function loadState(){
   }
   if(!S || !S.v) S = blankState();
   if(!S.custom) S.custom = [];
+  mergeDuplicateExtras();
 
   try{ localStorage.setItem(userKey() + ":probe", "1"); localStorage.removeItem(userKey() + ":probe"); }
   catch(e){ storageOK = false; }
@@ -1595,9 +1633,10 @@ function shortDate(key){
   return keyDate(key).toLocaleDateString("en-US", {month:"short", day:"numeric"});
 }
 
-/* days between two YYYY-MM-DD keys */
-function daysBetween(a, b){
-  return Math.round((keyDate(b) - keyDate(a)) / 86400000);
+/* days between two YYYY-MM-DD keys — distinct from daysBetween, which takes
+   Date objects. Two functions, two names, on purpose. */
+function dayGap(aKey, bKey){
+  return Math.round((keyDate(bKey) - keyDate(aKey)) / 86400000);
 }
 
 function cadence(days){
@@ -2104,7 +2143,7 @@ function viewHome(){
       const rec = bDone[n];
       if(rec){
         const day  = recDay(rec.h);
-        const gap  = prevDay ? daysBetween(prevDay, day) : 2;
+        const gap  = prevDay ? dayGap(prevDay, day) : 2;
         const late = gap > 2;
         prevDay = day;
         cells += '<button class="rbx ' + (late ? "late" : "on") + '" data-hopen="' + rec.i + '" ' +
