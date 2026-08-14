@@ -177,8 +177,9 @@ h2.head{
 .shots figure{flex:1;margin:0;min-width:0}
 .shots img{width:100%;height:auto;display:block}
 .shots figcaption{font-size:11px;color:var(--slate);text-align:center;margin-top:6px;line-height:1.35}
-.shots[data-failed] img{display:none}
-.shots[data-failed] figcaption{padding:18px 4px;background:var(--paper);border-radius:6px}
+.shots[data-failed]{display:none}
+.diag.fallback{display:none}
+.shots[data-failed] + .diag.fallback{display:flex}
 
 .diag{display:flex;gap:10px;margin:14px 0 0;background:var(--paper-2);padding:12px;border-radius:2px}
 .diag figure{flex:1;margin:0;min-width:0}
@@ -1099,6 +1100,8 @@ const DIAG = {
 "bb-rdl":"rdl","db-rdl":"rdl","landmine-rdl":"rdl","sl-rdl":"slRdl",
 "pallof":"pallof","chop":"pallof","hk-pallof":"pallof","landmine-rainbow":"landmineRot",
 "suitcase-carry":"carry","renegade-row":"bentRow",
+"weighted-pressup":"floorPress","bstance-rdl":"slRdl","sl-glute-bridge":"hipThrust",
+"low-step-up":"stepUp","sl-hip-thrust-u":"hipThrust",
 "conv-deadlift":"deadlift","deficit-deadlift":"deadlift","paused-deadlift":"deadlift","rack-pull":"rackPull",
 "bb-ohp":"ohp","db-shoulder":"ohp","arnold":"ohp","landmine-press":"halfkneelPress",
 "bb-row":"bentRow","landmine-row":"bentRow","cs-row":"csRow","seated-cable-row":"seatedRow",
@@ -1139,21 +1142,30 @@ function shots(exId){
   return '<div class="shots' + (n > 2 ? " many" : "") + '">' + cells + '</div>';
 }
 
-function diagram(exId){
-  const shot = shots(exId);
-  if(shot) return shot;
+/* the app's own drawn diagram, used when there is no photograph or the
+   photograph fails to load */
+function drawnDiagram(exId, extraClass){
   const a = ARCH[DIAG[exId]];
   if(!a) return "";
-  return '<div class="diag">' + a.f.map((fr, i)=>
+  return '<div class="diag' + (extraClass ? " " + extraClass : "") + '">' + a.f.map((fr, i)=>
     '<figure><svg viewBox="0 0 200 200" role="img" aria-label="' + esc(a.caps[i]) + '">' +
       (fr.k || "") + fig(fr.p) +
     '</svg><figcaption>' + esc(a.caps[i]) + '</figcaption></figure>').join("") + '</div>';
 }
 
+function diagram(exId){
+  const shot  = shots(exId);
+  const drawn = drawnDiagram(exId, "fallback");
+  /* both: the photograph, with the drawing behind it if the file is missing */
+  if(shot && drawn) return shot + drawn;
+  if(shot) return shot;
+  return drawnDiagram(exId);
+}
+
 /* ============================================================
    STATE
    ============================================================ */
-const BUILD = "41";
+const BUILD = "42";
 /* the masthead and Setup show this as v3.4 — one number, formatted on the way out */
 const VERSION = (function(){ const n = String(BUILD).padStart(2, "0");
   return "v" + n.slice(0, -1) + "." + n.slice(-1); })();
