@@ -682,9 +682,9 @@ const SLOTS = {
     {id:"weighted-pressup",name:"Weighted press-up",kind:"bodyweight",inc:2.5,cue:"Plate across the upper back, feet on the bench. Log added weight only. Ribs down, body in one line, chest to within a fist of the floor."}
   ]},
   vpull:{label:"Vertical pull", pool:[
-    {id:"pullup",name:"Pull-ups",kind:"bodyweight",inc:2.5,cue:"Wide grip on the multi-grip bar. Log added weight only — 0 is bodyweight. Chest to bar, control the lower."},
+    {id:"pullup",name:"Pull-ups",kind:"bodyweight",bwOnly:true,inc:2.5,cue:"Wide grip on the multi-grip bar. Bodyweight only — chase reps, not load. Chest to bar, control the lower."},
     {id:"lat-pulldown",name:"Lat pulldown",kind:"cable",inc:2.5,cue:"High pulley, long bar attachment, knees pinned. Drive the elbows down and back, pause a beat at the bottom."},
-    {id:"neutral-chin",name:"Neutral-grip chin-ups",kind:"bodyweight",inc:2.5,cue:"Parallel handles on the pull-up station. Log added weight only. Kindest grip on the elbows."},
+    {id:"neutral-chin",name:"Neutral-grip chin-ups",kind:"bodyweight",bwOnly:true,inc:2.5,cue:"Parallel handles on the pull-up station. Bodyweight only — chase reps. Kindest grip on the elbows."},
     {id:"sa-pulldown",name:"Half-kneeling single-arm pulldown",kind:"cable",inc:1.25,cue:"One pulley high, single handle, inside knee down. Ribs stay stacked — no side bend to finish the rep."}
   ]},
   rdl:{label:"Hinge accessory", pool:[
@@ -724,7 +724,7 @@ const SLOTS = {
     {id:"sl-hip-thrust-u",name:"Single-leg hip thrust",kind:"dumbbell",inc:2,perSide:true,cue:"Weight on the hip. Shoulders on the bench, one foot planted. Hips stay square and finish level. Glute work without bending the knee under load."}
   ]},
   antiext:{label:"Anti-extension core", pool:[
-    {id:"hanging-knee",name:"Hanging knee raise",kind:"bodyweight",inc:2.5,cue:"Hang from the pull-up bar. Log added weight only. Curl the pelvis up rather than just lifting the thighs."},
+    {id:"hanging-knee",name:"Hanging knee raise",kind:"bodyweight",bwOnly:true,inc:2.5,cue:"Hang from the pull-up bar. Bodyweight only — chase reps. Curl the pelvis up rather than just lifting the knees."},
     {id:"cable-crunch",name:"Kneeling cable crunch",kind:"cable",inc:2.5,cue:"High pulley, rope at the ears. Flex the spine down, hips stay still. Nothing to do with the hip flexors."},
     {id:"deadbug",name:"Cable dead bug",kind:"cable",inc:1.25,cue:"Low pulley, arms locked overhead holding tension, lower opposite arm and leg. Lower back stays flat on the floor."},
     {id:"hollow",name:"Hollow body hold",kind:"bodyweight",inc:2.5,cue:"Log a plate on the chest or 0 for bodyweight. Reps are seconds here. Lower back glued down throughout."}
@@ -1153,7 +1153,7 @@ function diagram(exId){
 /* ============================================================
    STATE
    ============================================================ */
-const BUILD = "40";
+const BUILD = "41";
 /* the masthead and Setup show this as v3.4 — one number, formatted on the way out */
 const VERSION = (function(){ const n = String(BUILD).padStart(2, "0");
   return "v" + n.slice(0, -1) + "." + n.slice(-1); })();
@@ -1339,6 +1339,24 @@ function anySingle(hist){ return hist.some(x => x.single !== null); }
 /* the learning bit: what should today's load be? */
 function suggest(ex, item, sessionIndex){
   const hist = allPerf(ex.id);
+
+  /* bodyweight-only movements have no load to progress, so the whole
+     double-progression ladder collapses to one rung: add reps */
+  if(ex.bwOnly){
+    if(!hist.length) return {w:0, why:"First time — stop each set 2 reps short of failure."};
+    const sets = hist[hist.length - 1].sets;
+    const best = sets.reduce((n,x)=> Math.max(n, x.r), 0);
+    const allTop = sets.length >= item.sets && sets.every(x => x.r >= item.hi);
+    const anyLow = sets.some(x => x.r < item.lo);
+    if(isDeload(sessionIndex))
+      return {w:0, why:"Deload session — same reps, but stop well short and move cleanly."};
+    if(allTop)
+      return {w:0, why:"Top of the range on every set. Add a rep, or slow the lower to keep it hard."};
+    if(anyLow)
+      return {w:0, why:"Some sets under the range. Hold here until all " + item.sets + " reach " + item.lo + "."};
+    return {w:0, why:"Best set was " + best + ". Chase " + item.hi + " on every set."};
+  }
+
   if(!hist.length) return {w:null, why:"First time on this lift — find a load you could stop 2 reps short of."};
 
   const last = hist[hist.length - 1];
@@ -2584,17 +2602,24 @@ function field(kind, id, val, cfg, exKind){
   '</div>';
 }
 
+/* some movements never take added load — they progress on reps alone */
+function isBodyweightOnly(exId){
+  const f = findEx(exId);
+  return !!(f && f.ex && f.ex.bwOnly);
+}
+
 function setRows(entry, rest){
   const P = PROFILES[entryProfile(entry)] || PROFILES.duration;
   if(P.golf) return "";
   const f = findEx(entry.exId);
   const exKind = (f && f.ex && f.ex.kind) ? f.ex.kind : null;
+  const bwOnly = !!(f && f.ex && f.ex.bwOnly);
   let out = "";
   entry.sets.forEach((st, si)=>{
     const id = entry.exId + ":" + si;
     out += '<div class="set ' + (st.done ? "done" : "") + '">' +
       '<span class="set-n">' + (si + 1) + '</span>' +
-      field("w", id, st.w, P.a, exKind) +
+      (bwOnly ? "" : field("w", id, st.w, P.a, exKind)) +
       (P.b ? field("r", id, st.r, P.b, exKind) : "") +
       '<button class="tick-btn" data-done="' + id + ':' + rest + '" aria-label="Mark complete"></button>' +
     '</div>';
@@ -3029,10 +3054,11 @@ function viewSession(){
       const ex = SLOTS[entry.slot].pool.find(x => x.id === entry.exId);
       const sug = suggest(ex, item, c.index);
       const lp = lastPerf(ex.id);
-      const ghost = lp
-        ? "Last: " + fmt(lp.entry.sets.filter(s=>s.done)[0].w) + " " + S.units + " × " +
-          lp.entry.sets.filter(s=>s.done).map(s=>s.r).join(" · ")
-        : "No history yet";
+      const ghost = !lp ? "No history yet"
+        : ex.bwOnly
+          ? "Last: " + lp.entry.sets.filter(s=>s.done).map(s=>s.r).join(" · ") + " reps"
+          : "Last: " + fmt(lp.entry.sets.filter(s=>s.done)[0].w) + " " + S.units + " × " +
+            lp.entry.sets.filter(s=>s.done).map(s=>s.r).join(" · ");
 
       html += '<div class="ex" style="padding-top:16px;margin-top:16px">' +
         '<div class="ex-head">' +
@@ -3044,7 +3070,7 @@ function viewSession(){
         '</div><button class="mini" data-swap="' + entry.slot + '">Swap</button></div>' +
         '<p class="target"><b>' + item.sets + ' × ' + item.lo + '–' + item.hi +
           (ex.perSide ? " each side" : "") + '</b>' +
-          '<span>' + (sug.w === null ? "load to find" : fmt(sug.w) + " " + S.units + (ex.kind === "dumbbell" ? " per hand" : ex.kind === "bodyweight" ? " added" : "")) + '</span></p>' +
+          '<span>' + (ex.bwOnly ? "bodyweight" : sug.w === null ? "load to find" : fmt(sug.w) + " " + S.units + (ex.kind === "dumbbell" ? " per hand" : ex.kind === "bodyweight" ? " added" : "")) + '</span></p>' +
         '<p class="ghost">' + esc(ghost) + '</p>' +
         '<p class="cue">' + esc(sug.why) + '</p>' +
         '<div class="bar-line"></div><div class="sets">';
