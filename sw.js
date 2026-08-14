@@ -5,12 +5,15 @@
    it is not. Cache-first was faster but meant a stale app could persist for
    days, which is worse.
 
-   Exercise artwork stays cache-first — those files never change under a given
-   name, and there are 262 of them. */
+   Exercise artwork stays cache-first — those files are large and there are 256
+   of them. They CAN change under the same name when a diagram is redrawn, so
+   bump ART below when that happens; activate then clears the old cache on every
+   device without anyone pressing anything. */
 
-const VERSION = "29";
+const VERSION = "30";
 const SHELL   = "ironwork-shell-v" + VERSION;
-const ART     = "ironwork-art-v1";
+const ART     = "ironwork-art-v2";   /* bumped for the round 8 redraw — the
+                                        activate handler deletes v1 automatically */
 
 const PRECACHE = ["./", "./index.html", "./manifest.webmanifest", "./icon.svg"];
 
