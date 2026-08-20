@@ -1170,7 +1170,7 @@ function diagram(exId){
 /* ============================================================
    STATE
    ============================================================ */
-const BUILD = "43";
+const BUILD = "44";
 /* the masthead and Setup show this as v3.4 — one number, formatted on the way out */
 const VERSION = (function(){ const n = String(BUILD).padStart(2, "0");
   return "v" + n.slice(0, -1) + "." + n.slice(-1); })();
@@ -1561,10 +1561,14 @@ function render(){
   });
   const v = document.getElementById("view");
   if(summaryRec){ v.innerHTML = viewSummary(); return; }
+  /* a session or an exercise opened from anywhere takes over the view — these
+     are reachable from Progress as well as Train, so they are checked before
+     the tab is */
+  if(histIdx !== null){ v.innerHTML = viewHistory(); return; }
+  if(histEx){ v.innerHTML = viewHistEx(); return; }
+
   if(tab === "train"){
     v.innerHTML = S.current ? viewSession()
-      : histIdx !== null ? viewHistory()
-      : histEx ? viewHistEx()
       : histList ? viewHistList()
       : previewOpen ? viewPreview()
       : pick.open ? viewPicker()
@@ -3609,8 +3613,9 @@ document.addEventListener("click", e=>{
   }
 
   if(t.dataset.histex){
+    /* stay on whichever tab you opened it from — Progress rows use this too */
     histEx = t.dataset.histex; histIdx = null; histList = false; histDay = null;
-    previewOpen = false; tab = "train"; render(); return;
+    previewOpen = false; render(); return;
   }
 
   if(t.dataset.day){
