@@ -10,9 +10,9 @@
    bump ART below when that happens; activate then clears the old cache on every
    device without anyone pressing anything. */
 
-const VERSION = "30";
+const VERSION = "31";
 const SHELL   = "ironwork-shell-v" + VERSION;
-const ART     = "ironwork-art-v2";   /* bumped for the round 8 redraw — the
+const ART     = "ironwork-art-v3";   /* bumped for the round 8 redraw — the
                                         activate handler deletes v1 automatically */
 
 const PRECACHE = ["./", "./index.html", "./manifest.webmanifest", "./icon.svg"];
