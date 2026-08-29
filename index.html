@@ -1103,7 +1103,7 @@ const DIAG = {
 "bb-bench":"bench","db-bench":"bench","floor-press":"floorPress","cable-press":"cablePress",
 "pullup":"pullup","neutral-chin":"pullup","lat-pulldown":"pulldown","sa-pulldown":"pulldown",
 "bb-rdl":"rdl","db-rdl":"rdl","landmine-rdl":"rdl","sl-rdl":"slRdl",
-"pallof":"pallof","chop":"pallof","hk-pallof":"pallof","landmine-antirot":"pallof","landmine-rainbow":"landmineRot",
+"pallof":"pallof","chop":"pallof","hk-pallof":"pallof","landmine-antirot":"halfkneelPress","landmine-rainbow":"landmineRot",
 "suitcase-carry":"carry","renegade-row":"bentRow",
 "archer-pullup":"pullup","db-pullover":"skullcrusher",
 "good-morning":"rdl",
@@ -1155,10 +1155,15 @@ function shots(exId){
 function drawnDiagram(exId, extraClass){
   const a = ARCH[DIAG[exId]];
   if(!a) return "";
+  /* the drawing is generic and shared between exercises, so prefer this
+     exercise's own captions — otherwise the words describe the drawing rather
+     than the movement, and can contradict the coaching cue */
+  const own = SHOT_CAPS[exId];
+  const cap = i => (own && own[i]) || a.caps[i] || "";
   return '<div class="diag' + (extraClass ? " " + extraClass : "") + '">' + a.f.map((fr, i)=>
-    '<figure><svg viewBox="0 0 200 200" role="img" aria-label="' + esc(a.caps[i]) + '">' +
+    '<figure><svg viewBox="0 0 200 200" role="img" aria-label="' + esc(cap(i)) + '">' +
       (fr.k || "") + fig(fr.p) +
-    '</svg><figcaption>' + esc(a.caps[i]) + '</figcaption></figure>').join("") + '</div>';
+    '</svg><figcaption>' + esc(cap(i)) + '</figcaption></figure>').join("") + '</div>';
 }
 
 function diagram(exId){
@@ -1173,7 +1178,7 @@ function diagram(exId){
 /* ============================================================
    STATE
    ============================================================ */
-const BUILD = "48";
+const BUILD = "49";
 /* the masthead and Setup show this as v3.4 — one number, formatted on the way out */
 const VERSION = (function(){ const n = String(BUILD).padStart(2, "0");
   return "v" + n.slice(0, -1) + "." + n.slice(-1); })();
