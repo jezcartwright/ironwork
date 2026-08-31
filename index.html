@@ -1178,7 +1178,7 @@ function diagram(exId){
 /* ============================================================
    STATE
    ============================================================ */
-const BUILD = "53";
+const BUILD = "54";
 /* the masthead and Setup show this as v3.4 — one number, formatted on the way out */
 const VERSION = (function(){ const n = String(BUILD).padStart(2, "0");
   return "v" + n.slice(0, -1) + "." + n.slice(-1); })();
@@ -1246,13 +1246,13 @@ async function loadState(){
   mergeDuplicateExtras();
 
   /* a rest that was running when the app was closed or reloaded */
-  if(S.rest && S.rest.endsAt && S.rest.endsAt > Date.now()){
+  if(S && S.rest && S.rest.endsAt && S.rest.endsAt > Date.now()){
     restEndsAt = S.rest.endsAt;
     restLabel  = S.rest.label || "Rest";
     restLeft   = restRemaining();
     clearInterval(restTimer);
     restTimer  = setInterval(restTick, 1000);
-  }else if(S.rest){
+  }else if(S && S.rest){
     S.rest = null;
   }
 
@@ -1614,8 +1614,7 @@ function startRest(secs, label){
   clearInterval(restTimer);
   restEndsAt = Date.now() + secs * 1000;
   restLeft = secs; restLabel = label;
-  S.rest = {endsAt: restEndsAt, label: label};   // survives a reload mid-set
-  save();
+  if(S){ S.rest = {endsAt: restEndsAt, label: label}; save(); }   // survives a reload mid-set
   drawRest();
   restTimer = setInterval(restTick, 1000);
 }
@@ -1626,7 +1625,7 @@ function restTick(){
   restLeft = left;
   if(left <= 0){
     clearInterval(restTimer); restTimer = null;
-    restEndsAt = 0; S.rest = null; save();
+    restEndsAt = 0; if(S){ S.rest = null; save(); }
     if(wasRunning) beep();
   }
   drawRest();
@@ -1642,14 +1641,15 @@ function restResync(){
     drawRest();
   }else{
     clearInterval(restTimer); restTimer = null;
-    restEndsAt = 0; restLeft = 0; S.rest = null; save();
+    restEndsAt = 0; restLeft = 0; if(S){ S.rest = null; save(); }
     drawRest();
   }
 }
 
 function stopRest(){
   clearInterval(restTimer); restTimer = null;
-  restLeft = 0; restEndsAt = 0; S.rest = null;
+  restLeft = 0; restEndsAt = 0;
+  if(S) S.rest = null;   /* called on sign-in before the state is loaded */
   drawRest();
 }
 function drawRest(){
