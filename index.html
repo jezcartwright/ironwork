@@ -965,7 +965,7 @@ function mergeDuplicateExtras(){
 /* resolve any exercise id — programme or extra */
 function findEx(exId){
   for(const k in SLOTS){
-    const f = SLOTS[k].pool.find(x => x.id === exId);
+    const f = SLOTS[k] && SLOTS[k].pool.find(x => x.id === exId);
     if(f) return {ex:f, label:SLOTS[k].label, track:"load", profile:"strength", slot:k};
   }
   const e = allExtras().find(x => x.id === exId);
@@ -1178,7 +1178,7 @@ function diagram(exId){
 /* ============================================================
    STATE
    ============================================================ */
-const BUILD = "54";
+const BUILD = "55";
 /* the masthead and Setup show this as v3.4 — one number, formatted on the way out */
 const VERSION = (function(){ const n = String(BUILD).padStart(2, "0");
   return "v" + n.slice(0, -1) + "." + n.slice(-1); })();
@@ -1321,7 +1321,9 @@ function contentsOf(sess, idx){
 function cycleAt(i){ return Math.floor(i / 3); }
 
 function variantFor(slotId, sessionIndex){
-  const pool = SLOTS[slotId].pool;
+  const slot = SLOTS[slotId];
+  if(!slot || !slot.pool || !slot.pool.length) return null;   /* slot renamed or removed */
+  const pool = slot.pool;
   const auto = Math.floor(cycleAt(sessionIndex) / ROTATE_EVERY);
   const manual = S.nudge[slotId] || 0;
   return pool[(auto + manual) % pool.length];
@@ -1329,7 +1331,9 @@ function variantFor(slotId, sessionIndex){
 
 function isNewVariant(slotId, sessionIndex){
   if(sessionIndex < 3) return false;
-  return variantFor(slotId, sessionIndex).id !== variantFor(slotId, sessionIndex - 3).id;
+  const now = variantFor(slotId, sessionIndex), then = variantFor(slotId, sessionIndex - 3);
+  if(!now || !then) return false;
+  return now.id !== then.id;
 }
 
 function isDeload(i){ return i > 0 && i % DELOAD_EVERY === (DELOAD_EVERY - 1); }
@@ -1389,6 +1393,10 @@ function anySingle(hist){ return hist.some(x => x.single !== null); }
 
 /* the learning bit: what should today's load be? */
 function suggest(ex, item, sessionIndex){
+  /* a session in progress can outlive a programme change, so neither the
+     exercise nor its prescription is guaranteed to still exist */
+  if(!ex) return {w:0, why:"This exercise is no longer in the programme. Log what you do and it will be kept."};
+  if(!item || typeof item.sets !== "number") item = {sets:3, lo:8, hi:12, slot:(item && item.slot) || null};
   const hist = allPerf(ex.id);
 
   /* bodyweight-only movements have no load to progress, so the whole
@@ -3269,8 +3277,22 @@ function viewSession(){
     else html += '<span class="pair-flag">Rest ' + b.rest + 's between sets</span>';
 
     inBlock.forEach(entry=>{
-      const item = b.items.find(x => x.slot === entry.slot);
-      const ex = SLOTS[entry.slot].pool.find(x => x.id === entry.exId);
+      /* A session started before an exercise was swapped out still names the old
+         one, and its slot may no longer be in this block at all */
+      const item = b.items.find(x => x.slot === entry.slot) ||
+                   {slot: entry.slot, sets: (entry.sets || []).length || 3, lo: 8, hi: 12};
+      /* Fall back to the definition wherever it now lives, and if it has
+         gone entirely, carry on with what the entry itself remembers rather than
+         taking the whole session down. */
+      const slot = SLOTS[entry.slot];
+      let ex = slot && slot.pool && slot.pool.find(x => x.id === entry.exId);
+      if(!ex){
+        const anywhere = Object.keys(SLOTS)
+          .map(k => SLOTS[k].pool.find(x => x.id === entry.exId)).filter(Boolean)[0];
+        ex = anywhere || {id: entry.exId, name: entry.name || "Removed exercise",
+                          kind: entry.track === "load" ? "barbell" : "bodyweight",
+                          inc: 2.5, cue: "", retired: true};
+      }
       const sug = suggest(ex, item, c.index);
       const lp = lastPerf(ex.id);
       const ghost = !lp ? "No history yet"
