@@ -1178,7 +1178,7 @@ function diagram(exId){
 /* ============================================================
    STATE
    ============================================================ */
-const BUILD = "49";
+const BUILD = "50";
 /* the masthead and Setup show this as v3.4 — one number, formatted on the way out */
 const VERSION = (function(){ const n = String(BUILD).padStart(2, "0");
   return "v" + n.slice(0, -1) + "." + n.slice(-1); })();
@@ -1560,7 +1560,35 @@ function drawRest(){
    ============================================================ */
 const esc = t => String(t).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
+/* Re-rendering replaces the whole view, which throws away focus and the caret.
+   That made every text field lose the cursor mid-word — worst on the golf course
+   search, which re-renders on each keystroke as results come back. Remember
+   where the cursor was and put it back. */
+function keepFocus(fn){
+  const a = document.activeElement;
+  let mark = null;
+  if(a && (a.tagName === "INPUT" || a.tagName === "TEXTAREA")){
+    const attr = Array.prototype.slice.call(a.attributes || [])
+      .filter(x => x.name.indexOf("data-") === 0)[0];
+    if(attr) mark = {sel:'[' + attr.name + '="' + attr.value + '"]',
+                     start:a.selectionStart, end:a.selectionEnd};
+  }
+  fn();
+  if(!mark) return;
+  const el = document.querySelector(mark.sel);
+  if(!el || el === document.activeElement) return;
+  try{
+    el.focus({preventScroll:true});
+    if(mark.start !== null && mark.start !== undefined && el.setSelectionRange)
+      el.setSelectionRange(mark.start, mark.end);
+  }catch(e){}
+}
+
 function render(){
+  keepFocus(renderView);
+}
+
+function renderView(){
   document.getElementById("mastSub").textContent =
     (!cloudOK ? "Offline" : S.current ? "Session in progress" : "Session " + (S.sessionIndex + 1)) +
     "  ·  " + VERSION;
@@ -1683,10 +1711,27 @@ function blockAlongside(i){
     if(!h.open || !h.entries.length) return;
     if(recDay(h) < from) return;
     const e = h.entries[0];
-    const g = groups[e.exId] || (groups[e.exId] = {exId:e.exId, name:e.name || "Session", n:0});
+    const g = groups[e.exId] || (groups[e.exId] = {exId:e.exId, name:e.name || "Session", n:0, rounds:[]});
     g.n++;
+    if(entryProfile(e) === "golf" && e.meta && Number(e.meta.score))
+      g.rounds.push({day:recDay(h), score:Number(e.meta.score)});
   });
   return Object.keys(groups).map(k=> groups[k]).sort((a,c)=> c.n - a.n).slice(0, 3);
+}
+
+/* When golf is the only thing logged alongside a block, the three tiles are
+   better spent on the scores themselves than on a count of one. Oldest on the
+   left so it reads the same direction as the session boxes above. */
+function alongsideTiles(bAlso){
+  const only = bAlso.length === 1 && bAlso[0].rounds && bAlso[0].rounds.length;
+  if(!only) return null;
+  const g = bAlso[0];
+  const rounds = g.rounds.slice().sort((a,b)=> a.day < b.day ? -1 : 1);
+  const shown = rounds.length <= 3 ? rounds : rounds.slice(rounds.length - 2);
+  const tiles = [];
+  if(rounds.length > 3) tiles.push({exId:g.exId, label:"+" + (rounds.length - 2) + " more", name:g.name});
+  shown.forEach(r => tiles.push({exId:g.exId, label:String(r.score), name:g.name}));
+  return tiles;
 }
 
 /* the day a not-yet-done session falls due: every other day from the last
@@ -2248,7 +2293,16 @@ function viewHome(){
   }
 
   cells += '<span class="rgl" style="color:var(--green)">ALSO</span>';
+  const scoreTiles = alongsideTiles(bAlso);
   for(let p = 0; p < 3; p++){
+    if(scoreTiles){
+      const t = scoreTiles[p];
+      cells += t
+        ? '<button class="rgb" data-histex="' + esc(t.exId) + '" aria-label="' + esc(t.name) + ', ' + esc(t.label) + '">' +
+            '<span style="display:flex">' + icon(iconFor(t.exId), 14) + '</span>' + esc(t.label) + '</button>'
+        : '<div class="rgb none">·</div>';
+      continue;
+    }
     const g = bAlso[p];
     cells += g
       ? '<button class="rgb" data-histex="' + esc(g.exId) + '" aria-label="Every ' + esc(g.name) + '">' +
