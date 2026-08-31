@@ -1178,7 +1178,7 @@ function diagram(exId){
 /* ============================================================
    STATE
    ============================================================ */
-const BUILD = "51";
+const BUILD = "52";
 /* the masthead and Setup show this as v3.4 — one number, formatted on the way out */
 const VERSION = (function(){ const n = String(BUILD).padStart(2, "0");
   return "v" + n.slice(0, -1) + "." + n.slice(-1); })();
@@ -1659,20 +1659,31 @@ const esc = t => String(t).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&
    That made every text field lose the cursor mid-word — worst on the golf course
    search, which re-renders on each keystroke as results come back. Remember
    where the cursor was and put it back. */
+const TEXTY = ["text","search","url","tel","password",""];
 function keepFocus(fn){
-  const a = document.activeElement;
   let mark = null;
-  if(a && (a.tagName === "INPUT" || a.tagName === "TEXTAREA")){
-    const attr = Array.prototype.slice.call(a.attributes || [])
-      .filter(x => x.name.indexOf("data-") === 0)[0];
-    if(attr) mark = {sel:'[' + attr.name + '="' + attr.value + '"]',
-                     start:a.selectionStart, end:a.selectionEnd};
-  }
-  fn();
-  if(!mark) return;
-  const el = document.querySelector(mark.sel);
-  if(!el || el === document.activeElement) return;
   try{
+    const a = document.activeElement;
+    if(a && (a.tagName === "INPUT" || a.tagName === "TEXTAREA")){
+      const attr = Array.prototype.slice.call(a.attributes || [])
+        .filter(x => x.name.indexOf("data-") === 0)[0];
+      if(attr){
+        mark = {sel:'[' + attr.name + '="' + String(attr.value).replace(/"/g, '\\"') + '"]'};
+        /* selectionStart throws on number, date and several other input types,
+           so only ask for it where it is allowed */
+        if(a.tagName === "TEXTAREA" || TEXTY.indexOf(a.type) !== -1){
+          mark.start = a.selectionStart; mark.end = a.selectionEnd;
+        }
+      }
+    }
+  }catch(e){ mark = null; }
+
+  fn();
+
+  if(!mark) return;
+  try{
+    const el = document.querySelector(mark.sel);
+    if(!el || el === document.activeElement) return;
     el.focus({preventScroll:true});
     if(mark.start !== null && mark.start !== undefined && el.setSelectionRange)
       el.setSelectionRange(mark.start, mark.end);
