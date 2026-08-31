@@ -1178,7 +1178,7 @@ function diagram(exId){
 /* ============================================================
    STATE
    ============================================================ */
-const BUILD = "52";
+const BUILD = "53";
 /* the masthead and Setup show this as v3.4 — one number, formatted on the way out */
 const VERSION = (function(){ const n = String(BUILD).padStart(2, "0");
   return "v" + n.slice(0, -1) + "." + n.slice(-1); })();
@@ -1206,6 +1206,12 @@ function userKey(){ return UID ? KEY + ":" + UID : KEY; }
 function pickNewer(a, b){
   if(!a) return b;
   if(!b) return a;
+  /* Recency alone is dangerous. If one copy has sessions and the other has
+     none, the one with sessions wins however new the empty one looks —
+     otherwise a single blank save destroys the history on every device. */
+  const na = (a.history || []).length, nb = (b.history || []).length;
+  if(na && !nb) return a;
+  if(nb && !na) return b;
   return (b.updatedAt || 0) > (a.updatedAt || 0) ? b : a;
 }
 
@@ -1218,7 +1224,10 @@ async function loadState(){
   const local = readLocal(userKey());
   let cloud = null;
   if(window.__cloud && UID){
-    try{ cloud = await window.__cloud.get(UID); cloudOK = true; }
+    try{
+      cloud = await window.__cloud.get(UID); cloudOK = true;
+      cloudHadHistory = (cloud && cloud.history ? cloud.history.length : 0);
+    }
     catch(e){ cloudOK = false; }
   }
 
@@ -1255,8 +1264,14 @@ async function loadState(){
 }
 
 let cloudTimer = null;
+let cloudHadHistory = 0;
 function pushCloud(){
   if(!UID || !window.__cloud) return;
+  /* a wipe is never the result of normal use — refuse to send one up */
+  if(cloudHadHistory && !(S.history || []).length){
+    console.warn("Ironwork: refused to overwrite " + cloudHadHistory + " saved sessions with an empty history.");
+    return;
+  }
   clearTimeout(cloudTimer);
   cloudPending = true;
   cloudTimer = setTimeout(async ()=>{
@@ -1691,7 +1706,10 @@ function keepFocus(fn){
 }
 
 function render(){
-  keepFocus(renderView);
+  /* keepFocus is off. It preserved the caret while typing, but it wraps every
+     single re-render, so any fault in it takes the whole app down. Not worth
+     that risk until the current problem is understood. */
+  renderView();
 }
 
 function renderView(){
@@ -3586,7 +3604,32 @@ function setVal(id, field, val){
   e.sets[Number(si)][field] = val;
 }
 
+/* If anything throws, say so on screen. A silent exception looks exactly like
+   "nothing is clickable", and guessing at it from a description wastes days. */
+function showFault(what, err){
+  try{
+    let box = document.getElementById("faultBox");
+    if(!box){
+      box = document.createElement("div");
+      box.id = "faultBox";
+      box.style.cssText = "position:fixed;left:0;right:0;bottom:0;z-index:9999;background:#C24E00;" +
+        "color:#fff;font:12px/1.45 ui-monospace,Menlo,monospace;padding:10px 12px;max-height:42vh;overflow:auto";
+      document.body.appendChild(box);
+    }
+    box.innerHTML = '<b>Something went wrong — please send this to Claude</b><br>' +
+      String(what) + ': ' + String(err && err.message || err) +
+      '<br><span style="opacity:.8">' + String((err && err.stack || "")).split("\n").slice(0,3).join(" ‹ ") + '</span>' +
+      '<br><button style="margin-top:8px;padding:6px 12px" onclick="this.parentNode.remove()">Dismiss</button>';
+  }catch(e){}
+}
+window.addEventListener("error", e => showFault("Error", e.error || e.message));
+window.addEventListener("unhandledrejection", e => showFault("Promise", e.reason));
+
 document.addEventListener("click", e=>{
+  try{ handleClick(e); }catch(err){ showFault("Tap", err); }
+}, {passive:true});
+
+function handleClick(e){
   const t = e.target.closest("[data-tab],[data-act],[data-done],[data-nudge],[data-swap],[data-units],[data-bar],[data-rest],[data-diag],[data-rmx],[data-addset],[data-newtrack],[data-delcustom],[data-pick],[data-addpick],[data-day],[data-hopen],[data-hnudge],[data-haddset],[data-hrmset],[data-hrmex],[data-rot],[data-newicon],[data-effort],[data-mins],[data-hadd],[data-figure],[data-feel],[data-place],[data-coursepick],[data-courseown],[data-courseclear],[data-tee],[data-holes],[data-score],[data-geffort],[data-parstep],[data-setprofile],[data-histfilter],[data-histex],[data-family]");
   if(!t) return;
 
@@ -4020,7 +4063,7 @@ document.addEventListener("click", e=>{
       S = blankState(); summaryRec = null; save(); render();
     }
   }
-});
+}
 
 document.addEventListener("input", e=>{
   const t = e.target;
