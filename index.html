@@ -1178,7 +1178,7 @@ function diagram(exId){
 /* ============================================================
    STATE
    ============================================================ */
-const BUILD = "50";
+const BUILD = "51";
 /* the masthead and Setup show this as v3.4 — one number, formatted on the way out */
 const VERSION = (function(){ const n = String(BUILD).padStart(2, "0");
   return "v" + n.slice(0, -1) + "." + n.slice(-1); })();
@@ -1235,6 +1235,17 @@ async function loadState(){
   if(!S || !S.v) S = blankState();
   if(!S.custom) S.custom = [];
   mergeDuplicateExtras();
+
+  /* a rest that was running when the app was closed or reloaded */
+  if(S.rest && S.rest.endsAt && S.rest.endsAt > Date.now()){
+    restEndsAt = S.rest.endsAt;
+    restLabel  = S.rest.label || "Rest";
+    restLeft   = restRemaining();
+    clearInterval(restTimer);
+    restTimer  = setInterval(restTick, 1000);
+  }else if(S.rest){
+    S.rest = null;
+  }
 
   try{ localStorage.setItem(userKey() + ":probe", "1"); localStorage.removeItem(userKey() + ":probe"); }
   catch(e){ storageOK = false; }
@@ -1483,7 +1494,11 @@ function finishSession(){
       : Math.round((Date.now() - c.startedAt) / 60000),
     entries: c.entries.map(e=>({
       slot:e.slot, exId:e.exId, track:e.track || "load", profile:entryProfile(e), extra:!!e.extra, name:e.name, meta:e.meta || {},
-      sets:e.sets.filter(s=>s.done).map(s=>({w:Number(s.w)||0, r:Number(s.r)||0, done:true}))
+      sets:e.sets.filter(s=>s.done).map(s=>({w:Number(s.w)||0, r:Number(s.r)||0, done:true})),
+      /* sets you never ticked, kept only so a session finished by mistake can be
+         reopened exactly as it was. Nothing reads this except reopenSession —
+         stats, progression and the history view all still use `sets`. */
+      pending:e.sets.filter(s=>!s.done).map(s=>({w:Number(s.w)||0, r:Number(s.r)||0}))
     })).filter(e => e.sets.length || (e.meta && (e.meta.score || e.meta.course)))
   };
   /* a round's effort stands as the session's, unless one is already set */
@@ -1504,14 +1519,53 @@ function finishSession(){
     }
   });
 
-  S.history.push(rec);
+  /* re-finishing a reopened session puts it back where it came from, with its
+     original date and duration — it must not jump to today or to the end */
+  const ro = c.reopened;
+  if(ro){
+    rec.date = ro.date; rec.day = ro.day;
+    if(ro.minutes) rec.minutes = ro.minutes;
+    if(ro.effort && !rec.effort) rec.effort = ro.effort;
+    S.history.splice(Math.min(ro.at, S.history.length), 0, rec);
+  }else{
+    S.history.push(rec);
+  }
   addOpen = false;
-  if(!c.open) S.sessionIndex = c.index + 1;
+  /* only the latest session moves the programme on. Re-finishing something from
+     three weeks ago must not wind the counter back to it. */
+  if(!c.open && !ro) S.sessionIndex = c.index + 1;
+  if(!c.open && ro && ro.wasLatest) S.sessionIndex = c.index + 1;
   S.current = null;
   save();
   tab = "train";
   render();
   showSummary(rec);
+}
+
+/* Put a finished session back on the bench. Used when Finish was pressed by
+   mistake, and for going back to an old session to add what was missed. */
+function reopenSession(idx){
+  if(S.current) return "one at a time";
+  const rec = S.history[idx];
+  if(!rec) return "gone";
+  const latest = idx === S.history.length - 1;
+  S.current = {
+    key: rec.key, index: rec.index, open: !!rec.open,
+    startedAt: Date.now(),
+    reopened: {at: idx, date: rec.date, day: rec.day, minutes: rec.minutes,
+               effort: rec.effort, wasLatest: latest},
+    entries: rec.entries.map(e=>({
+      slot:e.slot, exId:e.exId, track:e.track || "load", profile:e.profile,
+      extra:!!e.extra, name:e.name, meta:Object.assign({}, e.meta || {}),
+      sets: (e.sets || []).map(x=>({w:x.w, r:x.r, done:true}))
+             .concat((e.pending || []).map(x=>({w:x.w, r:x.r, done:false})))
+    }))
+  };
+  S.history.splice(idx, 1);
+  if(latest && !rec.open) S.sessionIndex = rec.index;
+  summaryRec = null; histIdx = null; histEx = null; tab = "train";
+  save(); render();
+  return null;
 }
 
 let summaryRec = null;
@@ -1531,17 +1585,58 @@ function beep(){
   }catch(e){}
   if(navigator.vibrate) navigator.vibrate(200);
 }
+/* The countdown works from an absolute finish time, not by decrementing once a
+   second. Phones throttle or suspend timers in a backgrounded tab, so a ticking
+   counter drifts or stops; reading the clock means the number is right the
+   moment you come back, however long you were away. */
+let restEndsAt = 0;
+
+function restRemaining(){
+  return restEndsAt ? Math.max(0, Math.ceil((restEndsAt - Date.now()) / 1000)) : 0;
+}
+
 function startRest(secs, label){
   clearInterval(restTimer);
+  restEndsAt = Date.now() + secs * 1000;
   restLeft = secs; restLabel = label;
+  S.rest = {endsAt: restEndsAt, label: label};   // survives a reload mid-set
+  save();
   drawRest();
-  restTimer = setInterval(()=>{
-    restLeft--;
-    if(restLeft <= 0){ clearInterval(restTimer); restTimer = null; beep(); }
-    drawRest();
-  }, 1000);
+  restTimer = setInterval(restTick, 1000);
 }
-function stopRest(){ clearInterval(restTimer); restTimer = null; restLeft = 0; drawRest(); }
+
+function restTick(){
+  const left = restRemaining();
+  const wasRunning = restLeft > 0;
+  restLeft = left;
+  if(left <= 0){
+    clearInterval(restTimer); restTimer = null;
+    restEndsAt = 0; S.rest = null; save();
+    if(wasRunning) beep();
+  }
+  drawRest();
+}
+
+/* coming back from another app, or from the lock screen */
+function restResync(){
+  if(!restEndsAt) return;
+  const left = restRemaining();
+  if(left > 0){
+    restLeft = left;
+    if(!restTimer) restTimer = setInterval(restTick, 1000);
+    drawRest();
+  }else{
+    clearInterval(restTimer); restTimer = null;
+    restEndsAt = 0; restLeft = 0; S.rest = null; save();
+    drawRest();
+  }
+}
+
+function stopRest(){
+  clearInterval(restTimer); restTimer = null;
+  restLeft = 0; restEndsAt = 0; S.rest = null;
+  drawRest();
+}
 function drawRest(){
   const host = document.getElementById("restHost");
   if(!restTimer && restLeft <= 0){ host.innerHTML = ""; return; }
@@ -2042,7 +2137,10 @@ function viewHistory(){
         (loggedElsewhere(h) ? ' · ' + esc(loggedElsewhere(h)) + ' time' : "") +
         (h.open ? " · open session" : "") + '</p>' +
       '<h1 class="session-title">' + esc(sessionTitle(h)) + '</h1></div>' +
-      '<button class="mini" data-act="closeHist">Done</button>' +
+      '<div style="display:flex;gap:6px;flex-shrink:0">' +
+        '<button class="mini" data-act="reopen:' + histIdx + '">Continue</button>' +
+        '<button class="mini" data-act="closeHist">Done</button>' +
+      '</div>' +
     '</div>' +
     '<div class="meta">' +
       (golfOnly(h)
@@ -3227,7 +3325,10 @@ function viewSummary(){
       pbs.map(p=>'<p class="lede" style="margin-top:4px">' + esc(p) + '</p>').join("") : "") +
     '<hr class="rule">' +
     '<p class="lede">Next up is <b>' + esc(next.title) + '</b>. ' + esc(next.blurb) + ' Leave a full day between sessions.</p>' +
-    '<div style="margin-top:16px"><button class="btn btn-quiet" data-act="closeSummary">Done</button></div>' +
+    '<div style="margin-top:16px;display:flex;gap:8px">' +
+      '<button class="btn btn-quiet" data-act="closeSummary">Done</button>' +
+      '<button class="btn btn-ghost" data-act="reopenLast">Finished by mistake</button>' +
+    '</div>' +
   '</div></div>';
 }
 
@@ -3865,6 +3966,22 @@ document.addEventListener("click", e=>{
     if(confirm("Discard this session? Nothing will be saved.")){ stopRest(); S.current = null; save(); render(); }
   }
   if(act === "closeSummary"){ summaryRec = null; render(); }
+  if(act === "reopenLast"){
+    const idx = S.history.indexOf(summaryRec);
+    const why = reopenSession(idx < 0 ? S.history.length - 1 : idx);
+    if(why === "one at a time") alert("Finish or discard the session in progress first.");
+    return;
+  }
+  if(act.indexOf("reopen:") === 0){
+    const idx = Number(act.split(":")[1]);
+    const h = S.history[idx];
+    const stale = h && !h.open && (h.entries || []).every(e => !(e.pending || []).length);
+    if(!confirm("Put this session back in progress so you can carry on with it?" +
+        (stale ? "\n\nIt was finished before this feature existed, so only the sets you logged come back." : ""))) return;
+    const why = reopenSession(idx);
+    if(why === "one at a time") alert("Finish or discard the session in progress first.");
+    return;
+  }
   if(act === "export"){
     const txt = JSON.stringify(S.history, null, 2);
     navigator.clipboard ? navigator.clipboard.writeText(txt).then(()=>alert("History copied to the clipboard.")) : alert(txt);
@@ -3951,6 +4068,11 @@ document.addEventListener("input", e=>{
 /* ============================================================
    BOOT
    ============================================================ */
+/* put the rest clock right the moment the app is looked at again */
+document.addEventListener("visibilitychange", ()=>{ if(!document.hidden) restResync(); });
+window.addEventListener("focus", restResync);
+window.addEventListener("pageshow", restResync);
+
 if("serviceWorker" in navigator){
   window.addEventListener("load", ()=>{
     navigator.serviceWorker.register("sw.js").then(reg=>{
