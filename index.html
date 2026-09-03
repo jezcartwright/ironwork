@@ -1178,7 +1178,7 @@ function diagram(exId){
 /* ============================================================
    STATE
    ============================================================ */
-const BUILD = "55";
+const BUILD = "56";
 /* the masthead and Setup show this as v3.4 — one number, formatted on the way out */
 const VERSION = (function(){ const n = String(BUILD).padStart(2, "0");
   return "v" + n.slice(0, -1) + "." + n.slice(-1); })();
@@ -4184,19 +4184,33 @@ window.ironworkSignedIn = async function(uid, profile){
   summaryRec = null; tab = "train"; pick = {open:false, sel:null}; addOpen = false;
   await loadState();
   document.getElementById("gate").hidden = true;
+  authResolved = true;
   render();
 };
 
 window.ironworkSignedOut = function(){
+  authResolved = true;
   UID = null; ACCOUNT = {}; S = blankState();
   document.getElementById("gate").hidden = false;
   document.getElementById("view").innerHTML = "";
 };
 
+/* Firebase decides who is signed in, and that answer arrives a moment after the
+   page does. Drawing before it lands shows whatever was cached locally — often a
+   session in progress — which is then replaced the instant auth resolves. So
+   load the state now but wait to draw, with a fallback for when there is no
+   answer coming at all (offline, or auth failing). */
+let authResolved = false;
+function firstRender(){
+  if(authResolved) return;
+  authResolved = true;
+  render();
+}
+
 (async function(){
   await loadState();
-  render();
-  setInterval(()=>{ if(S.current && tab === "train" && !summaryRec){ /* keep elapsed fresh, cheap */ } }, 60000);
+  setTimeout(firstRender, 2500);   // nothing from auth by now: show what we have
+  setInterval(()=>{ if(S && S.current && tab === "train" && !summaryRec){ /* keep elapsed fresh, cheap */ } }, 60000);
 })();
 </script>
 
