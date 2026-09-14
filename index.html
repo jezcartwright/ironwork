@@ -1178,7 +1178,7 @@ function diagram(exId){
 /* ============================================================
    STATE
    ============================================================ */
-const BUILD = "56";
+const BUILD = "57";
 /* the masthead and Setup show this as v3.4 — one number, formatted on the way out */
 const VERSION = (function(){ const n = String(BUILD).padStart(2, "0");
   return "v" + n.slice(0, -1) + "." + n.slice(-1); })();
@@ -1721,6 +1721,8 @@ function render(){
 }
 
 function renderView(){
+  /* nothing can be drawn before the state exists, and every caller is async */
+  if(!S) return;
   document.getElementById("mastSub").textContent =
     (!cloudOK ? "Offline" : S.current ? "Session in progress" : "Session " + (S.sessionIndex + 1)) +
     "  ·  " + VERSION;
@@ -4177,6 +4179,9 @@ if("serviceWorker" in navigator){
 }
 
 window.ironworkSignedIn = async function(uid, profile){
+  /* auth has answered — mark it now, before the await, or the fallback timer can
+     fire midway through loading and try to draw a state that is not there yet */
+  authResolved = true;
   UID = uid;
   S = null;
   ACCOUNT = profile || {};
@@ -4184,7 +4189,6 @@ window.ironworkSignedIn = async function(uid, profile){
   summaryRec = null; tab = "train"; pick = {open:false, sel:null}; addOpen = false;
   await loadState();
   document.getElementById("gate").hidden = true;
-  authResolved = true;
   render();
 };
 
@@ -4203,6 +4207,7 @@ window.ironworkSignedOut = function(){
 let authResolved = false;
 function firstRender(){
   if(authResolved) return;
+  if(!S){ setTimeout(firstRender, 200); return; }   // still loading — try again shortly
   authResolved = true;
   render();
 }
