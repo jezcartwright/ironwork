@@ -1178,7 +1178,7 @@ function diagram(exId){
 /* ============================================================
    STATE
    ============================================================ */
-const BUILD = "59";
+const BUILD = "60";
 /* the masthead and Setup show this as v3.4 — one number, formatted on the way out */
 const VERSION = (function(){ const n = String(BUILD).padStart(2, "0");
   return "v" + n.slice(0, -1) + "." + n.slice(-1); })();
@@ -1201,6 +1201,9 @@ function blankState(){
 
 let UID = null, ACCOUNT = {}, cloudOK = true, cloudPending = false;
 let lastSyncAt = 0;
+let lastCloudError = "";   /* the exact reason the account could not be reached */
+let cloudCount = null;     /* sessions the account holds, as last seen */
+let cloudProbe = null;     /* the result of the Check the connection button */
 
 /* Which device this is. The account document records the device that wrote it,
    so a live update can tell its own echo from a genuine change made elsewhere. */
@@ -1350,10 +1353,11 @@ async function loadState(){
         window.__cloud.get(UID),
         new Promise((res, rej)=> setTimeout(()=> rej(new Error("slow")), 6000))
       ]);
-      cloudOK = true; lastSyncAt = Date.now();
+      cloudOK = true; lastSyncAt = Date.now(); lastCloudError = "";
       cloudHadHistory = (cloud && cloud.history ? cloud.history.length : 0);
+      cloudCount = cloud ? (cloud.history || []).length : 0;
     }
-    catch(e){ cloudOK = false; }
+    catch(e){ cloudOK = false; lastCloudError = cloudErrText(e); }
   }
 
   /* Both copies, united — anything either one knows about survives. A device
@@ -1432,13 +1436,12 @@ function sendCloud(){
   const body = S;
   window.__cloud.set(UID, body).then(()=>{
     cloudPending = false;
-    lastSyncAt = Date.now();
     cloudHadHistory = (body.history || []).length;
-    if(!cloudOK){ cloudOK = true; render(); }
-    else if(tab === "settings") render();
-  }).catch(()=>{
+    cloudCount = (body.history || []).length;
+    markOnline();
+  }).catch(err=>{
     cloudPending = false;
-    if(cloudOK){ cloudOK = false; render(); }
+    markOffline(err);
   });
 }
 
@@ -1472,21 +1475,42 @@ function backupLocal(state){
 let cloudWatch = null;
 let remoteQueued = null;
 
+/* Online means an operation against the account has actually succeeded. It does
+   NOT mean a snapshot arrived: Firestore keeps a copy on the device and hands
+   that over first, so a cached snapshot says nothing about the connection. An
+   earlier build read it as proof of being offline, which is why both devices
+   claimed Offline while syncing perfectly well. */
+function markOnline(){
+  lastSyncAt = Date.now();
+  lastCloudError = "";
+  if(!cloudOK){ cloudOK = true; render(); }
+  else if(tab === "settings") render();
+}
+function markOffline(err){
+  lastCloudError = cloudErrText(err);
+  if(cloudOK){ cloudOK = false; render(); }
+  else if(tab === "settings") render();
+}
+function cloudErrText(err){
+  if(!err) return "";
+  return String(err.code || err.message || err).slice(0, 80);
+}
+
 function startCloudWatch(){
   stopCloudWatch();
   if(!UID || !window.__cloud || !window.__cloud.watch) return;
   try{
     cloudWatch = window.__cloud.watch(UID, (state, meta)=>{
       const m = meta || {};
-      if(m.error){ if(cloudOK){ cloudOK = false; render(); } return; }
-      const live = !m.fromCache;
-      lastSyncAt = live ? Date.now() : lastSyncAt;
-      if(live !== cloudOK){ cloudOK = live; render(); }
+      if(m.error){ markOffline(m.error); return; }
+      /* only a snapshot the server confirmed proves there is a connection */
+      if(!m.fromCache) markOnline();
+      if(state) cloudCount = (state.history || []).length;
       if(!state) return;
       if(m.device && m.device === DEVICE) return;   // this device's own write, echoing back
       adoptRemote(state);
     });
-  }catch(e){ cloudOK = false; }
+  }catch(e){ markOffline(e); }
 }
 
 function stopCloudWatch(){
@@ -1505,10 +1529,10 @@ async function resyncCloud(){
   lastResync = Date.now();
   try{
     const cloud = await window.__cloud.get(UID);
-    lastSyncAt = Date.now();
-    if(!cloudOK){ cloudOK = true; render(); }
+    if(cloud) cloudCount = (cloud.history || []).length;
+    markOnline();
     if(cloud) adoptRemote(cloud);
-  }catch(e){ if(cloudOK){ cloudOK = false; render(); } }
+  }catch(e){ markOffline(e); }
 }
 
 function adoptRemote(state){
@@ -3876,7 +3900,8 @@ function viewLibrary(){
 
 /* ---------- settings ---------- */
 function syncLine(){
-  if(!cloudOK) return "Offline — waiting to send to your account";
+  if(!cloudOK) return "Offline — waiting to send to your account" +
+    (lastCloudError ? " (" + esc(lastCloudError) + ")" : "");
   if(cloudPending || cloudTimer) return "Saving to your account…";
   if(!lastSyncAt) return "Recorded against your account";
   const s = Math.round((Date.now() - lastSyncAt) / 1000);
@@ -3885,6 +3910,38 @@ function syncLine(){
   const m = Math.round(s / 60);
   if(m < 90)  return "Recorded against your account · " + m + " min ago";
   return "Recorded against your account · " + Math.round(m / 60) + "h ago";
+}
+
+/* The two numbers worth comparing when devices disagree, side by side. */
+function tallyLine(){
+  const here = (S.history || []).length;
+  const there = cloudCount === null ? "not read yet" : cloudCount + "";
+  const same = cloudCount !== null && cloudCount === here;
+  return '<p class="lede" style="margin:0 0 10px;font-size:12px">' +
+    "<b>This device: " + here + " session" + (here === 1 ? "" : "s") + "</b>" +
+    "  ·  <b>Your account: " + esc(there) + "</b>" +
+    (same ? "  — in step." : cloudCount === null ? "" : "  — not in step yet.") +
+    '</p>';
+}
+
+/* What the Check the connection button writes out. Plain text, so it can be
+   read off the screen or sent on without interpretation. */
+function probeLine(){
+  if(!cloudProbe) return "";
+  const p = cloudProbe;
+  if(p.running) return '<p class="lede" style="margin:8px 0 0;font-size:12px">Checking…</p>';
+  const rows = [
+    "Browser thinks it is " + (p.online ? "online" : "offline"),
+    "Read from your account: " + (p.read === "ok"
+      ? "worked" + (p.exists ? " — " + p.count + " session" + (p.count === 1 ? "" : "s") + " up there"
+                             : " — nothing stored yet")
+      : "FAILED — " + p.read),
+    "Write to your account: " + (p.write === "ok" ? "worked" : "FAILED — " + p.write)
+  ];
+  if(p.updatedAt) rows.push("Last written up: " + new Date(p.updatedAt).toLocaleString());
+  if(p.device) rows.push("Last written by: " + (p.device === DEVICE ? "this device" : "another device"));
+  return '<div class="warn" style="margin-top:10px;text-align:left">' +
+    rows.map(r => esc(r)).join("<br>") + '</div>';
 }
 
 let restoreOpen = false;
@@ -3907,7 +3964,11 @@ function viewSettings(){
         '<span>' + syncLine() + '</span></span>' +
         '<span class="sync ' + (cloudOK ? "on" : "off") + '">' + (cloudOK ? "Online" : "Offline") + '</span>' +
       '</div>' +
+      tallyLine() +
       '<p class="lede" style="margin-bottom:14px">' + countLine() + ' Every session is recorded against your account rather than this device, and this screen updates itself when you log something elsewhere. Sign in on any machine to carry on where you left off. With no signal it keeps working here and sends everything up as soon as you are back.</p>' +
+      '<button class="btn btn-ghost" data-act="cloudTest">Check the connection</button>' +
+      probeLine() +
+      '<div style="height:8px"></div>' +
       '<button class="btn btn-ghost" data-act="signout">Sign out</button>' +
     '</div></div>' : "";
   return acct + '<div class="panel"><div class="pad">' +
@@ -4424,6 +4485,31 @@ function handleClick(e){
     })();
     return;
   }
+  if(act === "cloudTest"){
+    if(!UID || !window.__cloud){ cloudProbe = {read:"not signed in", write:"-", online:false}; render(); return; }
+    cloudProbe = {running:true}; render();
+    (async ()=>{
+      let out;
+      if(window.__cloud.probe){
+        try{ out = await window.__cloud.probe(UID); }
+        catch(e){ out = {online:true, read: cloudErrText(e), write:"not attempted"}; }
+      }else{
+        /* an older module with no probe of its own — do it the long way */
+        out = {online: typeof navigator !== "undefined" ? navigator.onLine !== false : true};
+        try{ const c = await window.__cloud.get(UID);
+             out.read = "ok"; out.exists = !!c; out.count = c ? (c.history || []).length : 0; }
+        catch(e){ out.read = cloudErrText(e); }
+        try{ await window.__cloud.set(UID, S); out.write = "ok"; }
+        catch(e){ out.write = cloudErrText(e); }
+      }
+      cloudProbe = out;
+      if(out.read === "ok" && typeof out.count === "number") cloudCount = out.count;
+      if(out.read === "ok" || out.write === "ok") markOnline(); else markOffline(out.read);
+      render();
+    })();
+    return;
+  }
+
   if(act === "toggleRestore"){ restoreOpen = !restoreOpen; render(); return; }
 
   if(act === "restore"){
@@ -4619,7 +4705,8 @@ import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWith
          signOut, GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail,
          setPersistence, browserLocalPersistence }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, onSnapshot, enableIndexedDbPersistence }
+import { getFirestore, doc, getDoc, getDocFromServer, setDoc, onSnapshot,
+         enableIndexedDbPersistence }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { FIREBASE_CONFIG } from "./firebase-config.js";
 
@@ -4694,6 +4781,26 @@ if(!FIREBASE_CONFIG.apiKey || !FIREBASE_CONFIG.projectId){
         },
         (err)=> cb(null, {error: err})
       );
+    },
+    /* A deliberate round-trip to the server, bypassing the copy Firestore keeps
+       on the device, so the answer says something about the connection rather
+       than about the cache. Reports the real error code either way. */
+    async probe(uid){
+      const out = {online: navigator.onLine !== false, read: null, write: null};
+      try{
+        const snap = await getDocFromServer(ref(uid));
+        out.read = "ok";
+        out.exists = snap.exists();
+        const d = snap.exists() ? (snap.data() || {}) : {};
+        out.count = (d.state && d.state.history) ? d.state.history.length : 0;
+        out.updatedAt = d.updatedAt || 0;
+        out.device = d.device || "";
+      }catch(e){ out.read = String((e && e.code) || (e && e.message) || e).slice(0, 80); }
+      try{
+        await setDoc(ref(uid), {checkedAt: Date.now(), device: window.__device || ""}, {merge: true});
+        out.write = "ok";
+      }catch(e){ out.write = String((e && e.code) || (e && e.message) || e).slice(0, 80); }
+      return out;
     }
   };
 
