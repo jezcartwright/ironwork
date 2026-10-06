@@ -1178,7 +1178,7 @@ function diagram(exId){
 /* ============================================================
    STATE
    ============================================================ */
-const BUILD = "62";
+const BUILD = "63";
 /* the masthead and Setup show this as v3.4 — one number, formatted on the way out */
 const VERSION = (function(){ const n = String(BUILD).padStart(2, "0");
   return "v" + n.slice(0, -1) + "." + n.slice(-1); })();
@@ -1295,6 +1295,12 @@ function mergeStates(local, cloud){
   const older = newer === local ? cloud : local;
   const out = Object.assign({}, older, newer);
 
+  /* Object.assign only overwrites keys the newer copy actually has, so a copy
+     saved without a `current` key at all would leave the older copy's session
+     sitting on the bench. Resolve the single-valued fields explicitly. */
+  out.current = Object.prototype.hasOwnProperty.call(newer, "current") ? newer.current : null;
+  out.rest    = Object.prototype.hasOwnProperty.call(newer, "rest")    ? newer.rest    : null;
+
   out.history = mergeHistories(local.history, cloud.history);
   out.custom  = mergeLists(local.custom, cloud.custom, "id");
   out.courses = mergeLists(local.courses, cloud.courses, "name");
@@ -1394,7 +1400,10 @@ async function loadState(){
   /* an older copy from before sign-in existed, still sitting on this device */
   const legacy = readLocal(KEY);
   if(legacy && legacy.v && legacy.history && legacy.history.length){
-    S = mergeStates(legacy, S) || S;
+    /* it is there for its sessions only — an ancient session left on the bench
+       in it must not reappear as one in progress now */
+    const past = Object.assign({}, legacy, {current: null, rest: null, updatedAt: 0});
+    S = mergeStates(past, S) || S;
   }
   if(!S || !S.v) S = blankState();
   if(!S.custom) S.custom = [];
@@ -4726,9 +4735,12 @@ window.ironworkSignedIn = async function(uid, profile){
   /* auth has answered — mark it now, before the await, or the fallback timer can
      fire midway through loading and try to draw a state that is not there yet */
   authResolved = true;
+  signInStarted = true;
   stopCloudWatch();
   accountRead = false; pushWanted = false; cloudCount = null; cloudProbe = null;
   UID = uid;
+  /* so the next launch knows whose copy to wait for */
+  try{ localStorage.setItem(KEY + ":signedin", uid); }catch(e){}
   S = null;
   ACCOUNT = profile || {};
   stopRest();
@@ -4740,6 +4752,8 @@ window.ironworkSignedIn = async function(uid, profile){
 
 window.ironworkSignedOut = function(){
   authResolved = true;
+  signInStarted = false;
+  try{ localStorage.removeItem(KEY + ":signedin"); }catch(e){}
   flushCloud();
   stopCloudWatch();
   stopHealing();
@@ -4756,16 +4770,39 @@ window.ironworkSignedOut = function(){
    load the state now but wait to draw, with a fallback for when there is no
    answer coming at all (offline, or auth failing). */
 let authResolved = false;
-function firstRender(){
-  if(authResolved) return;
-  if(!S){ setTimeout(firstRender, 200); return; }   // still loading — try again shortly
+let signInStarted = false;
+
+/* Who signed in on this device last time. Firebase takes a moment to answer, and
+   until it does the app has no idea whose copy to show. Without this it fell
+   back to the signed-out copy — whatever was last left on the device before
+   anyone signed in — which is how opening the app could show a session that was
+   finished weeks ago and then swap to the home screen a second later. */
+const LAST_UID = (function(){
+  try{ return localStorage.getItem(KEY + ":signedin") || null; }catch(e){ return null; }
+})();
+
+async function firstRender(){
+  if(authResolved || signInStarted) return;
+  if(!LAST_UID && !S){ setTimeout(firstRender, 200); return; }   // still loading
   authResolved = true;
+  /* Auth has not answered at all — offline, or the SDK never loaded. Open on
+     this person's own cached copy rather than the signed-out one. */
+  if(LAST_UID && !UID){
+    UID = LAST_UID;
+    await loadState();
+    if(signInStarted) return;          // auth answered while we were loading
+    const gate = document.getElementById("gate");
+    if(gate) gate.hidden = true;
+  }
+  if(!S) S = blankState();
   render();
 }
 
 (async function(){
-  await loadState();
-  setTimeout(firstRender, 2500);   // nothing from auth by now: show what we have
+  /* Nothing is drawn from the signed-out copy when a sign-in is expected — the
+     wait is longer, and what it falls back to is the right person's copy. */
+  if(!LAST_UID) await loadState();
+  setTimeout(firstRender, LAST_UID ? 9000 : 2500);
   setInterval(()=>{ if(S && S.current && tab === "train" && !summaryRec){ /* keep elapsed fresh, cheap */ } }, 60000);
 })();
 </script>
