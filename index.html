@@ -1178,7 +1178,7 @@ function diagram(exId){
 /* ============================================================
    STATE
    ============================================================ */
-const BUILD = "58";
+const BUILD = "59";
 /* the masthead and Setup show this as v3.4 — one number, formatted on the way out */
 const VERSION = (function(){ const n = String(BUILD).padStart(2, "0");
   return "v" + n.slice(0, -1) + "." + n.slice(-1); })();
@@ -1218,22 +1218,120 @@ window.__device = DEVICE;   /* the Firebase module stamps it onto every write */
 
 function userKey(){ return UID ? KEY + ":" + UID : KEY; }
 
-/* The account is the record of truth. The copy in this browser is a cache so the
-   app still works with no signal, so it only wins when it is strictly newer —
-   which happens only if this device logged something while it was offline.
-   Recency alone is dangerous, though: if one copy has sessions and the other has
-   none, the one with sessions wins however new the empty one looks, otherwise a
-   single blank save destroys the history everywhere. */
-function chooseState(local, cloud){
-  if(!cloud) return local || null;
-  if(!local) return cloud;
-  const nl = (local.history || []).length, nc = (cloud.history || []).length;
-  if(nc && !nl) return cloud;
-  if(nl && !nc) return local;
-  return (local.updatedAt || 0) > (cloud.updatedAt || 0) ? local : cloud;
+/* ------------------------------------------------------------------
+   Merging two copies
+
+   Two copies of the history are never really in conflict: a session either
+   happened or it did not. Choosing one copy and discarding the other is what
+   loses sessions — train on the phone, open the laptop, and the laptop's copy
+   replaces the lot, including everything the phone logged. So the two are
+   united, session by session, and the union always wins. History can grow
+   from a merge and never shrink.
+   ------------------------------------------------------------------ */
+
+/* What identifies a session across two copies. A programme session is pinned by
+   its place in the programme, which is unique and survives a reopen. An open
+   session has no place in the programme, so it goes by the day, the activity
+   and the shape of what was logged. */
+function sessionId(rec){
+  if(!rec) return "?";
+  if(rec.key && rec.key !== "X" && typeof rec.index === "number")
+    return "p:" + rec.key + ":" + rec.index;
+  const first = (rec.entries || [])[0] || {};
+  const sets = (rec.entries || []).reduce((n, e)=> n + ((e.sets || []).length), 0);
+  return "x:" + (rec.day || "") + ":" + (first.exId || "") + ":" + sets + ":" + (rec.minutes || 0);
 }
-/* kept for callers that predate the rename */
-function pickNewer(local, cloud){ return chooseState(local, cloud); }
+
+/* the same session held in two copies: keep whichever has more logged in it */
+function fullerSession(a, b){
+  const count = r => (r.entries || []).reduce((n, e)=> n + ((e.sets || []).length), 0);
+  const ca = count(a), cb = count(b);
+  if(ca !== cb) return ca > cb ? a : b;
+  const ea = (a.entries || []).length, eb = (b.entries || []).length;
+  if(ea !== eb) return ea > eb ? a : b;
+  return JSON.stringify(a).length >= JSON.stringify(b).length ? a : b;
+}
+
+function mergeHistories(a, b){
+  const out = [], at = {};
+  (a || []).concat(b || []).forEach(rec=>{
+    if(!rec || typeof rec !== "object") return;
+    const id = sessionId(rec);
+    if(at[id] === undefined){ at[id] = out.length; out.push(rec); }
+    else out[at[id]] = fullerSession(out[at[id]], rec);
+  });
+  /* the app reads the last entry as the most recent one, so order matters */
+  out.sort((x, y)=> (Date.parse(x.date || x.day || 0) || 0) - (Date.parse(y.date || y.day || 0) || 0));
+  return out;
+}
+
+function mergeLists(a, b, key){
+  const out = [], seen = {};
+  (a || []).concat(b || []).forEach(x=>{
+    if(!x) return;
+    const k = String(x[key] || "").toLowerCase().replace(/\s+/g, " ").trim();
+    if(!k) return;
+    if(seen[k] === undefined){ seen[k] = true; out.push(x); }
+  });
+  return out;
+}
+
+function mergeStates(local, cloud){
+  if(!cloud || !cloud.v) return local || null;
+  if(!local || !local.v) return cloud;
+
+  /* settings, the session in progress and the rest clock are single values with
+     no sensible union, so those come from whichever copy was touched last */
+  const newer = (local.updatedAt || 0) > (cloud.updatedAt || 0) ? local : cloud;
+  const older = newer === local ? cloud : local;
+  const out = Object.assign({}, older, newer);
+
+  out.history = mergeHistories(local.history, cloud.history);
+  out.custom  = mergeLists(local.custom, cloud.custom, "id");
+  out.courses = mergeLists(local.courses, cloud.courses, "name");
+  out.nudge   = Object.assign({}, older.nudge || {}, newer.nudge || {});
+  out.updatedAt = Math.max(local.updatedAt || 0, cloud.updatedAt || 0);
+
+  /* One copy may have finished a session the other still has on the bench. The
+     finished record is the one that counts — an in-progress copy of a session
+     already in the history is stale, unless it was deliberately reopened. */
+  if(out.current && !out.current.reopened){
+    const id = sessionId({key: out.current.key, index: out.current.index,
+                          day: out.current.day, entries: out.current.entries,
+                          minutes: 0});
+    if(out.history.some(h => sessionId(h) === id)) out.current = null;
+  }
+
+  /* the counter has to sit past everything logged, or the next session repeats
+     one that is already in the history */
+  const past = out.history.reduce((m, h)=>
+    (h.key !== "X" && typeof h.index === "number" && !h.open) ? Math.max(m, h.index + 1) : m, 0);
+  out.sessionIndex = Math.max(local.sessionIndex || 0, cloud.sessionIndex || 0, past);
+  /* except while a session is open on the bench, which sits at its own index */
+  if(out.current && typeof out.current.index === "number" && !out.current.open)
+    out.sessionIndex = Math.min(out.sessionIndex, out.current.index);
+
+  return out;
+}
+
+/* Enough of the state to tell whether a merge actually changed anything, so an
+   unchanged copy arriving from the account does not redraw the screen. */
+function stateFingerprint(s){
+  if(!s) return "";
+  const live = s.current
+    ? (s.current.entries || []).map(e => (e.sets || []).map(x => (x.done ? 1 : 0) + ":" + x.w + ":" + x.r).join(",")).join("|")
+    : "-";
+  /* the set count goes in as well as the session's identity, so a set added to
+     a past session somewhere else is noticed and not quietly dropped */
+  const logged = h => (h && h.entries || []).reduce((n, e)=> n + ((e.sets || []).length), 0);
+  return (s.history || []).map(h => sessionId(h) + "/" + logged(h)).join(",") + " #" + live +
+    " " + (s.units || "") + "/" + (s.bar || "") + "/" + (s.figure || "") +
+    " r" + (s.rest ? s.rest.endsAt : "-") + " i" + (s.sessionIndex || 0) +
+    " c" + (s.custom || []).length + " k" + (s.courses || []).length;
+}
+
+/* kept for callers that predate the merge */
+function pickNewer(local, cloud){ return mergeStates(local, cloud); }
 
 function readLocal(k){
   try{ const raw = localStorage.getItem(k); return raw ? JSON.parse(raw) : null; }
@@ -1258,15 +1356,19 @@ async function loadState(){
     catch(e){ cloudOK = false; }
   }
 
-  S = chooseState(local, cloud);
+  /* Both copies, united — anything either one knows about survives. A device
+     holding sessions the account never received puts them back on the next
+     line, when the union is sent up. */
+  S = mergeStates(local, cloud);
 
-  /* first sign-in on a device that already has anonymous history: adopt it */
-  if(!S){
-    const legacy = readLocal(KEY);
-    if(legacy && legacy.history && legacy.history.length){
-      S = legacy;
-      S.updatedAt = Date.now();
-    }
+  /* sessions logged on this device that the account has never seen */
+  const recovered = Math.max(0, (S ? (S.history || []).length : 0) -
+                                (cloud ? (cloud.history || []).length : 0));
+
+  /* an older copy from before sign-in existed, still sitting on this device */
+  const legacy = readLocal(KEY);
+  if(legacy && legacy.v && legacy.history && legacy.history.length){
+    S = mergeStates(legacy, S) || S;
   }
   if(!S || !S.v) S = blankState();
   if(!S.custom) S.custom = [];
@@ -1276,14 +1378,25 @@ async function loadState(){
      another device */
   adoptRest();
 
-  /* Cache what was just loaded on this device too. The account is the record,
-     but a copy here is what lets the app open to the right place in a gym with
-     no signal. */
+  /* Keep the copy this device had before the merge. Nothing reads it, but if a
+     merge ever gets something wrong it is the way back. */
+  if(local) backupLocal(local);
+
+  /* Cache the union on this device too. The account is the record, but a copy
+     here is what lets the app open to the right place in a gym with no signal. */
   try{ localStorage.setItem(userKey(), JSON.stringify(S)); }
   catch(e){ storageOK = false; }
 
-  /* if the account copy was empty or behind, send this one up */
-  if(UID && window.__cloud && (!cloud || (S.updatedAt || 0) > (cloud.updatedAt || 0))) pushCloud();
+  /* Send the union up if it holds anything the account was missing. The guard
+     below only lets the history grow, so this is the one chance a device has to
+     restore sessions that were lost when a whole copy last overwrote another. */
+  if(UID && window.__cloud &&
+     (!cloud || recovered > 0 || (S.updatedAt || 0) > (cloud.updatedAt || 0))){
+    if(recovered > 0) console.warn("Ironwork: putting " + recovered +
+      " session(s) held only on this device back into the account.");
+    cloudHadHistory = Math.min(cloudHadHistory, (S.history || []).length);
+    pushCloud();
+  }
 
   /* from here on the account document is watched, so anything logged on another
      machine lands on this screen without anyone reloading */
@@ -1305,10 +1418,15 @@ function sendCloud(){
   clearTimeout(cloudTimer);
   cloudTimer = null;
   if(!UID || !window.__cloud || !S) return;
-  /* a wipe is never the result of normal use — refuse to send one up */
-  if(cloudHadHistory && !(S.history || []).length){
+  /* Because copies are merged rather than chosen between, the history can only
+     ever grow. A shorter one on the way up means something has gone wrong, so
+     it is refused — the only thing that may shorten it is a deletion you asked
+     for, and those lower the mark themselves through allowShrink(). */
+  const n = (S.history || []).length;
+  if(cloudHadHistory && n < cloudHadHistory){
     cloudPending = false;
-    console.warn("Ironwork: refused to overwrite " + cloudHadHistory + " saved sessions with an empty history.");
+    console.warn("Ironwork: refused to replace " + cloudHadHistory +
+      " saved sessions with " + n + ".");
     return;
   }
   const body = S;
@@ -1328,6 +1446,26 @@ function sendCloud(){
    straight away instead, so the next machine you open sees where you are. */
 function flushCloud(){
   if(cloudTimer) sendCloud();
+}
+
+/* You asked for something to go, so the growth-only guard stands aside once. */
+function allowShrink(){
+  cloudHadHistory = (S && S.history ? S.history.length : 0);
+}
+
+/* The copy this device held before a merge or a sign-in, kept as the way back.
+   Nothing reads it; it is there to be exported if a merge ever gets it wrong. */
+function backupLocal(state){
+  try{
+    const prev = localStorage.getItem(userKey() + ":prev");
+    const now = JSON.stringify({at: Date.now(), state: state});
+    /* keep the copy with the most sessions in it, not merely the latest */
+    if(prev){
+      const old = JSON.parse(prev);
+      if(old && old.state && (old.state.history || []).length > (state.history || []).length) return;
+    }
+    localStorage.setItem(userKey() + ":prev", now);
+  }catch(e){}
 }
 
 /* ---------- reading what another machine did ---------- */
@@ -1375,9 +1513,6 @@ async function resyncCloud(){
 
 function adoptRemote(state){
   if(!state || !state.v || !S) return;
-  if((state.updatedAt || 0) <= (S.updatedAt || 0)) return;        // this device is level or ahead
-  /* the same guard as on the way up: an empty copy never wipes one with sessions */
-  if((S.history || []).length && !(state.history || []).length) return;
   remoteQueued = state;
   applyRemote();
 }
@@ -1387,20 +1522,39 @@ function adoptRemote(state){
    moment, so hold the incoming copy and apply it when they do. */
 function holdOff(){
   if(cloudTimer) return true;
-  const a = document.activeElement;
-  return !!(a && (a.tagName === "INPUT" || a.tagName === "TEXTAREA"));
+  /* a snapshot can land while the page is being torn down, when reading the
+     document may itself throw — never let that reach the fault bar */
+  try{
+    const a = document.activeElement;
+    return !!(a && (a.tagName === "INPUT" || a.tagName === "TEXTAREA"));
+  }catch(e){ return false; }
 }
 
 function applyRemote(){
   if(!remoteQueued) return;
   if(holdOff()){ setTimeout(applyRemote, 1200); return; }
-  const next = remoteQueued;
+  const incoming = remoteQueued;
   remoteQueued = null;
-  if(!S || (next.updatedAt || 0) <= (S.updatedAt || 0)) return;
-  S = next;
+  if(!S || !UID) return;
+
+  const mine = (S.history || []).length;
+  const theirs = (incoming.history || []).length;
+  const merged = mergeStates(S, incoming);
+  if(!merged) return;
+  lastSyncAt = Date.now();
+
+  /* Nothing new in it. This device may still hold sessions the account has not
+     got, though, so make sure those go up. */
+  if(stateFingerprint(merged) === stateFingerprint(S)){
+    if(mine > theirs) pushCloud();
+    return;
+  }
+
+  backupLocal(S);
+  S = merged;
   if(!S.custom) S.custom = [];
   mergeDuplicateExtras();
-  cloudHadHistory = (S.history || []).length;
+  cloudHadHistory = Math.min(cloudHadHistory || theirs, (S.history || []).length);
   try{ localStorage.setItem(userKey(), JSON.stringify(S)); }
   catch(e){ storageOK = false; }
   /* the open view may be pointing at a session that has just changed underneath
@@ -1409,8 +1563,10 @@ function applyRemote(){
   previewOpen = false; previewIdx = null; histList = false; addOpen = false;
   pick = {open:false, sel:null, when:null, family:null};
   adoptRest();
-  lastSyncAt = Date.now();
   render();
+
+  /* the account is now short of what this device has worked out */
+  if((S.history || []).length > theirs) pushCloud();
 }
 
 let saveQueued = false;
@@ -3731,6 +3887,16 @@ function syncLine(){
   return "Recorded against your account · " + Math.round(m / 60) + "h ago";
 }
 
+let restoreOpen = false;
+
+/* The number on each device, so two of them can be compared at a glance. */
+function countLine(){
+  const n = (S.history || []).length;
+  const programme = (S.history || []).filter(h => h.key && h.key !== "X").length;
+  return '<b>' + n + " session" + (n === 1 ? "" : "s") + " recorded</b> · " +
+    programme + " in the programme, " + (n - programme) + " alongside.";
+}
+
 function viewSettings(){
   const initials = (ACCOUNT.name || ACCOUNT.email || "?").trim().slice(0,1).toUpperCase();
   const acct = UID ? '<div class="panel"><div class="pad">' +
@@ -3741,7 +3907,7 @@ function viewSettings(){
         '<span>' + syncLine() + '</span></span>' +
         '<span class="sync ' + (cloudOK ? "on" : "off") + '">' + (cloudOK ? "Online" : "Offline") + '</span>' +
       '</div>' +
-      '<p class="lede" style="margin-bottom:14px">Every session is recorded against your account rather than this device, and this screen updates itself when you log something elsewhere. Sign in on any machine to carry on where you left off. With no signal it keeps working here and sends everything up as soon as you are back.</p>' +
+      '<p class="lede" style="margin-bottom:14px">' + countLine() + ' Every session is recorded against your account rather than this device, and this screen updates itself when you log something elsewhere. Sign in on any machine to carry on where you left off. With no signal it keeps working here and sends everything up as soon as you are back.</p>' +
       '<button class="btn btn-ghost" data-act="signout">Sign out</button>' +
     '</div></div>' : "";
   return acct + '<div class="panel"><div class="pad">' +
@@ -3771,8 +3937,19 @@ function viewSettings(){
   '</div></div>' +
   '<div class="panel"><div class="pad">' +
     '<p class="eyebrow">Data · ' + VERSION + '</p>' +
-    '<p class="lede" style="margin-bottom:14px">Your history is kept on this device and copied to your account, so a lost phone is not a lost log.</p>' +
+    '<p class="lede" style="margin-bottom:14px">Your history is recorded against your account and cached on this device, so a lost phone is not a lost log. Copy it out now and then anyway — it is the only backup that does not depend on any of this working.</p>' +
     '<button class="btn btn-ghost" data-act="export">Copy my history as JSON</button>' +
+    '<div style="height:8px"></div>' +
+    '<button class="btn btn-ghost" data-act="toggleRestore">' +
+      (restoreOpen ? "Cancel restore" : "Restore sessions from JSON") + '</button>' +
+    (restoreOpen ?
+      '<p class="lede" style="margin:8px 0 6px;font-size:11.5px">Paste a copy taken from any device. Sessions are added to what is already here — nothing is replaced and nothing is removed.</p>' +
+      '<textarea id="restoreBox" rows="4" placeholder="Paste the JSON here" ' +
+        'style="width:100%;box-sizing:border-box;font:12px/1.4 var(--mono,monospace);' +
+        'padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)"></textarea>' +
+      '<div style="height:8px"></div>' +
+      '<button class="btn" data-act="restore">Add these sessions</button>'
+      : "") +
     '<div style="height:8px"></div>' +
     '<button class="btn btn-ghost" data-act="forceUpdate">Force an update now</button>' +
     '<p class="lede" style="margin:8px 0 0;font-size:11.5px">Clears everything cached, including exercise illustrations, and reloads. Use it after new artwork goes up.</p>' +
@@ -4182,7 +4359,8 @@ function handleClick(e){
     if(h && confirm("Delete " + sessionTitle(h) + " from " + niceDate(h.date) + "? This cannot be undone.")){
       S.history.splice(histIdx, 1);
       histIdx = null;
-      save(); render();
+      allowShrink();          // you asked for this one to go
+      save(true); render();
     }
     return;
   }
@@ -4246,9 +4424,48 @@ function handleClick(e){
     })();
     return;
   }
+  if(act === "toggleRestore"){ restoreOpen = !restoreOpen; render(); return; }
+
+  if(act === "restore"){
+    const box = document.getElementById("restoreBox");
+    const raw = box ? box.value.trim() : "";
+    if(!raw){ alert("Paste the copied JSON into the box first."); return; }
+    let parsed;
+    try{ parsed = JSON.parse(raw); }
+    catch(e){ alert("That is not readable JSON. Copy it again and paste the whole thing."); return; }
+    /* the export hands back a bare history, but a whole state is fine too */
+    const incoming = Array.isArray(parsed)
+      ? {v:1, history: parsed, updatedAt: 0}
+      : (parsed && parsed.v ? parsed : (parsed && Array.isArray(parsed.history)
+          ? Object.assign({v:1, updatedAt:0}, parsed) : null));
+    if(!incoming || !Array.isArray(incoming.history) || !incoming.history.length){
+      alert("No sessions found in that. It should be the text from “Copy my history as JSON”."); return;
+    }
+    const before = (S.history || []).length;
+    backupLocal(S);
+    /* the pasted copy is never treated as newer, so it cannot change a setting
+       or the session on the bench — it can only add sessions */
+    incoming.updatedAt = 0;
+    const merged = mergeStates(incoming, S);
+    if(!merged){ alert("Nothing could be read from that."); return; }
+    S = merged;
+    const added = (S.history || []).length - before;
+    restoreOpen = false;
+    save(true); render();
+    alert(added
+      ? added + " session" + (added === 1 ? "" : "s") + " added. You now have " +
+        (S.history || []).length + "."
+      : "Nothing new in that one — all " + incoming.history.length +
+        " of those sessions were already here.");
+    return;
+  }
+
   if(act === "reset"){
     if(confirm("Erase every session, weight and record? This cannot be undone.")){
-      S = blankState(); summaryRec = null; save(); render();
+      backupLocal(S);         // the way back, if this was a mis-tap
+      S = blankState(); summaryRec = null;
+      allowShrink();
+      save(true); render();
     }
   }
 }
