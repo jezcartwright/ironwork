@@ -1178,7 +1178,7 @@ function diagram(exId){
 /* ============================================================
    STATE
    ============================================================ */
-const BUILD = "61";
+const BUILD = "62";
 /* the masthead and Setup show this as v3.4 — one number, formatted on the way out */
 const VERSION = (function(){ const n = String(BUILD).padStart(2, "0");
   return "v" + n.slice(0, -1) + "." + n.slice(-1); })();
@@ -1542,8 +1542,13 @@ function startCloudWatch(){
       const m = meta || {};
       if(m.error){ markOffline(m.error); return; }
       /* only a snapshot the server confirmed proves there is a connection */
-      if(!m.fromCache){ markOnline(); noteAccountRead(); }
-      if(state) cloudCount = (state.history || []).length;
+      if(!m.fromCache){
+        markOnline();
+        noteAccountRead();
+        if(state) cloudCount = (state.history || []).length;
+      }
+      /* a cached snapshot is the last thing this device saw, which may be weeks
+         old — it must never be reported as what the account holds now */
       if(!state) return;
       if(m.device && m.device === DEVICE) return;   // this device's own write, echoing back
       adoptRemote(state);
@@ -1559,7 +1564,13 @@ function startHealing(){
   healTimer = setInterval(()=>{
     if(!UID || !window.__cloud || cloudOK) return;
     lastResync = 0;              // the every-three-seconds guard is for taps, not this
-    resyncCloud();
+    const was = cloudOK;
+    Promise.resolve(resyncCloud()).then(()=>{
+      /* An error does not pause a Firestore listener, it ends it. So once the
+         account is reachable again the listener has to be started afresh, or
+         the app would read fine and then never hear about anything again. */
+      if(!was && cloudOK) startCloudWatch();
+    });
   }, 25000);
 }
 function stopHealing(){ clearInterval(healTimer); healTimer = null; }
@@ -3967,12 +3978,13 @@ function syncLine(){
 /* The two numbers worth comparing when devices disagree, side by side. */
 function tallyLine(){
   const here = (S.history || []).length;
-  const there = cloudCount === null ? "not read yet" : cloudCount + "";
-  const same = cloudCount !== null && cloudCount === here;
+  const known = accountRead && cloudCount !== null;
+  const there = known ? cloudCount + "" : "could not be read";
+  const same = known && cloudCount === here;
   return '<p class="lede" style="margin:0 0 10px;font-size:12px">' +
     "<b>This device: " + here + " session" + (here === 1 ? "" : "s") + "</b>" +
     "  ·  <b>Your account: " + esc(there) + "</b>" +
-    (same ? "  — in step." : cloudCount === null ? "" : "  — not in step yet.") +
+    (same ? "  — in step." : !known ? "" : "  — not in step yet.") +
     '</p>';
 }
 
