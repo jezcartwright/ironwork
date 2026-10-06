@@ -1178,7 +1178,7 @@ function diagram(exId){
 /* ============================================================
    STATE
    ============================================================ */
-const BUILD = "57";
+const BUILD = "58";
 /* the masthead and Setup show this as v3.4 — one number, formatted on the way out */
 const VERSION = (function(){ const n = String(BUILD).padStart(2, "0");
   return "v" + n.slice(0, -1) + "." + n.slice(-1); })();
@@ -1200,20 +1200,40 @@ function blankState(){
 }
 
 let UID = null, ACCOUNT = {}, cloudOK = true, cloudPending = false;
+let lastSyncAt = 0;
+
+/* Which device this is. The account document records the device that wrote it,
+   so a live update can tell its own echo from a genuine change made elsewhere. */
+const DEVICE = (function(){
+  try{
+    let d = localStorage.getItem(KEY + ":device");
+    if(!d){
+      d = Math.random().toString(36).slice(2) + "-" + Date.now().toString(36);
+      localStorage.setItem(KEY + ":device", d);
+    }
+    return d;
+  }catch(e){ return "temp-" + Math.random().toString(36).slice(2); }
+})();
+window.__device = DEVICE;   /* the Firebase module stamps it onto every write */
 
 function userKey(){ return UID ? KEY + ":" + UID : KEY; }
 
-function pickNewer(a, b){
-  if(!a) return b;
-  if(!b) return a;
-  /* Recency alone is dangerous. If one copy has sessions and the other has
-     none, the one with sessions wins however new the empty one looks —
-     otherwise a single blank save destroys the history on every device. */
-  const na = (a.history || []).length, nb = (b.history || []).length;
-  if(na && !nb) return a;
-  if(nb && !na) return b;
-  return (b.updatedAt || 0) > (a.updatedAt || 0) ? b : a;
+/* The account is the record of truth. The copy in this browser is a cache so the
+   app still works with no signal, so it only wins when it is strictly newer —
+   which happens only if this device logged something while it was offline.
+   Recency alone is dangerous, though: if one copy has sessions and the other has
+   none, the one with sessions wins however new the empty one looks, otherwise a
+   single blank save destroys the history everywhere. */
+function chooseState(local, cloud){
+  if(!cloud) return local || null;
+  if(!local) return cloud;
+  const nl = (local.history || []).length, nc = (cloud.history || []).length;
+  if(nc && !nl) return cloud;
+  if(nl && !nc) return local;
+  return (local.updatedAt || 0) > (cloud.updatedAt || 0) ? local : cloud;
 }
+/* kept for callers that predate the rename */
+function pickNewer(local, cloud){ return chooseState(local, cloud); }
 
 function readLocal(k){
   try{ const raw = localStorage.getItem(k); return raw ? JSON.parse(raw) : null; }
@@ -1225,13 +1245,20 @@ async function loadState(){
   let cloud = null;
   if(window.__cloud && UID){
     try{
-      cloud = await window.__cloud.get(UID); cloudOK = true;
+      /* A dead network can leave this hanging, and nothing draws until it
+         answers. Give it six seconds, fall back to the cached copy, and let the
+         live listener correct the screen the moment the account does reply. */
+      cloud = await Promise.race([
+        window.__cloud.get(UID),
+        new Promise((res, rej)=> setTimeout(()=> rej(new Error("slow")), 6000))
+      ]);
+      cloudOK = true; lastSyncAt = Date.now();
       cloudHadHistory = (cloud && cloud.history ? cloud.history.length : 0);
     }
     catch(e){ cloudOK = false; }
   }
 
-  S = pickNewer(local, cloud);
+  S = chooseState(local, cloud);
 
   /* first sign-in on a device that already has anonymous history: adopt it */
   if(!S){
@@ -1245,49 +1272,149 @@ async function loadState(){
   if(!S.custom) S.custom = [];
   mergeDuplicateExtras();
 
-  /* a rest that was running when the app was closed or reloaded */
-  if(S && S.rest && S.rest.endsAt && S.rest.endsAt > Date.now()){
-    restEndsAt = S.rest.endsAt;
-    restLabel  = S.rest.label || "Rest";
-    restLeft   = restRemaining();
-    clearInterval(restTimer);
-    restTimer  = setInterval(restTick, 1000);
-  }else if(S && S.rest){
-    S.rest = null;
-  }
+  /* a rest that was running when the app was closed, reloaded, or started on
+     another device */
+  adoptRest();
 
-  try{ localStorage.setItem(userKey() + ":probe", "1"); localStorage.removeItem(userKey() + ":probe"); }
+  /* Cache what was just loaded on this device too. The account is the record,
+     but a copy here is what lets the app open to the right place in a gym with
+     no signal. */
+  try{ localStorage.setItem(userKey(), JSON.stringify(S)); }
   catch(e){ storageOK = false; }
 
-  /* if the cloud was empty or behind, push what we have up */
+  /* if the account copy was empty or behind, send this one up */
   if(UID && window.__cloud && (!cloud || (S.updatedAt || 0) > (cloud.updatedAt || 0))) pushCloud();
+
+  /* from here on the account document is watched, so anything logged on another
+     machine lands on this screen without anyone reloading */
+  startCloudWatch();
 }
 
+/* ---------- writing up ---------- */
 let cloudTimer = null;
 let cloudHadHistory = 0;
+
 function pushCloud(){
   if(!UID || !window.__cloud) return;
+  clearTimeout(cloudTimer);
+  cloudPending = true;
+  cloudTimer = setTimeout(sendCloud, 700);
+}
+
+function sendCloud(){
+  clearTimeout(cloudTimer);
+  cloudTimer = null;
+  if(!UID || !window.__cloud || !S) return;
   /* a wipe is never the result of normal use — refuse to send one up */
   if(cloudHadHistory && !(S.history || []).length){
+    cloudPending = false;
     console.warn("Ironwork: refused to overwrite " + cloudHadHistory + " saved sessions with an empty history.");
     return;
   }
-  clearTimeout(cloudTimer);
-  cloudPending = true;
-  cloudTimer = setTimeout(async ()=>{
-    try{
-      await window.__cloud.set(UID, S);
-      cloudPending = false;
-      if(!cloudOK){ cloudOK = true; render(); }
-    }catch(e){
-      cloudPending = false;
-      if(cloudOK){ cloudOK = false; render(); }
-    }
-  }, 1200);
+  const body = S;
+  window.__cloud.set(UID, body).then(()=>{
+    cloudPending = false;
+    lastSyncAt = Date.now();
+    cloudHadHistory = (body.history || []).length;
+    if(!cloudOK){ cloudOK = true; render(); }
+    else if(tab === "settings") render();
+  }).catch(()=>{
+    cloudPending = false;
+    if(cloudOK){ cloudOK = false; render(); }
+  });
+}
+
+/* Put the phone down mid-session and the debounce would still be waiting. Send
+   straight away instead, so the next machine you open sees where you are. */
+function flushCloud(){
+  if(cloudTimer) sendCloud();
+}
+
+/* ---------- reading what another machine did ---------- */
+let cloudWatch = null;
+let remoteQueued = null;
+
+function startCloudWatch(){
+  stopCloudWatch();
+  if(!UID || !window.__cloud || !window.__cloud.watch) return;
+  try{
+    cloudWatch = window.__cloud.watch(UID, (state, meta)=>{
+      const m = meta || {};
+      if(m.error){ if(cloudOK){ cloudOK = false; render(); } return; }
+      const live = !m.fromCache;
+      lastSyncAt = live ? Date.now() : lastSyncAt;
+      if(live !== cloudOK){ cloudOK = live; render(); }
+      if(!state) return;
+      if(m.device && m.device === DEVICE) return;   // this device's own write, echoing back
+      adoptRemote(state);
+    });
+  }catch(e){ cloudOK = false; }
+}
+
+function stopCloudWatch(){
+  if(cloudWatch){ try{ cloudWatch(); }catch(e){} }
+  cloudWatch = null;
+  remoteQueued = null;
+}
+
+/* Fetch the account copy on its own — for coming back to a tab that has been
+   backgrounded long enough for the listener to have been dropped. */
+let lastResync = 0;
+async function resyncCloud(){
+  if(!UID || !window.__cloud) return;
+  /* coming back to the app fires several events at once — one read will do */
+  if(Date.now() - lastResync < 3000) return;
+  lastResync = Date.now();
+  try{
+    const cloud = await window.__cloud.get(UID);
+    lastSyncAt = Date.now();
+    if(!cloudOK){ cloudOK = true; render(); }
+    if(cloud) adoptRemote(cloud);
+  }catch(e){ if(cloudOK){ cloudOK = false; render(); } }
+}
+
+function adoptRemote(state){
+  if(!state || !state.v || !S) return;
+  if((state.updatedAt || 0) <= (S.updatedAt || 0)) return;        // this device is level or ahead
+  /* the same guard as on the way up: an empty copy never wipes one with sessions */
+  if((S.history || []).length && !(state.history || []).length) return;
+  remoteQueued = state;
+  applyRemote();
+}
+
+/* Swapping the state out from under a half-typed number would lose it, and so
+   would doing it while this device has a write still queued. Both resolve in a
+   moment, so hold the incoming copy and apply it when they do. */
+function holdOff(){
+  if(cloudTimer) return true;
+  const a = document.activeElement;
+  return !!(a && (a.tagName === "INPUT" || a.tagName === "TEXTAREA"));
+}
+
+function applyRemote(){
+  if(!remoteQueued) return;
+  if(holdOff()){ setTimeout(applyRemote, 1200); return; }
+  const next = remoteQueued;
+  remoteQueued = null;
+  if(!S || (next.updatedAt || 0) <= (S.updatedAt || 0)) return;
+  S = next;
+  if(!S.custom) S.custom = [];
+  mergeDuplicateExtras();
+  cloudHadHistory = (S.history || []).length;
+  try{ localStorage.setItem(userKey(), JSON.stringify(S)); }
+  catch(e){ storageOK = false; }
+  /* the open view may be pointing at a session that has just changed underneath
+     it, so come back to a screen that is certainly consistent */
+  summaryRec = null; histIdx = null; histEx = null; histDay = null;
+  previewOpen = false; previewIdx = null; histList = false; addOpen = false;
+  pick = {open:false, sel:null, when:null, family:null};
+  adoptRest();
+  lastSyncAt = Date.now();
+  render();
 }
 
 let saveQueued = false;
-function save(){
+function save(now){
   S.updatedAt = Date.now();
   if(!saveQueued){
     saveQueued = true;
@@ -1298,6 +1425,9 @@ function save(){
     }, 120);
   }
   pushCloud();
+  /* starting, finishing or reopening a session is the moment another machine
+     most needs to know — do not sit on it for the debounce */
+  if(now) flushCloud();
 }
 
 /* ============================================================
@@ -1486,14 +1616,14 @@ function startSession(){
   });
   S.current = {index:i, key:sess.key, startedAt:Date.now(), entries:entries};
   addOpen = false;
-  save(); render();
+  save(true); render();
 }
 
 function startOpen(when){
   S.current = {index:S.sessionIndex, key:"X", open:true, startedAt:Date.now(), entries:[]};
   if(when) S.current.retro = when;
   addOpen = false;
-  save(); render();
+  save(true); render();
 }
 
 function finishSession(){
@@ -1559,7 +1689,10 @@ function finishSession(){
   if(!c.open && !ro) S.sessionIndex = c.index + 1;
   if(!c.open && ro && ro.wasLatest) S.sessionIndex = c.index + 1;
   S.current = null;
-  save();
+  /* the session is over, so the rest clock goes with it — and because the clock
+     lives in the state, clearing it here also stops it on every other device */
+  stopRest();
+  save(true);
   tab = "train";
   render();
   showSummary(rec);
@@ -1587,7 +1720,7 @@ function reopenSession(idx){
   S.history.splice(idx, 1);
   if(latest && !rec.open) S.sessionIndex = rec.index;
   summaryRec = null; histIdx = null; histEx = null; tab = "train";
-  save(); render();
+  save(true); render();
   return null;
 }
 
@@ -1660,8 +1793,27 @@ function stopRest(){
   if(S) S.rest = null;   /* called on sign-in before the state is loaded */
   drawRest();
 }
+
+/* Set the on-screen clock from whatever the state says — used after a reload,
+   after signing in, and when a rest started on another device arrives here.
+   The end time is absolute, so it is right wherever it is read. */
+function adoptRest(){
+  if(S && S.rest && S.rest.endsAt && S.rest.endsAt > Date.now()){
+    restEndsAt = S.rest.endsAt;
+    restLabel  = S.rest.label || "Rest";
+    restLeft   = restRemaining();
+    clearInterval(restTimer);
+    restTimer  = setInterval(restTick, 1000);
+  }else{
+    clearInterval(restTimer); restTimer = null;
+    restEndsAt = 0; restLeft = 0;
+    if(S && S.rest) S.rest = null;
+  }
+  drawRest();
+}
 function drawRest(){
   const host = document.getElementById("restHost");
+  if(!host) return;
   if(!restTimer && restLeft <= 0){ host.innerHTML = ""; return; }
   const m = Math.floor(restLeft / 60), s = restLeft % 60;
   host.innerHTML =
@@ -3567,6 +3719,18 @@ function viewLibrary(){
 }
 
 /* ---------- settings ---------- */
+function syncLine(){
+  if(!cloudOK) return "Offline — waiting to send to your account";
+  if(cloudPending || cloudTimer) return "Saving to your account…";
+  if(!lastSyncAt) return "Recorded against your account";
+  const s = Math.round((Date.now() - lastSyncAt) / 1000);
+  if(s < 10)  return "Recorded against your account · just now";
+  if(s < 90)  return "Recorded against your account · " + s + "s ago";
+  const m = Math.round(s / 60);
+  if(m < 90)  return "Recorded against your account · " + m + " min ago";
+  return "Recorded against your account · " + Math.round(m / 60) + "h ago";
+}
+
 function viewSettings(){
   const initials = (ACCOUNT.name || ACCOUNT.email || "?").trim().slice(0,1).toUpperCase();
   const acct = UID ? '<div class="panel"><div class="pad">' +
@@ -3574,10 +3738,10 @@ function viewSettings(){
       '<div class="acct">' +
         '<span class="ex-icon lead" style="font-family:var(--ui);font-weight:700">' + esc(initials) + '</span>' +
         '<span class="who"><b>' + esc(ACCOUNT.name || ACCOUNT.email || "Signed in") + '</b>' +
-        '<span>' + (cloudOK ? "Syncing to your account" : "Offline — saved on this device") + '</span></span>' +
-        '<span class="sync ' + (cloudOK ? "on" : "off") + '">' + (cloudOK ? "Synced" : "Local") + '</span>' +
+        '<span>' + syncLine() + '</span></span>' +
+        '<span class="sync ' + (cloudOK ? "on" : "off") + '">' + (cloudOK ? "Online" : "Offline") + '</span>' +
       '</div>' +
-      '<p class="lede" style="margin-bottom:14px">Your training is stored against your account, so it follows you to any device you sign in on.</p>' +
+      '<p class="lede" style="margin-bottom:14px">Every session is recorded against your account rather than this device, and this screen updates itself when you log something elsewhere. Sign in on any machine to carry on where you left off. With no signal it keeps working here and sends everything up as soon as you are back.</p>' +
       '<button class="btn btn-ghost" data-act="signout">Sign out</button>' +
     '</div></div>' : "";
   return acct + '<div class="panel"><div class="pad">' +
@@ -4146,10 +4310,19 @@ document.addEventListener("input", e=>{
 /* ============================================================
    BOOT
    ============================================================ */
-/* put the rest clock right the moment the app is looked at again */
-document.addEventListener("visibilitychange", ()=>{ if(!document.hidden) restResync(); });
-window.addEventListener("focus", restResync);
-window.addEventListener("pageshow", restResync);
+/* Put the rest clock right the moment the app is looked at again, and check the
+   account at the same time — a tab left in the background long enough can have
+   its live listener dropped, and the session may have moved on elsewhere. */
+document.addEventListener("visibilitychange", ()=>{
+  if(document.hidden){ flushCloud(); return; }   // leaving: send before the screen locks
+  restResync();
+  resyncCloud();
+});
+window.addEventListener("focus", ()=>{ restResync(); resyncCloud(); });
+window.addEventListener("pageshow", ()=>{ restResync(); resyncCloud(); });
+/* closing the tab, or the phone killing it, must not lose the last set logged */
+window.addEventListener("pagehide", flushCloud);
+window.addEventListener("beforeunload", flushCloud);
 
 if("serviceWorker" in navigator){
   window.addEventListener("load", ()=>{
@@ -4182,6 +4355,7 @@ window.ironworkSignedIn = async function(uid, profile){
   /* auth has answered — mark it now, before the await, or the fallback timer can
      fire midway through loading and try to draw a state that is not there yet */
   authResolved = true;
+  stopCloudWatch();
   UID = uid;
   S = null;
   ACCOUNT = profile || {};
@@ -4194,6 +4368,9 @@ window.ironworkSignedIn = async function(uid, profile){
 
 window.ironworkSignedOut = function(){
   authResolved = true;
+  flushCloud();
+  stopCloudWatch();
+  cloudHadHistory = 0;
   UID = null; ACCOUNT = {}; S = blankState();
   document.getElementById("gate").hidden = false;
   document.getElementById("view").innerHTML = "";
@@ -4225,7 +4402,7 @@ import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWith
          signOut, GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail,
          setPersistence, browserLocalPersistence }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, enableIndexedDbPersistence }
+import { getFirestore, doc, getDoc, setDoc, onSnapshot, enableIndexedDbPersistence }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { FIREBASE_CONFIG } from "./firebase-config.js";
 
@@ -4269,13 +4446,37 @@ if(!FIREBASE_CONFIG.apiKey || !FIREBASE_CONFIG.projectId){
   await setPersistence(auth, browserLocalPersistence).catch(()=>{});
 
   window.__auth = { signOut: ()=> signOut(auth) };
+  const ref = (uid)=> doc(db, "ironwork", uid);
+
   window.__cloud = {
     async get(uid){
-      const snap = await getDoc(doc(db, "ironwork", uid));
+      const snap = await getDoc(ref(uid));
       return snap.exists() ? snap.data().state : null;
     },
     async set(uid, state){
-      await setDoc(doc(db, "ironwork", uid), { state: state, updatedAt: Date.now() });
+      await setDoc(ref(uid), {
+        state: state,
+        updatedAt: Date.now(),
+        device: window.__device || ""      // so a live update can skip its own echo
+      });
+    },
+    /* The account document is the record. Watching it means a session logged on
+       the phone shows up on the laptop without anyone reloading anything.
+       Returns the function that stops watching. */
+    watch(uid, cb){
+      return onSnapshot(ref(uid),
+        { includeMetadataChanges: true },
+        (snap)=>{
+          if(!snap.exists()){ cb(null, {fromCache: snap.metadata.fromCache}); return; }
+          const d = snap.data() || {};
+          cb(d.state || null, {
+            device: snap.metadata.hasPendingWrites ? (window.__device || "") : (d.device || ""),
+            updatedAt: d.updatedAt || 0,
+            fromCache: snap.metadata.fromCache
+          });
+        },
+        (err)=> cb(null, {error: err})
+      );
     }
   };
 
