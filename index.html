@@ -1178,7 +1178,7 @@ function diagram(exId){
 /* ============================================================
    STATE
    ============================================================ */
-const BUILD = "60";
+const BUILD = "61";
 /* the masthead and Setup show this as v3.4 — one number, formatted on the way out */
 const VERSION = (function(){ const n = String(BUILD).padStart(2, "0");
   return "v" + n.slice(0, -1) + "." + n.slice(-1); })();
@@ -1204,6 +1204,12 @@ let lastSyncAt = 0;
 let lastCloudError = "";   /* the exact reason the account could not be reached */
 let cloudCount = null;     /* sessions the account holds, as last seen */
 let cloudProbe = null;     /* the result of the Check the connection button */
+/* Whether the account has been read successfully yet in this session. A write
+   replaces the whole document, so sending one before knowing what is up there
+   can overwrite sessions this device has never seen. Nothing goes up until a
+   read has come back and been merged. */
+let accountRead = false;
+let pushWanted = false;
 
 /* Which device this is. The account document records the device that wrote it,
    so a live update can tell its own echo from a genuine change made elsewhere. */
@@ -1345,19 +1351,35 @@ async function loadState(){
   const local = readLocal(userKey());
   let cloud = null;
   if(window.__cloud && UID){
-    try{
-      /* A dead network can leave this hanging, and nothing draws until it
-         answers. Give it six seconds, fall back to the cached copy, and let the
-         live listener correct the screen the moment the account does reply. */
-      cloud = await Promise.race([
-        window.__cloud.get(UID),
-        new Promise((res, rej)=> setTimeout(()=> rej(new Error("slow")), 6000))
-      ]);
+    /* The read is started here and acted on WHENEVER it lands. The six seconds
+       below are only about how long the first paint waits for it — a phone
+       waking up on a slow connection regularly takes longer than that, and an
+       earlier build called that Offline and left it there. Being slow is not
+       being offline. */
+    const settled = window.__cloud.get(UID).then(c => ({ok:true, c:c}), e => ({ok:false, e:e}));
+    settled.then(r=>{
+      if(r.ok){
+        if(r.c) cloudCount = (r.c.history || []).length;
+        cloudHadHistory = r.c ? (r.c.history || []).length : 0;
+        markOnline();
+        if(r.c && S) adoptRemote(r.c);      // late, but never wasted
+        noteAccountRead();
+      }else{
+        markOffline(r.e);
+      }
+    });
+    const first = await Promise.race([settled, new Promise(res=> setTimeout(()=> res(null), 6000))]);
+    if(first && first.ok){
+      cloud = first.c;
       cloudOK = true; lastSyncAt = Date.now(); lastCloudError = "";
       cloudHadHistory = (cloud && cloud.history ? cloud.history.length : 0);
       cloudCount = cloud ? (cloud.history || []).length : 0;
+      accountRead = true;
+    }else if(first && !first.ok){
+      cloudOK = false; lastCloudError = cloudErrText(first.e);
     }
-    catch(e){ cloudOK = false; lastCloudError = cloudErrText(e); }
+    /* first === null: still waiting. Draw from the device copy and let the
+       handler above put it right the moment the account answers. */
   }
 
   /* Both copies, united — anything either one knows about survives. A device
@@ -1405,6 +1427,7 @@ async function loadState(){
   /* from here on the account document is watched, so anything logged on another
      machine lands on this screen without anyone reloading */
   startCloudWatch();
+  startHealing();
 }
 
 /* ---------- writing up ---------- */
@@ -1426,6 +1449,14 @@ function sendCloud(){
      ever grow. A shorter one on the way up means something has gone wrong, so
      it is refused — the only thing that may shorten it is a deletion you asked
      for, and those lower the mark themselves through allowShrink(). */
+  /* Not read yet. A write now would replace whatever is up there with a copy
+     that has never been merged against it, which is how sessions go missing.
+     Wait for the read; noteAccountRead() sends this the moment it lands. */
+  if(!accountRead){
+    cloudPending = false;
+    pushWanted = true;
+    return;
+  }
   const n = (S.history || []).length;
   if(cloudHadHistory && n < cloudHadHistory){
     cloudPending = false;
@@ -1480,6 +1511,13 @@ let remoteQueued = null;
    that over first, so a cached snapshot says nothing about the connection. An
    earlier build read it as proof of being offline, which is why both devices
    claimed Offline while syncing perfectly well. */
+/* a read of the account came back — from here, writing is safe */
+function noteAccountRead(){
+  if(accountRead) return;
+  accountRead = true;
+  if(pushWanted){ pushWanted = false; pushCloud(); }
+}
+
 function markOnline(){
   lastSyncAt = Date.now();
   lastCloudError = "";
@@ -1504,7 +1542,7 @@ function startCloudWatch(){
       const m = meta || {};
       if(m.error){ markOffline(m.error); return; }
       /* only a snapshot the server confirmed proves there is a connection */
-      if(!m.fromCache) markOnline();
+      if(!m.fromCache){ markOnline(); noteAccountRead(); }
       if(state) cloudCount = (state.history || []).length;
       if(!state) return;
       if(m.device && m.device === DEVICE) return;   // this device's own write, echoing back
@@ -1512,6 +1550,19 @@ function startCloudWatch(){
     });
   }catch(e){ markOffline(e); }
 }
+
+/* While it says Offline, keep quietly trying. Nothing about being offline is
+   permanent, and nobody should have to reopen the app to find that out. */
+let healTimer = null;
+function startHealing(){
+  clearInterval(healTimer);
+  healTimer = setInterval(()=>{
+    if(!UID || !window.__cloud || cloudOK) return;
+    lastResync = 0;              // the every-three-seconds guard is for taps, not this
+    resyncCloud();
+  }, 25000);
+}
+function stopHealing(){ clearInterval(healTimer); healTimer = null; }
 
 function stopCloudWatch(){
   if(cloudWatch){ try{ cloudWatch(); }catch(e){} }
@@ -1532,6 +1583,7 @@ async function resyncCloud(){
     if(cloud) cloudCount = (cloud.history || []).length;
     markOnline();
     if(cloud) adoptRemote(cloud);
+    noteAccountRead();
   }catch(e){ markOffline(e); }
 }
 
@@ -3962,7 +4014,8 @@ function viewSettings(){
         '<span class="ex-icon lead" style="font-family:var(--ui);font-weight:700">' + esc(initials) + '</span>' +
         '<span class="who"><b>' + esc(ACCOUNT.name || ACCOUNT.email || "Signed in") + '</b>' +
         '<span>' + syncLine() + '</span></span>' +
-        '<span class="sync ' + (cloudOK ? "on" : "off") + '">' + (cloudOK ? "Online" : "Offline") + '</span>' +
+        '<button class="sync ' + (cloudOK ? "on" : "off") + '" data-act="cloudTest" ' +
+          'title="Check the connection">' + (cloudOK ? "Online" : "Offline") + '</button>' +
       '</div>' +
       tallyLine() +
       '<p class="lede" style="margin-bottom:14px">' + countLine() + ' Every session is recorded against your account rather than this device, and this screen updates itself when you log something elsewhere. Sign in on any machine to carry on where you left off. With no signal it keeps working here and sends everything up as soon as you are back.</p>' +
@@ -4623,6 +4676,9 @@ document.addEventListener("visibilitychange", ()=>{
 });
 window.addEventListener("focus", ()=>{ restResync(); resyncCloud(); });
 window.addEventListener("pageshow", ()=>{ restResync(); resyncCloud(); });
+/* the browser telling us the network came back or went away */
+window.addEventListener("online", ()=>{ lastResync = 0; resyncCloud(); flushCloud(); });
+window.addEventListener("offline", ()=>{ markOffline({code:"no network"}); });
 /* closing the tab, or the phone killing it, must not lose the last set logged */
 window.addEventListener("pagehide", flushCloud);
 window.addEventListener("beforeunload", flushCloud);
@@ -4659,6 +4715,7 @@ window.ironworkSignedIn = async function(uid, profile){
      fire midway through loading and try to draw a state that is not there yet */
   authResolved = true;
   stopCloudWatch();
+  accountRead = false; pushWanted = false; cloudCount = null; cloudProbe = null;
   UID = uid;
   S = null;
   ACCOUNT = profile || {};
@@ -4673,7 +4730,9 @@ window.ironworkSignedOut = function(){
   authResolved = true;
   flushCloud();
   stopCloudWatch();
-  cloudHadHistory = 0;
+  stopHealing();
+  cloudHadHistory = 0; cloudCount = null; cloudProbe = null; lastCloudError = "";
+  accountRead = false; pushWanted = false;
   UID = null; ACCOUNT = {}; S = blankState();
   document.getElementById("gate").hidden = false;
   document.getElementById("view").innerHTML = "";
@@ -4705,8 +4764,9 @@ import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWith
          signOut, GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail,
          setPersistence, browserLocalPersistence }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, doc, getDoc, getDocFromServer, setDoc, onSnapshot,
-         enableIndexedDbPersistence }
+import { getFirestore, initializeFirestore, persistentLocalCache,
+         persistentMultipleTabManager, doc, getDoc, getDocFromServer, setDoc,
+         onSnapshot }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { FIREBASE_CONFIG } from "./firebase-config.js";
 
@@ -4745,8 +4805,21 @@ if(!FIREBASE_CONFIG.apiKey || !FIREBASE_CONFIG.projectId){
 }else{
   const app  = initializeApp(FIREBASE_CONFIG);
   const auth = getAuth(app);
-  const db   = getFirestore(app);
-  enableIndexedDbPersistence(db).catch(()=>{});
+  /* Firestore's default transport is a streaming connection that some networks
+     and some versions of Safari never manage to hold open — the symptom is an
+     app that is permanently "offline" while every other request works fine.
+     Auto-detect falls back to long polling when that happens. The persistent
+     cache replaces enableIndexedDbPersistence, which is deprecated and had to
+     be called separately. If either is refused, plain Firestore still works. */
+  let db;
+  try{
+    db = initializeFirestore(app, {
+      localCache: persistentLocalCache({tabManager: persistentMultipleTabManager()}),
+      experimentalAutoDetectLongPolling: true
+    });
+  }catch(e){
+    db = getFirestore(app);
+  }
   await setPersistence(auth, browserLocalPersistence).catch(()=>{});
 
   window.__auth = { signOut: ()=> signOut(auth) };
