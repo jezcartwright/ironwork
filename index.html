@@ -66,6 +66,7 @@ button{cursor:pointer;border:0;background:none}
   background:var(--iron-2);border:1px solid var(--iron-line);color:var(--paper);font-size:16px}
 .gate input:focus{outline:none;border-color:var(--orange)}
 .gate .btn{margin-bottom:10px}
+.gate .btn:disabled{background:var(--iron-3);color:#9A9384}
 .gate .btn-alt{background:var(--iron-2);color:var(--paper);border:1px solid var(--iron-line)}
 .gate .link{display:block;width:100%;text-align:center;font-size:13px;color:#9A9384;padding:10px}
 .gate .link u{color:var(--orange);text-decoration:none;border-bottom:1px solid var(--orange)}
@@ -281,7 +282,7 @@ h2.head{
 .exrow{padding:13px 0;border-bottom:1px solid var(--paper-2);display:block;width:100%;
   background:none;border-left:0;border-right:0;border-top:0;text-align:left;font:inherit;
   color:inherit;cursor:pointer;position:relative}
-.exrow:active{opacity:.6}
+.exrow:active{background:var(--paper-2)}
 .exrow-chev{position:absolute;right:2px;top:13px;color:var(--slate);font-size:17px;line-height:1}
 .exrow .exrow-top{padding-right:18px}
 .exrow:last-child{border-bottom:0}
@@ -323,7 +324,7 @@ h2.head{
   cursor:pointer;margin-bottom:8px;font-family:var(--ui)}
 .amode:active{transform:translateY(2px)}
 .amode b{color:#FFFFFF;font-size:15px;font-weight:600;display:block}
-.amode span{color:rgba(255,255,255,.82);font-size:11.5px;display:block;margin-top:2px;line-height:1.45}
+.amode span{color:#DAE5DE;font-size:11.5px;display:block;margin-top:2px;line-height:1.45}
 .amode.alt{background:var(--paper);border:1.5px solid var(--green)}
 .amode.alt b{color:var(--green)}
 .amode.alt span{color:#4A6B57}
@@ -332,7 +333,8 @@ h2.head{
 .rbx{height:42px;border-radius:3px;background:var(--paper-3);border:0;padding:0;font-family:var(--ui);
   font-size:11.5px;font-weight:600;color:var(--slate);display:flex;flex-direction:column;
   align-items:center;justify-content:center;gap:1px}
-.rbx small{font-family:var(--mono);font-size:8px;font-weight:400;opacity:.85}
+.rbx small{font-family:var(--mono);font-size:8px;font-weight:400}
+.rbx.on small,.rbx.late small{color:var(--orange-pale)}
 .rbx.on{background:var(--orange);color:#FFFFFF}
 .rbx.late{background:var(--orange-deep);color:#FFFFFF}
 .rbx.next{background:var(--paper);border:2px solid var(--orange);color:var(--orange-deep)}
@@ -361,7 +363,7 @@ h2.head{
 
 .numlink{font-family:var(--mono);font-weight:600;font-size:19px;line-height:1.1;padding:0;
   color:var(--orange-deep);border-bottom:1px solid var(--orange-deep);display:inline-block}
-.numlink:active{opacity:.6}
+.numlink:active{color:var(--orange)}
 
 .histrow{display:flex;align-items:center;gap:11px;width:100%;text-align:left;
   padding:11px 0;border-bottom:1px solid var(--paper-2);color:var(--ink)}
@@ -369,7 +371,7 @@ h2.head{
 .histrow b{display:block;font-family:var(--display);font-size:19px;font-weight:700;line-height:1.15}
 .histrow span span{font-family:var(--mono);font-size:11px;color:var(--slate)}
 .histrow .chev-r{font-size:22px;color:var(--rule);line-height:1}
-.histrow:active{opacity:.6}
+.histrow:active{background:var(--paper-2)}
 .tag-open{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;
   color:var(--slate);vertical-align:2px}
 .tick-btn.rm{font-size:20px;color:var(--slate);line-height:1}
@@ -406,7 +408,7 @@ h2.head{
 .rot.next{background:var(--orange)}
 .rot.next b{color:#FFFFFF}
 .rot.next .rot-l{color:var(--orange-pale)}
-.rot.done{opacity:.5}
+.rot.done b,.rot.done .rot-l{color:#9A9384}
 .rot:active{transform:translateY(2px)}
 
 .contents{font-size:13px;color:var(--slate);line-height:1.6;margin:9px 0 0;
@@ -441,7 +443,7 @@ h2.head{
 .prow b{display:block;font-size:14px;font-weight:500;line-height:1.25}
 .prow span span{font-family:var(--mono);font-size:11px;color:var(--slate)}
 .prow-n{font-family:var(--mono);font-size:11px;color:var(--slate);white-space:nowrap}
-.prow:active{opacity:.6}
+.prow:active{background:var(--paper-2)}
 
 .wkrow{display:flex;gap:11px;padding:13px 0;border-top:1px solid var(--rule)}
 .wkrow b{font-size:15px;font-weight:600;display:block}
@@ -453,7 +455,7 @@ h2.head{
   color:var(--orange-deep);display:flex;align-items:center;justify-content:center}
 .aero-tile b{display:block;font-size:16px;font-weight:600;line-height:1.2}
 .aero-tile span span{font-size:12px;color:var(--slate);line-height:1.45;display:block;margin-top:2px}
-.aero-tile:active{opacity:.7}
+.aero-tile:active{background:var(--orange-pale)}
 
 .tiles{display:flex;gap:11px}
 .tile-big{
@@ -604,6 +606,35 @@ button.tile:active{transform:translateY(2px)}
   border-left:3px solid var(--orange);padding-left:12px;margin:0;
   font-family:var(--display);font-style:italic;font-size:19px;line-height:1.35;
 }
+
+/* ---------- where you are training ---------- */
+.kits{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid var(--rule);
+  border-radius:3px;overflow:hidden;margin:0 0 2px}
+.kits button{font-size:12px;font-weight:600;padding:9px 3px;min-height:46px;border-right:1px solid var(--rule);
+  background:var(--paper-2);color:var(--slate);display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:1px;line-height:1.2}
+.kits button:last-child{border-right:0}
+.kits button span{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;font-weight:400}
+.kits button.on{background:var(--ink);color:var(--paper)}
+.kits button.on span{color:#9A9384}
+.kit-tag{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--orange-deep);background:var(--orange-pale);padding:3px 7px;border-radius:2px;margin:0 0 8px}
+.hold{background:var(--paper-2);border-radius:11px;padding:12px;margin:12px 0 0;font-size:13px;line-height:1.5;
+  color:var(--iron-3);display:flex;gap:10px;align-items:flex-start}
+.hold b{color:var(--ink)}
+.hold svg{flex:0 0 18px;margin-top:1px;color:var(--orange-deep)}
+.welcome{background:var(--green-pale);border-radius:11px;padding:12px;margin:12px 0 0;font-size:13px;
+  line-height:1.5;color:var(--ink)}
+.welcome b{display:block;font-size:14px;margin-bottom:2px;color:var(--green)}
+.ramp{background:var(--orange-pale);border-radius:2px;padding:10px 12px;margin:8px 0 0;font-size:13px;
+  line-height:1.5;color:var(--orange-deep)}
+.ramp b{display:block;font-size:14px;color:var(--ink);margin-bottom:2px}
+.seg-fit button{flex:1 1 0;min-width:0;padding:8px 4px}
+.segn{color:#9A9384}
+.seg button.on .segn{color:var(--orange-pale)}
+.roadhead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin:14px 0 2px}
+.roadhead b{font-family:var(--display);font-size:22px;font-weight:700}
+.roadhead span{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--slate)}
 .warn{background:var(--orange-pale);color:var(--orange-deep);padding:10px 12px;border-radius:2px;font-size:13px;margin:14px 0}
 .empty{text-align:center;padding:26px 12px;color:var(--slate);font-size:14px}
 .pb{font-family:var(--mono);font-size:11px;color:var(--green);letter-spacing:.06em;text-transform:uppercase}
@@ -807,6 +838,191 @@ const SESSIONS = [
   ]}
 ];
 
+/* ============================================================
+   ON THE ROAD — three kits, one shared Drive · Root · Reach rotation
+
+   Road sessions never touch the home programme: not its place in the
+   rotation, not its variations, not its deload count and not its loads.
+   They are recorded with key "T" and their own counter (S.roadIndex), and
+   every exercise has its own id, so a hotel's dumbbells never feed a
+   suggestion at home. The rotation is shared by all three kits: a trip
+   starts at whatever home had next, and carries on from the last road
+   session whichever kit is used for the next one.
+   ============================================================ */
+const ROAD_KITS = [
+  {id:"db",  label:"Dumbbells",  sub:"hotel",  tag:"Dumbbells",  needs:"A hotel rack of dumbbells and a bench."},
+  {id:"trx", label:"TRX",        sub:"straps", tag:"TRX",        needs:"TRX straps on a door anchor, on a door that closes."},
+  {id:"bw",  label:"Bodyweight", sub:"floor",  tag:"Bodyweight", needs:"Floor, a bath towel and the edge of the bed."}
+];
+function kitInfo(id){ return ROAD_KITS.find(k => k.id === id) || null; }
+
+/* art: an existing drawing of exactly the same movement, reused so a road
+   exercise is never shown with a picture of something else */
+const ROAD_EX = (function(){
+  const list = [
+    /* dumbbells */
+    {id:"r-goblet",   name:"Goblet squat", kind:"dumbbell", inc:2, cue:"One dumbbell held upright at the chest, elbows inside the knees. Sit between the hips, chest tall, full depth."},
+    {id:"r-db-bench", name:"Dumbbell bench press", kind:"dumbbell", inc:2, art:"db-bench", cue:"Weight per hand. Dumbbells stacked over the elbows, wrists neutral, shoulder blades pinned to the bench."},
+    {id:"r-db-row1",  name:"One-arm dumbbell row", kind:"dumbbell", inc:2, perSide:true, cue:"Weight per hand. Hand and knee on the bench, back flat. Row to the hip, not the chest."},
+    {id:"r-bstance",  name:"B-stance dumbbell RDL", kind:"dumbbell", inc:2, perSide:true, art:"bstance-rdl", cue:"Weight per hand. Back toe lightly down for balance only — the front leg does the work. Hips back, back flat."},
+    {id:"r-deadbug",  name:"Dead bug", kind:"bodyweight", bwOnly:true, inc:0, cue:"Lower back pressed into the floor the whole time. Opposite arm and leg reach out slowly, then return."},
+    {id:"r-db-rdl",   name:"Dumbbell Romanian deadlift", kind:"dumbbell", inc:2, art:"db-rdl", cue:"Weight per hand. Soft knees, hips back, dumbbells tracking down the front of the legs. Stop where the hamstrings run out."},
+    {id:"r-db-press", name:"Seated dumbbell shoulder press", kind:"dumbbell", inc:2, art:"db-shoulder", cue:"Weight per hand. Back on the bench pad, ribs down, press to lockout without arching."},
+    {id:"r-cs-row",   name:"Chest-supported dumbbell row", kind:"dumbbell", inc:2, art:"cs-row", cue:"Weight per hand. Chest on an inclined bench, arms hanging. Row the elbows back past the ribs and pause."},
+    {id:"r-bulgarian",name:"Bulgarian split squat", kind:"dumbbell", inc:2, perSide:true, art:"bulgarian", cue:"Weight per hand. Rear foot on the bench, front shin near vertical, rear knee low. Drive through the front heel."},
+    {id:"r-sh-tap",   name:"Plank shoulder tap", kind:"bodyweight", bwOnly:true, inc:0, perSide:true, cue:"High plank, feet wide. Tap the opposite shoulder without the hips rocking."},
+    {id:"r-pullover", name:"Dumbbell pullover", kind:"dumbbell", inc:2, art:"db-pullover", cue:"One dumbbell, upper back across the bench. Long arms back over the head, then pull through with the lats."},
+    {id:"r-hk-press", name:"Half-kneeling one-arm press", kind:"dumbbell", inc:1, perSide:true, art:"sa-db-press", cue:"Weight per hand. Down knee on the pressing side, glute squeezed. Press straight up with no side bend."},
+    {id:"r-sl-thrust",name:"Single-leg dumbbell hip thrust", kind:"dumbbell", inc:2, perSide:true, art:"sl-hip-thrust-u", cue:"Weight on the hip, shoulders on the bench. Hips finish level and square."},
+    {id:"r-oh-ext",   name:"Overhead dumbbell triceps extension", kind:"dumbbell", inc:1, cue:"One dumbbell in both hands behind the head, elbows pointing up. Lower deep, extend fully."},
+    {id:"r-hammer",   name:"Hammer curl", kind:"dumbbell", inc:1, art:"hammer-curl", cue:"Weight per hand. Neutral grip, elbows still, no swing."},
+    {id:"r-thruster", name:"Dumbbell thruster", kind:"dumbbell", inc:1, art:"thruster", cue:"Weight per hand. Front squat straight into an overhead press. One breath per rep, unbroken sets."},
+    /* TRX */
+    {id:"t-pistol",   name:"TRX-assisted pistol squat", kind:"bodyweight", bwOnly:true, inc:0, perSide:true, cue:"Hold both handles, one leg out in front. Sit all the way down on the standing leg, pull only as much as you need."},
+    {id:"t-press",    name:"TRX chest press", kind:"bodyweight", bwOnly:true, inc:0, cue:"Facing away from the anchor, body in one line. Lower until the hands reach the chest. Walk the feet back to make it harder."},
+    {id:"t-row",      name:"TRX row", kind:"bodyweight", bwOnly:true, inc:0, cue:"Facing the anchor, body in one line. Pull the handles to the ribs. Walk the feet in to make it harder."},
+    {id:"t-sl-rdl",   name:"TRX single-leg RDL", kind:"bodyweight", bwOnly:true, inc:0, perSide:true, cue:"Hands on the handles for balance only. Hinge on one leg, free leg long behind, hips square."},
+    {id:"t-saw",      name:"TRX body saw", kind:"bodyweight", bwOnly:true, inc:0, cue:"Forearm plank with the feet in the cradles. Rock the body back and forward without the hips sagging."},
+    {id:"t-ham-curl", name:"TRX hamstring curl", kind:"bodyweight", bwOnly:true, inc:0, cue:"On your back, heels in the cradles, hips lifted. Pull the heels to the glutes keeping the hips high."},
+    {id:"t-pushup",   name:"TRX feet-in-straps push-up", kind:"bodyweight", bwOnly:true, inc:0, cue:"Feet in the cradles, hands on the floor. Body in one line, chest to within a fist of the floor."},
+    {id:"t-row1",     name:"TRX single-arm row", kind:"bodyweight", bwOnly:true, inc:0, perSide:true, cue:"One handle, feet wide. Row without letting the chest turn to the floor."},
+    {id:"t-lunge",    name:"TRX suspended lunge", kind:"bodyweight", bwOnly:true, inc:0, perSide:true, cue:"Rear foot in the cradle. Drop the back knee straight down, front shin near vertical."},
+    {id:"t-pike",     name:"TRX pike", kind:"bodyweight", bwOnly:true, inc:0, cue:"Feet in the cradles, high plank. Lift the hips straight up, legs straight, then lower with control."},
+    {id:"t-row-ff",   name:"Feet-forward TRX row", kind:"bodyweight", bwOnly:true, inc:0, cue:"Walk the feet in until the body is close to horizontal. Pull the chest to the handles, elbows back."},
+    {id:"t-yfly",     name:"TRX Y-fly", kind:"bodyweight", bwOnly:true, inc:0, cue:"Facing the anchor, arms straight. Raise them into a Y overhead, shoulder blades down."},
+    {id:"t-hip-press",name:"TRX hip press", kind:"bodyweight", bwOnly:true, inc:0, cue:"On your back, heels in the cradles. Drive the hips up to a straight line and hold a beat."},
+    {id:"t-tri",      name:"TRX triceps extension", kind:"bodyweight", bwOnly:true, inc:0, cue:"Facing away, hands by the forehead. Extend the arms, elbows pointing forward and still."},
+    {id:"t-curl",     name:"TRX biceps curl", kind:"bodyweight", bwOnly:true, inc:0, cue:"Facing the anchor, palms up. Curl the handles to the forehead, elbows high and still."},
+    {id:"t-jump",     name:"TRX jump squat", kind:"bodyweight", bwOnly:true, inc:0, cue:"Hold the handles, squat and jump. Land soft and go straight into the next rep."},
+    /* bodyweight */
+    {id:"b-split",    name:"Bulgarian split squat, 3s lower", kind:"bodyweight", bwOnly:true, inc:0, perSide:true, cue:"Rear foot on the edge of the bed. Three seconds down, then drive up through the front heel."},
+    {id:"b-pushup",   name:"Push-up", kind:"bodyweight", bwOnly:true, inc:0, cue:"Body in one line, chest to within a fist of the floor. Slow the lower once you pass 15."},
+    {id:"b-snow",     name:"Reverse snow angel", kind:"bodyweight", bwOnly:true, inc:0, cue:"Face down, arms by the sides, lifted off the floor. Sweep them overhead and back without touching down."},
+    {id:"b-sl-rdl",   name:"Single-leg RDL", kind:"bodyweight", bwOnly:true, inc:0, perSide:true, cue:"Hinge on one leg, free leg long behind, hips square. Slow, with a pause at the bottom."},
+    {id:"b-deadbug",  name:"Dead bug", kind:"bodyweight", bwOnly:true, inc:0, cue:"Lower back pressed into the floor the whole time. Opposite arm and leg reach out slowly, then return."},
+    {id:"b-ham-curl", name:"Sliding hamstring curl, on a towel", kind:"bodyweight", bwOnly:true, inc:0, cue:"Heels on a towel on a smooth floor, hips lifted. Slide the heels in and out, hips staying high."},
+    {id:"b-decline",  name:"Feet-up decline push-up", kind:"bodyweight", bwOnly:true, inc:0, cue:"Feet on the edge of the bed. Body in one line, chest to within a fist of the floor."},
+    {id:"b-ytw",      name:"Prone Y-T-W", kind:"bodyweight", bwOnly:true, inc:0, perSide:true, cue:"Face down, thumbs up. Lift the arms into a Y, a T, then a W, holding each for a beat."},
+    {id:"b-lunge",    name:"Reverse lunge", kind:"bodyweight", bwOnly:true, inc:0, perSide:true, cue:"Step back, rear knee just off the floor, front shin near vertical. Drive back up through the front heel."},
+    {id:"b-hollow",   name:"Hollow rock", kind:"bodyweight", bwOnly:true, inc:0, cue:"Lower back pressed down, arms and legs long. Rock from shoulders to hips without losing the shape."},
+    {id:"b-pike",     name:"Feet-up pike push-up", kind:"bodyweight", bwOnly:true, inc:0, cue:"Feet on the bed, hips high. Lower the head between the hands, press back up."},
+    {id:"b-superman", name:"Superman lat pull", kind:"bodyweight", bwOnly:true, inc:0, cue:"Face down, arms overhead and lifted. Pull the elbows down to the ribs, squeeze the back, reach out again."},
+    {id:"b-glute",    name:"Single-leg glute bridge", kind:"bodyweight", bwOnly:true, inc:0, perSide:true, cue:"Shoulders on the floor, one foot planted. Drive the hips up level and hold a beat."},
+    {id:"b-dip",      name:"Bed-edge dip", kind:"bodyweight", bwOnly:true, inc:0, cue:"Hands on the edge of the bed, legs out. Lower until the elbows reach 90 degrees, press back up."},
+    {id:"b-towel",    name:"Towel curl, foot-anchored", kind:"bodyweight", bwOnly:true, inc:0, cue:"Towel under one foot, ends in both hands. Curl against the foot pushing down. Three seconds down."},
+    {id:"b-burpee",   name:"Burpee", kind:"bodyweight", bwOnly:true, inc:0, cue:"Chest to the floor, jump the feet in, jump up. Steady rhythm, unbroken sets."}
+  ];
+  const m = {};
+  list.forEach(x => { x.road = true; m[x.id] = x; });
+  return m;
+})();
+
+/* item(ex, sets, lo, hi) — the slot field is the exercise id, which never
+   matches a home slot, so nothing from the road feeds the home programme */
+function rIt(ex, sets, lo, hi){ return {slot:ex, ex:ex, sets:sets, lo:lo, hi:hi}; }
+const ROAD = {
+  db:{
+    A:{blurb:"Legs first with one dumbbell at the chest, then a press and a row to keep it full body.",
+       blocks:[{rest:120, items:[rIt("r-goblet",4,8,12)]},
+               {rest:90,  items:[rIt("r-db-bench",3,8,12), rIt("r-db-row1",3,8,12)]},
+               {rest:75,  items:[rIt("r-bstance",3,10,12), rIt("r-deadbug",3,10,12)]}]},
+    B:{blurb:"The hinge leads with a pair of dumbbells, then a press, a row and single-leg work.",
+       blocks:[{rest:120, items:[rIt("r-db-rdl",4,8,12)]},
+               {rest:90,  items:[rIt("r-db-press",3,8,12), rIt("r-cs-row",3,10,12)]},
+               {rest:75,  items:[rIt("r-bulgarian",3,8,10), rIt("r-sh-tap",3,10,12)]}]},
+    C:{blurb:"Pulling and pressing, arms, and a finisher that leaves you breathing hard.",
+       blocks:[{rest:105, items:[rIt("r-pullover",4,8,12)]},
+               {rest:90,  items:[rIt("r-hk-press",3,8,10), rIt("r-sl-thrust",3,10,12)]},
+               {rest:60,  items:[rIt("r-oh-ext",2,10,14), rIt("r-hammer",2,10,14)]},
+               {rest:60,  items:[rIt("r-thruster",3,8,12)]}]}
+  },
+  trx:{
+    A:{blurb:"Single-leg squatting on the straps, then a press and a row, then a hinge and trunk work.",
+       blocks:[{rest:120, items:[rIt("t-pistol",4,6,10)]},
+               {rest:90,  items:[rIt("t-press",3,8,15), rIt("t-row",3,8,15)]},
+               {rest:75,  items:[rIt("t-sl-rdl",3,10,12), rIt("t-saw",3,8,12)]}]},
+    B:{blurb:"Hamstrings lead from the floor, then a press and a one-arm row, then lunges and a pike.",
+       blocks:[{rest:120, items:[rIt("t-ham-curl",4,8,12)]},
+               {rest:90,  items:[rIt("t-pushup",3,8,12), rIt("t-row1",3,8,12)]},
+               {rest:75,  items:[rIt("t-lunge",3,10,12), rIt("t-pike",3,8,12)]}]},
+    C:{blurb:"Rows and presses on the straps, arms, and a finisher. Door anchor on a closed door is all it needs.",
+       blocks:[{rest:105, items:[rIt("t-row-ff",4,8,12)]},
+               {rest:90,  items:[rIt("t-yfly",3,10,12), rIt("t-hip-press",3,10,15)]},
+               {rest:60,  items:[rIt("t-tri",2,10,14), rIt("t-curl",2,10,14)]},
+               {rest:60,  items:[rIt("t-jump",3,10,15)]}]}
+  },
+  bw:{
+    A:{blurb:"Split squats slowed right down, then push-ups and floor pulling, then a hinge and trunk work.",
+       blocks:[{rest:90, items:[rIt("b-split",4,8,12)]},
+               {rest:75, items:[rIt("b-pushup",3,8,20), rIt("b-snow",3,10,15)]},
+               {rest:60, items:[rIt("b-sl-rdl",3,10,12), rIt("b-deadbug",3,10,12)]}]},
+    B:{blurb:"Hamstrings on a sliding towel, then a decline push-up and floor pulling, then lunges and trunk.",
+       blocks:[{rest:90, items:[rIt("b-ham-curl",4,8,12)]},
+               {rest:75, items:[rIt("b-decline",3,8,15), rIt("b-ytw",3,8,8)]},
+               {rest:60, items:[rIt("b-lunge",3,10,12), rIt("b-hollow",3,10,15)]}]},
+    C:{blurb:"Pressing overhead, pulling from the floor, arms, and a finisher. A bath towel and the edge of the bed are all it needs.",
+       blocks:[{rest:90, items:[rIt("b-pike",4,6,10)]},
+               {rest:75, items:[rIt("b-superman",3,10,15), rIt("b-glute",3,10,15)]},
+               {rest:60, items:[rIt("b-dip",2,10,15), rIt("b-towel",2,10,14)]},
+               {rest:60, items:[rIt("b-burpee",3,8,12)]}]}
+  }
+};
+
+/* one road session, shaped like a home one so the session screen can draw it */
+function roadSession(kit, rkey){
+  const k = ROAD[kit] && ROAD[kit][rkey];
+  const home = SESSIONS.find(x => x.key === rkey);
+  if(!k || !home) return null;
+  return {key:"T", rkey:rkey, kit:kit, title:home.title, glyph:home.glyph, lift:kitInfo(kit).tag,
+          blurb:k.blurb, trains:kitInfo(kit).needs, tags:home.tags, blocks:k.blocks};
+}
+function isRoad(h){ return !!h && h.key === "T"; }
+/* a session from the home programme: not open, not on the road */
+function isHome(h){ return !!h && !h.open && h.key !== "X" && h.key !== "T"; }
+
+/* the most recent session that was not open — home or road */
+function lastTrained(){
+  for(let i = S.history.length - 1; i >= 0; i--){
+    const h = S.history[i];
+    if(!h.open) return h;
+  }
+  return null;
+}
+function lastHome(){
+  for(let i = S.history.length - 1; i >= 0; i--) if(isHome(S.history[i])) return S.history[i];
+  return null;
+}
+/* road sessions logged since the last home session, oldest first */
+function roadSinceHome(){
+  const lh = lastHome();
+  const from = lh ? S.history.indexOf(lh) : -1;
+  return S.history.filter((h, i) => i > from && isRoad(h));
+}
+/* which session the road rotation is on: a trip starts at whatever home has
+   next, and carries on from the last road session after that */
+function roadNextKey(){
+  const last = lastTrained();
+  if(isRoad(last) && last.rkey){
+    const n = SESSIONS.findIndex(x => x.key === last.rkey);
+    if(n > -1) return SESSIONS[(n + 1) % 3].key;
+  }
+  return sessionAt(S.sessionIndex).key;
+}
+
+/* Back to the barbell after a week or more away from it: the barbell lifts in
+   that first home session are suggested at 90%, and that session is not used
+   as the basis for the next one, so full loads return the time after. */
+const RAMP_DAYS = 7;
+function rampDue(){
+  const lh = lastHome();
+  return !!lh && daysSinceKey(recDay(lh)) >= RAMP_DAYS;
+}
+
+/* which kit this device is training with. Not saved: the app opens on the
+   home gym every time. */
+let kit = "home";
+let roadPreview = null;   /* the road session being looked at, A/B/C */
+
 
 const FOCUS_CUES = [
   "Own the eccentric. Three seconds down on every working rep of the first lift.",
@@ -964,6 +1180,8 @@ function mergeDuplicateExtras(){
 
 /* resolve any exercise id — programme or extra */
 function findEx(exId){
+  if(typeof ROAD_EX !== "undefined" && ROAD_EX[exId])
+    return {ex:ROAD_EX[exId], label:"On the road", track:"load", profile:"strength"};
   for(const k in SLOTS){
     const f = SLOTS[k] && SLOTS[k].pool.find(x => x.id === exId);
     if(f) return {ex:f, label:SLOTS[k].label, track:"load", profile:"strength", slot:k};
@@ -1167,6 +1385,10 @@ function drawnDiagram(exId, extraClass){
 }
 
 function diagram(exId){
+  if(typeof ROAD_EX !== "undefined" && ROAD_EX[exId]){
+    if(!ROAD_EX[exId].art) return "";
+    exId = ROAD_EX[exId].art;
+  }
   const shot  = shots(exId);
   const drawn = drawnDiagram(exId, "fallback");
   /* both: the photograph, with the drawing behind it if the file is missing */
@@ -1178,7 +1400,7 @@ function diagram(exId){
 /* ============================================================
    STATE
    ============================================================ */
-const BUILD = "63";
+const BUILD = "64";
 /* the masthead and Setup show this as v3.4 — one number, formatted on the way out */
 const VERSION = (function(){ const n = String(BUILD).padStart(2, "0");
   return "v" + n.slice(0, -1) + "." + n.slice(-1); })();
@@ -1192,6 +1414,7 @@ function blankState(){
   return {
     v:1, units:"kg", bar:20, figure:"m", courses:[],
     sessionIndex:0,
+    roadIndex:0,       // road sessions logged — a counter of their own
     nudge:{},          // slotId -> manual variant offset
     custom:[],         // exercises you have added yourself
     history:[],        // completed sessions
@@ -1318,13 +1541,20 @@ function mergeStates(local, cloud){
   }
 
   /* the counter has to sit past everything logged, or the next session repeats
-     one that is already in the history */
+     one that is already in the history. Road sessions have a counter of their
+     own and never move this one. */
   const past = out.history.reduce((m, h)=>
-    (h.key !== "X" && typeof h.index === "number" && !h.open) ? Math.max(m, h.index + 1) : m, 0);
+    (h.key !== "X" && h.key !== "T" && typeof h.index === "number" && !h.open) ? Math.max(m, h.index + 1) : m, 0);
   out.sessionIndex = Math.max(local.sessionIndex || 0, cloud.sessionIndex || 0, past);
   /* except while a session is open on the bench, which sits at its own index */
-  if(out.current && typeof out.current.index === "number" && !out.current.open)
+  if(out.current && typeof out.current.index === "number" && !out.current.open && out.current.key !== "T")
     out.sessionIndex = Math.min(out.sessionIndex, out.current.index);
+
+  const roadPast = out.history.reduce((m, h)=>
+    (h.key === "T" && typeof h.index === "number") ? Math.max(m, h.index + 1) : m, 0);
+  out.roadIndex = Math.max(local.roadIndex || 0, cloud.roadIndex || 0, roadPast);
+  if(out.current && out.current.key === "T" && typeof out.current.index === "number")
+    out.roadIndex = Math.min(out.roadIndex, out.current.index);
 
   return out;
 }
@@ -1341,7 +1571,7 @@ function stateFingerprint(s){
   const logged = h => (h && h.entries || []).reduce((n, e)=> n + ((e.sets || []).length), 0);
   return (s.history || []).map(h => sessionId(h) + "/" + logged(h)).join(",") + " #" + live +
     " " + (s.units || "") + "/" + (s.bar || "") + "/" + (s.figure || "") +
-    " r" + (s.rest ? s.rest.endsAt : "-") + " i" + (s.sessionIndex || 0) +
+    " r" + (s.rest ? s.rest.endsAt : "-") + " i" + (s.sessionIndex || 0) + " t" + (s.roadIndex || 0) +
     " c" + (s.custom || []).length + " k" + (s.courses || []).length;
 }
 
@@ -1760,6 +1990,7 @@ function allPerf(exId){
       const done = e.sets.filter(s=>s.done);
       out.push({
         date:h.date,
+        ramp:!!h.ramp,
         sets:done,
         top: topWeight(done),
         single: trueSingle(done),
@@ -1774,7 +2005,7 @@ function allPerf(exId){
 function anySingle(hist){ return hist.some(x => x.single !== null); }
 
 /* the learning bit: what should today's load be? */
-function suggest(ex, item, sessionIndex){
+function suggest(ex, item, sessionIndex, ramp){
   /* a session in progress can outlive a programme change, so neither the
      exercise nor its prescription is guaranteed to still exist */
   if(!ex) return {w:0, why:"This exercise is no longer in the programme. Log what you do and it will be kept."};
@@ -1800,15 +2031,19 @@ function suggest(ex, item, sessionIndex){
 
   if(!hist.length) return {w:null, why:"First time on this lift — find a load you could stop 2 reps short of."};
 
-  const last = hist[hist.length - 1];
+  /* a session done at 90% after a break is not the basis for the next one —
+     otherwise the lighter load would carry forward */
+  const firm = hist.filter(x => !x.ramp);
+  const basis = firm.length ? firm : hist;
+  const last = basis[basis.length - 1];
   const doneSets = last.sets;
   const allTop = doneSets.length >= item.sets && doneSets.every(s => s.r >= item.hi);
   const anyLow = doneSets.some(s => s.r < item.lo);
   const w = doneSets[doneSets.length - 1].w;
 
   let prevLow = false;
-  if(hist.length > 1){
-    prevLow = hist[hist.length - 2].sets.some(s => s.r < item.lo);
+  if(basis.length > 1){
+    prevLow = basis[basis.length - 2].sets.some(s => s.r < item.lo);
   }
 
   let out, why;
@@ -1829,6 +2064,9 @@ function suggest(ex, item, sessionIndex){
   if(isDeload(sessionIndex)){
     out = roundLoad(out * 0.85, ex);
     why = "Deload session — 85% of your working load, moved fast and clean.";
+  }else if(ramp && ex.kind === "barbell"){
+    out = roundLoad(out * 0.9, ex);
+    why = "First session back on the barbell after a break — 90% today. Full load returns next time.";
   }
   return {w:out, why:why};
 }
@@ -1847,13 +2085,15 @@ function estimateMinutes(sess){
    SESSION LIFECYCLE
    ============================================================ */
 function startSession(){
+  if(kit !== "home") return startRoad(kit);
   const i = S.sessionIndex;
   const sess = sessionAt(i);
+  const ramp = rampDue();
   const entries = [];
   sess.blocks.forEach((b, bi)=>{
     b.items.forEach(item=>{
       const ex = variantFor(item.slot, i);
-      const sug = suggest(ex, item, i);
+      const sug = suggest(ex, item, i, ramp);
       const lp = lastPerf(ex.id);
       const prefillR = lp ? lp.entry.sets.filter(s=>s.done).slice(-1)[0].r : item.hi;
       entries.push({
@@ -1867,6 +2107,34 @@ function startSession(){
     });
   });
   S.current = {index:i, key:sess.key, startedAt:Date.now(), entries:entries};
+  if(ramp) S.current.ramp = true;
+  addOpen = false;
+  save(true); render();
+}
+
+/* a road session: the next one in the shared road rotation, on this kit */
+function startRoad(k){
+  const rkey = roadNextKey();
+  const sess = roadSession(k, rkey);
+  if(!sess) return;
+  const entries = [];
+  sess.blocks.forEach((b, bi)=>{
+    b.items.forEach(item=>{
+      const ex = ROAD_EX[item.ex];
+      const sug = suggest(ex, item, -1);
+      const lp = lastPerf(ex.id);
+      const prefillR = lp ? lp.entry.sets.filter(s=>s.done).slice(-1)[0].r : item.hi;
+      entries.push({
+        block:bi, slot:item.slot, exId:ex.id, track:"load",
+        sets:Array.from({length:item.sets}, ()=>({
+          w: ex.bwOnly ? 0 : (sug.w === null ? "" : sug.w),
+          r: prefillR,
+          done:false
+        }))
+      });
+    });
+  });
+  S.current = {index:S.roadIndex || 0, key:"T", kit:k, rkey:rkey, startedAt:Date.now(), entries:entries};
   addOpen = false;
   save(true); render();
 }
@@ -1893,6 +2161,7 @@ function finishSession(){
     tz: (function(){ try{ return Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(e){ return ""; } })(),
     key: c.key, index: c.index, open: !!c.open,
     title: c.open ? (c.entries[0] ? (c.entries[0].name || "Open session") : "Open session") : null,
+    kit: c.kit || undefined, rkey: c.rkey || undefined, ramp: c.ramp || undefined,
     minutes: c.retro
       ? c.entries.reduce((n,e)=> n + ((e.track === "time" || e.track === "distance")
           ? e.sets.reduce((m,x)=> m + (e.track === "time" ? x.w : x.r), 0) : 0), 0)
@@ -1906,6 +2175,7 @@ function finishSession(){
       pending:e.sets.filter(s=>!s.done).map(s=>({w:Number(s.w)||0, r:Number(s.r)||0}))
     })).filter(e => e.sets.length || (e.meta && (e.meta.score || e.meta.course)))
   };
+  ["kit","rkey","ramp"].forEach(k => { if(rec[k] === undefined) delete rec[k]; });
   /* a round's effort stands as the session's, unless one is already set */
   if(!rec.effort){
     const withEffort = rec.entries.find(e => e.meta && e.meta.effort);
@@ -1938,8 +2208,11 @@ function finishSession(){
   addOpen = false;
   /* only the latest session moves the programme on. Re-finishing something from
      three weeks ago must not wind the counter back to it. */
-  if(!c.open && !ro) S.sessionIndex = c.index + 1;
-  if(!c.open && ro && ro.wasLatest) S.sessionIndex = c.index + 1;
+  if(c.key === "T") S.roadIndex = Math.max(S.roadIndex || 0, c.index + 1);
+  else{
+    if(!c.open && !ro) S.sessionIndex = c.index + 1;
+    if(!c.open && ro && ro.wasLatest) S.sessionIndex = c.index + 1;
+  }
   S.current = null;
   /* the session is over, so the rest clock goes with it — and because the clock
      lives in the state, clearing it here also stops it on every other device */
@@ -1959,6 +2232,7 @@ function reopenSession(idx){
   const latest = idx === S.history.length - 1;
   S.current = {
     key: rec.key, index: rec.index, open: !!rec.open,
+    kit: rec.kit, rkey: rec.rkey, ramp: rec.ramp,
     startedAt: Date.now(),
     reopened: {at: idx, date: rec.date, day: rec.day, minutes: rec.minutes,
                effort: rec.effort, wasLatest: latest},
@@ -1970,7 +2244,7 @@ function reopenSession(idx){
     }))
   };
   S.history.splice(idx, 1);
-  if(latest && !rec.open) S.sessionIndex = rec.index;
+  if(latest && !rec.open && rec.key !== "T") S.sessionIndex = rec.index;
   summaryRec = null; histIdx = null; histEx = null; tab = "train";
   save(true); render();
   return null;
@@ -2207,7 +2481,7 @@ function blockSessions(i){
   const b = blockBounds(i);
   const byIndex = {};
   S.history.forEach((h, idx)=>{
-    if(h.open) return;
+    if(!isHome(h)) return;
     if(typeof h.index !== "number") return;
     if(h.index < b.start || h.index > b.end) return;
     byIndex[h.index] = {h:h, i:idx};
@@ -2226,7 +2500,7 @@ function blockStartDay(i){
   const b = blockBounds(i);
   let prev = null;
   S.history.forEach(h=>{
-    if(h.open || typeof h.index !== "number" || h.index >= b.start) return;
+    if(!isHome(h) || typeof h.index !== "number" || h.index >= b.start) return;
     const k = recDay(h);
     if(!prev || k > prev) prev = k;
   });
@@ -2245,6 +2519,12 @@ function blockStartDay(i){
 function blockAlongside(i){
   const from = blockStartDay(i);
   const groups = {};
+  /* road sessions are one tile between them, whichever kit */
+  S.history.forEach(h=>{
+    if(!isRoad(h) || recDay(h) < from) return;
+    const g = groups["road"] || (groups["road"] = {exId:"road", name:"Road", n:0, rounds:[], road:true});
+    g.n++;
+  });
   S.history.forEach(h=>{
     if(!h.open || !h.entries.length) return;
     if(recDay(h) < from) return;
@@ -2278,13 +2558,40 @@ function alongsideTiles(bAlso){
 function dueDay(n){
   let lastDay = null, lastIdx = null;
   S.history.forEach(h=>{
-    if(h.open || typeof h.index !== "number") return;
+    if(!isHome(h) || typeof h.index !== "number") return;
     if(lastIdx === null || h.index > lastIdx){ lastIdx = h.index; lastDay = recDay(h); }
   });
   const from = lastDay || dayKey(new Date());
   const base = lastIdx === null ? n : n - lastIdx;
   const d = keyDate(from); d.setDate(d.getDate() + base * 2);
-  return dayKey(d);
+  if(n < S.sessionIndex) return dayKey(d);
+
+  /* From the next session on, count from whichever came last — a home
+     session or a road one — and never put anything upcoming in the past. */
+  const nextFrom = keyDate(from);
+  nextFrom.setDate(nextFrom.getDate() + (lastIdx === null ? S.sessionIndex : S.sessionIndex - lastIdx) * 2);
+  let start = dayKey(nextFrom);
+  const lt = lastTrained();
+  if(lt){
+    const r = keyDate(recDay(lt)); r.setDate(r.getDate() + 2);
+    if(dayKey(r) > start) start = dayKey(r);
+  }
+  const today = dayKey(new Date());
+  if(today > start) start = today;
+  const out = keyDate(start); out.setDate(out.getDate() + (n - S.sessionIndex) * 2);
+  return dayKey(out);
+}
+
+/* Road sessions between two home sessions. If they kept the every-other-day
+   rhythm going — no stretch of more than two days without training — the
+   gap was trained through, not missed, and the count is returned. */
+function roadBridge(fromKey, toKey){
+  const days = S.history.filter(h => isRoad(h) && recDay(h) > fromKey && recDay(h) < toKey)
+    .map(h => recDay(h)).sort();
+  if(!days.length) return 0;
+  const chain = [fromKey].concat(days, [toKey]);
+  for(let k = 1; k < chain.length; k++) if(dayGap(chain[k - 1], chain[k]) > 2) return 0;
+  return days.length;
 }
 
 function shortDate(key){
@@ -2440,6 +2747,10 @@ function entryLine(e){
 
 function sessionTitle(h){
   if(h.open) return h.title || "Open session";
+  if(isRoad(h)){
+    const r = SESSIONS.find(x => x.key === h.rkey), k = kitInfo(h.kit);
+    return (r ? r.title : "Road session") + (k ? " · " + k.tag : "");
+  }
   const sess = SESSIONS.find(x => x.key === h.key);
   return sess ? sess.title : "Session";
 }
@@ -2496,14 +2807,19 @@ function viewHistEx(){
 function viewHistList(){
   const all = S.history.map((h, i)=>({h:h, i:i}))
     .filter(r => !histDay || recDay(r.h) === histDay);
-  const nWeights = all.filter(r => !r.h.open).length;
+  const nWeights = all.filter(r => isHome(r.h)).length;
   const nOpen    = all.filter(r => r.h.open).length;
+  const nRoad    = all.filter(r => isRoad(r.h)).length;
+  if(histFilter === "road" && !nRoad) histFilter = "all";
 
   const rows = all
     .filter(r => histFilter === "all"
-      || (histFilter === "weights" && !r.h.open)
-      || (histFilter === "aerobic" && r.h.open))
+      || (histFilter === "weights" && isHome(r.h))
+      || (histFilter === "aerobic" && r.h.open)
+      || (histFilter === "road" && isRoad(r.h)))
     .reverse();
+  const filters = [["all", nRoad ? "All" : "Everything", all.length], ["weights","Weights",nWeights], ["aerobic","Aerobic",nOpen]]
+    .concat(nRoad ? [["road","Road",nRoad]] : []);
 
   let html = '<div class="panel"><div class="pad">' +
     '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">' +
@@ -2511,10 +2827,10 @@ function viewHistList(){
       '<h1 class="session-title">' + (histDay ? "That day" : "All sessions") + '</h1></div>' +
       '<button class="mini" data-act="closeHist">Done</button>' +
     '</div>' +
-    '<div class="seg" style="margin:12px 0 14px">' +
-      [["all","Everything",all.length],["weights","Weights",nWeights],["aerobic","Aerobic",nOpen]].map(f=>
+    '<div class="seg' + (nRoad ? " seg-fit" : "") + '" style="margin:12px 0 14px">' +
+      filters.map(f=>
         '<button data-histfilter="' + f[0] + '" class="' + (histFilter === f[0] ? "on" : "") + '">' +
-          f[1] + ' <span style="opacity:.65">' + f[2] + '</span></button>').join("") +
+          f[1] + ' <span class="segn">' + f[2] + '</span></button>').join("") +
     '</div>' +
     '<button class="btn btn-quiet" data-act="logPast">Log something from a past date</button>' +
     '<div style="height:14px"></div>';
@@ -2578,7 +2894,7 @@ function viewHistory(){
     '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">' +
       '<div><p class="eyebrow">' + esc(recDateLabel(h)) +
         (loggedElsewhere(h) ? ' · ' + esc(loggedElsewhere(h)) + ' time' : "") +
-        (h.open ? " · open session" : "") + '</p>' +
+        (h.open ? " · open session" : isRoad(h) ? " · on the road" : "") + '</p>' +
       '<h1 class="session-title">' + esc(sessionTitle(h)) + '</h1></div>' +
       '<div style="display:flex;gap:6px;flex-shrink:0">' +
         '<button class="mini" data-act="reopen:' + histIdx + '">Continue</button>' +
@@ -2668,6 +2984,7 @@ function viewHistory(){
 
 /* ---------- preview the next programme session ---------- */
 function viewPreview(){
+  if(roadPreview) return viewRoadPreview();
   const next = S.sessionIndex;
   const i = previewIdx === null ? next : previewIdx;
   const sess = sessionAt(i);
@@ -2717,12 +3034,111 @@ function viewPreview(){
 
 /* ---------- home ---------- */
 
+/* the four places to train. The home gym is where the app always opens. */
+function kitSwitch(){
+  const opts = [["home","Home gym","full kit"]].concat(ROAD_KITS.map(k => [k.id, k.label, k.sub]));
+  return '<p class="eyebrow">Training at</p>' +
+    '<div class="kits" role="group" aria-label="Training at">' +
+    opts.map(o => '<button data-act="kit:' + o[0] + '" class="' + (kit === o[0] ? "on" : "") + '" aria-pressed="' +
+      (kit === o[0] ? "true" : "false") + '">' + esc(o[1]) + '<span>' + esc(o[2]) + '</span></button>').join("") +
+    '</div>';
+}
+
+const HOUSE = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg>';
+
+/* the main card when a road kit is picked */
+function roadCard(){
+  const k = kitInfo(kit);
+  const nextKey = roadNextKey();
+  const sess = roadSession(kit, nextKey);
+  const home = sessionAt(S.sessionIndex);
+  const since = roadSinceHome();
+  const pos = SESSIONS.findIndex(x => x.key === nextKey);
+  const rot = SESSIONS.map((x, n)=>{
+    const state = n < pos ? "done" : n === pos ? "next" : "after";
+    return '<button class="rot ' + state + '" data-act="rprev:' + x.key + '" aria-label="' + esc(x.title) + '">' +
+      '<span class="rot-l">' + state + '</span><b>' + esc(x.title) + '</b></button>';
+  }).join("");
+  const names = [];
+  sess.blocks.forEach(b => b.items.forEach(it => names.push(ROAD_EX[it.ex].name)));
+  const sets = sess.blocks.reduce((n,b)=> n + b.items.length * b.items[0].sets, 0);
+  const last = since.length ? since[since.length - 1] : null;
+  return '<div class="hold">' + HOUSE + '<span>Home gym holds at <b>' + esc(home.title) + ' · session ' +
+      (S.sessionIndex + 1) + '</b>. ' +
+      (since.length
+        ? since.length + ' road session' + (since.length === 1 ? "" : "s") + ' logged since — last ' +
+          esc(sessionTitle(last)) + ', ' + esc(recDateLabel(last)) + '.'
+        : 'It picks up exactly there when you switch back — loads, variations and deload count untouched.') +
+      '</span></div>' +
+    '<hr class="rule">' +
+    '<p class="eyebrow">Road rotation · shared by all three kits</p>' +
+    '<div class="rot-strip">' + rot + '</div>' +
+    '<hr class="rule">' +
+    '<span class="kit-tag">' + esc(k.tag) + ' · travel</span>' +
+    '<h1 class="session-title" style="font-size:34px">' + esc(sess.title) + '</h1>' +
+    '<p class="lede" style="margin-top:9px">' + esc(sess.blurb) + '</p>' +
+    '<p class="contents">' + esc(names.join(" · ")) + '</p>' +
+    '<p class="eyebrow" style="margin-top:11px">' + estimateMinutes(sess) + ' min · ' + sets + ' sets · ' +
+      (kit === "db" ? "loads tracked separately from home" : "reps only") + '</p>' +
+    '<div style="margin-top:16px"><button class="btn" data-act="start">Start ' + esc(sess.title) + ' · ' + esc(k.tag) + '</button></div>' +
+    '<div style="height:9px"></div>' +
+    '<button class="btn btn-ghost" data-act="rprev:' + nextKey + '">See next session ›</button>';
+}
+
+/* a road session, looked at before starting it */
+function viewRoadPreview(){
+  const k = kit === "home" ? "db" : kit;
+  const nextKey = roadNextKey();
+  const sess = roadSession(k, roadPreview);
+  if(!sess){ roadPreview = null; previewOpen = false; return viewHome(); }
+  const ahead = roadPreview !== nextKey;
+  let list = "";
+  sess.blocks.forEach((b, bi)=>{
+    b.items.forEach(item=>{
+      const ex = ROAD_EX[item.ex];
+      const sug = suggest(ex, item, -1);
+      list += '<button class="prow" data-diag="' + ex.id + '">' +
+        '<span class="prow-i' + (bi === 0 ? " lead" : "") + '">' + icon(iconFor(ex.id), 16) + '</span>' +
+        '<span style="flex:1;min-width:0">' +
+          '<b>' + esc(ex.name) + '</b>' +
+          '<span>' + (ex.bwOnly ? "reps only" : sug.w === null ? "find a load" : fmt(sug.w) + " " + S.units + " per hand") +
+            (ex.perSide ? " · each side" : "") + '</span>' +
+        '</span>' +
+        '<span class="prow-n">' + item.sets + ' × ' + item.lo + '–' + item.hi + '</span>' +
+      '</button>' +
+      (openDiag[ex.id] ? '<p class="cue" style="margin:0 0 10px">' + esc(ex.cue) + '</p>' + diagram(ex.id) : "");
+    });
+  });
+  const nextTitle = (SESSIONS.find(x => x.key === nextKey) || {}).title || "";
+  return '<div class="panel"><div class="pad">' +
+    '<div style="display:flex;justify-content:flex-end"><button class="mini" data-act="closePreview">Close</button></div>' +
+    '<span class="kit-tag">' + esc(kitInfo(k).tag) + ' · travel</span>' +
+    '<h1 class="session-title" style="font-size:32px;margin-top:2px">' + esc(sess.title) + '</h1>' +
+    '<p class="eyebrow" style="margin-top:4px">' + estimateMinutes(sess) + ' min · ' +
+      sess.blocks.reduce((n,b)=> n + b.items.length * b.items[0].sets, 0) + ' sets</p>' +
+    (ahead ? '<div class="warn">Comes after ' + esc(nextTitle) + ' on the road. Looking ahead only.</div>' : '') +
+    '<div class="blurb">' + esc(sess.blurb) + ' ' + esc(sess.trains) + '</div>' +
+    '<p class="eyebrow">What you will do</p>' + list +
+    '<p class="lede" style="margin-top:16px;font-size:13px">Tap any exercise to see how it is done. Nothing is logged and neither rotation moves until you start.</p>' +
+    '<div style="margin-top:16px">' +
+      (ahead
+        ? '<button class="btn btn-quiet" data-act="closePreview">Back to ' + esc(nextTitle) + '</button>'
+        : '<button class="btn" data-act="start">Start ' + esc(sess.title) + '</button>' +
+          '<div style="height:9px"></div><button class="btn btn-ghost" data-act="closePreview">Back</button>') +
+    '</div>' +
+  '</div></div>';
+}
+
 function viewHome(){
   const i = S.sessionIndex;
   const sess = sessionAt(i);
-  const strength = S.history.filter(h => !h.open);
-  const last = strength[strength.length - 1];
+  /* the Sessions tile counts the home programme; rest is judged from the
+     last session of any kind, home or road */
+  const strength = S.history.filter(isHome);
+  const last = lastTrained();
   const days = last ? daysSinceKey(recDay(last)) : null;
+  const onRoad = isRoad(last);
+  const ramp = rampDue() && !isDeload(i);
   const totalSets = S.history.reduce((n,h)=> n + h.entries.reduce((m,e)=> m + e.sets.length, 0), 0);
   const totalMins = S.history.reduce((n,h)=> n + (h.minutes || 0), 0);
   const totalVol = S.history.reduce((n,h)=> n + h.entries.reduce((m,e)=>
@@ -2730,9 +3146,12 @@ function viewHome(){
 
   const readiness = days === null
     ? "First session. Start light enough that the last set still looks like the first."
-    : days === 0 ? "You trained today. Rest is where the adaptation happens — come back tomorrow."
-    : days === 1 ? "You trained yesterday. This is the rhythm."
-    : days >= 4 ? "It has been " + days + " days. Take 10% off the suggested loads and rebuild from there."
+    : days === 0 ? "You trained today" + (onRoad ? ", on the road" : "") + ". Rest is where the adaptation happens — come back tomorrow."
+    : days === 1 ? "You trained yesterday" + (onRoad ? ", on the road" : "") + ". This is the rhythm."
+    : days >= 4 ? (ramp && kit === "home"
+        ? "It has been " + days + " days. Barbell loads are already at 90% — take the same off the rest."
+        : "It has been " + days + " days. Take 10% off the suggested loads and rebuild from there.")
+    : onRoad ? "Trained " + days + " days ago, on the road."
     : days + " days since the last session.";
 
   /* ---- where you are in the rotation ---- */
@@ -2745,8 +3164,40 @@ function viewHome(){
       '<b>' + esc(x.title) + '</b></button>';
   }).join("");
 
+  /* coming back from the road, and back to the barbell after a break */
+  let homeNotes = "";
+  const sinceHome = roadSinceHome();
+  if(kit === "home" && onRoad && sinceHome.length){
+    const names = sinceHome.map(h => (SESSIONS.find(x => x.key === h.rkey) || {}).title).filter(Boolean);
+    homeNotes += '<div class="welcome"><b>Back at the rack</b>' +
+      sinceHome.length + ' road session' + (sinceHome.length === 1 ? "" : "s") +
+      ' logged since your last home session' + (names.length ? ' — ' + esc(names.join(", ")) : "") +
+      '. Home picks up where you left it.</div>';
+  }
+  if(kit === "home" && ramp){
+    const bars = [];
+    sess.blocks.forEach(b => b.items.forEach(it=>{
+      const v = variantFor(it.slot, i);
+      if(v && v.kind === "barbell" && !bars.includes(v.name))
+        bars.push(bars.length ? v.name.charAt(0).toLowerCase() + v.name.slice(1) : v.name);
+    }));
+    if(bars.length){
+      const lh = lastHome();
+      const away = daysSinceKey(recDay(lh));
+      const list = bars.length === 1 ? bars[0]
+        : bars.slice(0, -1).join(", ") + " and " + bars[bars.length - 1];
+      homeNotes += '<div class="ramp"><b>' + away + ' days since the barbell</b>' +
+        esc(list) + (bars.length === 1 ? ' starts' : ' start') + ' at 90% today. Full suggested loads return next ' +
+        esc(sess.title) + '.</div>';
+    }
+  }
+
   let html = storageWarn() +
-    '<div class="panel"><div class="pad">' +
+    '<div class="panel"><div class="pad">' + kitSwitch();
+  if(kit !== "home"){
+    html += roadCard() + '</div></div>';
+  }else html +=
+      homeNotes + '<hr class="rule">' +
       '<p class="eyebrow">Rotation · tap to look ahead</p>' +
       '<div class="rot-strip">' + rot + '</div>' +
       '<hr class="rule">' +
@@ -2759,7 +3210,8 @@ function viewHome(){
       '<div style="margin-top:16px"><button class="btn" data-act="start">Start ' + esc(sess.title) + '</button></div>' +
       '<div style="height:9px"></div>' +
       '<button class="btn btn-ghost" data-act="preview">See next session ›</button>' +
-    '</div></div>' +
+    '</div></div>';
+  html +=
     '<div class="panel"><div class="pad">' +
       '<button class="aero-tile" data-act="openPicker">' +
         '<span class="aero-ico">' + icon("run", 21) + '</span>' +
@@ -2814,12 +3266,14 @@ function viewHome(){
       if(rec){
         const day  = recDay(rec.h);
         const gap  = prevDay ? dayGap(prevDay, day) : 2;
-        const late = gap > 2;
+        const away = gap > 2 ? roadBridge(prevDay, day) : 0;
+        const late = gap > 2 && !away;
         prevDay = day;
         cells += '<button class="rbx ' + (late ? "late" : "on") + '" data-hopen="' + rec.i + '" ' +
           'aria-label="' + esc(sessionTitle(rec.h)) + ' on ' + esc(shortDate(day)) + '">' +
           esc(shortDate(day)) +
           (late ? '<small>+' + (gap - 2) + ' day' + (gap - 2 > 1 ? "s" : "") + '</small>' : "") +
+          (away ? '<small>' + away + ' on the road</small>' : "") +
           '</button>';
       }else{
         const due   = dueDay(n);
@@ -2845,6 +3299,11 @@ function viewHome(){
       continue;
     }
     const g = bAlso[p];
+    if(g && g.road){
+      cells += '<button class="rgb" data-act="roadList" aria-label="Every road session">' +
+        '<span style="display:flex">' + icon("road", 14) + '</span>Road ' + g.n + '</button>';
+      continue;
+    }
     cells += g
       ? '<button class="rgb" data-histex="' + esc(g.exId) + '" aria-label="Every ' + esc(g.name) + '">' +
           '<span style="display:flex">' + icon(iconFor(g.exId), 14) + '</span>' + g.n + '</button>'
@@ -2865,7 +3324,7 @@ function viewHome(){
       '<span><i style="background:var(--green)"></i>Alongside</span>' +
       '<span><i style="background:var(--orange-deep)"></i>Ran late</span>' +
     '</div>' +
-    '<p class="lede" style="font-size:12px;margin-top:10px">Nine sessions — each exercise three times — then every slot moves on. Aerobic and open sessions sit alongside and do not use a slot. Tap anything to look inside.</p>' +
+    '<p class="lede" style="font-size:12px;margin-top:10px">Nine sessions — each exercise three times — then every slot moves on. Road, aerobic and open sessions sit alongside and do not use a slot. A gap you trained through on the road is not late. Tap anything to look inside.</p>' +
   '</div></div>';
 
   /* ---- totals ---- */
@@ -2972,6 +3431,7 @@ function viewHome(){
    ============================================================ */
 const ICON_PATHS = {
   barbell:'<path d="M3 9v6M6 7.5v9M18 7.5v9M21 9v6M6 12h12"/>',
+  road:'<path d="M5 20c3-6 11-8 14-16"/><circle cx="5" cy="20" r="1.6"/><circle cx="19" cy="4" r="1.6"/>',
   dumbbell:'<path d="M5 9v6M8.5 7v10M15.5 7v10M19 9v6M8.5 12h7"/>',
   pullbar:'<path d="M2.5 6h19M7 6v4.5M17 6v4.5M5.6 10.5h2.8M15.6 10.5h2.8"/>',
   cable:'<circle cx="12" cy="4.8" r="2.6"/><path d="M12 7.4v6.1M8.4 13.5h7.2l-1.1 3.4H9.5z"/>',
@@ -3662,13 +4122,14 @@ function finishPanel(){
 function viewSession(){
   const c = S.current;
   if(c.open) return viewOpen();
-  const sess = sessionAt(c.index);
+  const road = c.key === "T";
+  const sess = (road && roadSession(c.kit, c.rkey)) || sessionAt(c.index);
   let html = storageWarn() +
     '<div class="panel"><div class="pad">' +
       '<div class="sess-head">' +
         '<span class="ex-icon lead">' + icon(sess.glyph, 20) + '</span>' +
         '<div style="min-width:0"><h1 class="session-title" style="font-size:32px">' + esc(sess.title) + '</h1>' +
-        '<p class="eyebrow" style="margin:3px 0 0">' + esc(sess.lift) + ' · session ' + (c.index + 1) + '</p></div>' +
+        '<p class="eyebrow" style="margin:3px 0 0">' + esc(sess.lift) + (road ? ' · road session ' : ' · session ') + (c.index + 1) + '</p></div>' +
       '</div>' +
       '<p class="lede" style="margin-top:10px">' + esc(sess.blurb) + '</p>' +
       '<p class="focus-note" style="margin-top:12px">' + esc(FOCUS_CUES[c.index % FOCUS_CUES.length]) + '</p>' +
@@ -3692,6 +4153,7 @@ function viewSession(){
          taking the whole session down. */
       const slot = SLOTS[entry.slot];
       let ex = slot && slot.pool && slot.pool.find(x => x.id === entry.exId);
+      if(!ex && ROAD_EX[entry.exId]) ex = ROAD_EX[entry.exId];
       if(!ex){
         const anywhere = Object.keys(SLOTS)
           .map(k => SLOTS[k].pool.find(x => x.id === entry.exId)).filter(Boolean)[0];
@@ -3699,7 +4161,7 @@ function viewSession(){
                           kind: entry.track === "load" ? "barbell" : "bodyweight",
                           inc: 2.5, cue: "", retired: true};
       }
-      const sug = suggest(ex, item, c.index);
+      const sug = suggest(ex, item, road ? -1 : c.index, c.ramp);
       const lp = lastPerf(ex.id);
       const ghost = !lp ? "No history yet"
         : ex.bwOnly
@@ -3714,7 +4176,7 @@ function viewSession(){
           '<button class="ex-name" data-diag="' + entry.exId + '">' + esc(ex.name) +
             (isNewVariant(entry.slot, c.index) ? '<span class="tag-new">New</span>' : '') +
             '<span class="chev">' + infoIcon(!!openDiag[entry.exId]) + '</span></button>' +
-        '</div><button class="mini" data-swap="' + entry.slot + '">Swap</button></div>' +
+        '</div>' + (road ? '' : '<button class="mini" data-swap="' + entry.slot + '">Swap</button>') + '</div>' +
         '<p class="target"><b>' + item.sets + ' × ' + item.lo + '–' + item.hi +
           (ex.perSide ? " each side" : "") + '</b>' +
           '<span>' + (ex.bwOnly ? "bodyweight" : sug.w === null ? "load to find" : fmt(sug.w) + " " + S.units + (ex.kind === "dumbbell" ? " per hand" : ex.kind === "bodyweight" ? " added" : "")) + '</span></p>' +
@@ -3738,7 +4200,7 @@ function viewSession(){
 /* ---------- summary ---------- */
 function viewSummary(){
   const rec = summaryRec;
-  const sess = SESSIONS.find(s => s.key === rec.key);
+  const sess = SESSIONS.find(s => s.key === (isRoad(rec) ? rec.rkey : rec.key));
   const title = rec.open ? (rec.title || "Open session") : (sess ? sess.title : "Session");
   const sets = rec.entries.reduce((n,e)=> n + e.sets.length, 0);
   const vol = rec.entries.reduce((n,e)=> n + ((e.track||"load")==="load" ? e.sets.reduce((m,s)=> m + s.w * s.r, 0) : 0), 0);
@@ -3763,8 +4225,11 @@ function viewSummary(){
   });
 
   const next = sessionAt(S.sessionIndex);
+  const roadNext = isRoad(rec) ? (SESSIONS.find(x => x.key === roadNextKey()) || next) : null;
+  const rk = isRoad(rec) ? kitInfo(rec.kit) : null;
   return '<div class="panel"><div class="pad">' +
-    '<p class="eyebrow">' + (rec.open ? "Logged · open session" : "Logged") + '</p>' +
+    '<p class="eyebrow">' + (rec.open ? "Logged · open session" : isRoad(rec) ? "Logged · road session" : "Logged") + '</p>' +
+    (rk ? '<span class="kit-tag">' + esc(rk.tag) + '</span>' : '') +
     '<h1 class="session-title">' + esc(title) + '</h1>' +
     '<div class="meta">' +
       '<div><span class="n">' + rec.minutes + '<span style="font-size:12px">min</span></span><span class="l">Elapsed</span></div>' +
@@ -3781,9 +4246,12 @@ function viewSummary(){
     (pbs.length ? '<hr class="rule"><p class="pb">Personal best</p>' +
       pbs.map(p=>'<p class="lede" style="margin-top:4px">' + esc(p) + '</p>').join("") : "") +
     '<hr class="rule">' +
-    '<p class="lede">Next up is <b>' + esc(next.title) + '</b>. ' + esc(next.blurb) + ' Leave a full day between sessions.</p>' +
+    (roadNext
+      ? '<p class="lede">Next on the road is <b>' + esc(roadNext.title) + '</b>. Home gym holds at <b>' + esc(next.title) +
+        '</b> for when you are back. Leave a full day between sessions.</p>'
+      : '<p class="lede">Next up is <b>' + esc(next.title) + '</b>. ' + esc(next.blurb) + ' Leave a full day between sessions.</p>') +
     '<div style="margin-top:16px;display:flex;gap:8px">' +
-      '<button class="btn btn-quiet" data-act="closeSummary">Done</button>' +
+      '<button class="btn" data-act="closeSummary">Done</button>' +
       '<button class="btn btn-ghost" data-act="reopenLast">Finished by mistake</button>' +
     '</div>' +
   '</div></div>';
@@ -3869,8 +4337,7 @@ function viewProgress(){
   const totalVol = S.history.reduce((n,h)=> n + h.entries.reduce((m,e)=> m + ((e.track||"load")==="load" ? e.sets.reduce((k,s)=> k + s.w*s.r, 0) : 0), 0), 0);
   const recent = S.history.slice().reverse().map((h)=>{
     const i = S.history.indexOf(h);
-    const sess = SESSIONS.find(s => s.key === h.key);
-    const label = h.open ? (h.title || "Open session") : (sess ? sess.title : "Session");
+    const label = sessionTitle(h);
     const d = keyDate(recDay(h));
     const first = h.entries[0];
     const gOnly = golfOnly(h);
@@ -3889,7 +4356,9 @@ function viewProgress(){
   }).join("");
 
   return '<div class="panel"><div class="pad">' +
-      '<p class="eyebrow">Every session · ' + S.history.filter(h=>!h.open).length + ' weights, ' + S.history.filter(h=>h.open).length + ' aerobic</p>' +
+      '<p class="eyebrow">Every session · ' + S.history.filter(isHome).length + ' weights, ' +
+        (S.history.some(isRoad) ? S.history.filter(isRoad).length + ' road, ' : '') +
+        S.history.filter(h=>h.open).length + ' aerobic</p>' +
       '<h2 class="head">' + S.history.length + ' sessions, ' + Math.round(totalVol).toLocaleString("en-GB") + ' ' + S.units + ' moved</h2>' +
       '<hr class="rule">' + recent +
     '</div></div>' +
@@ -3938,6 +4407,36 @@ function viewLibrary(){
       '<p class="eyebrow" style="margin-top:16px">All ' + count + ' exercises \u00b7 tap any for how it is done</p>' +
       rows +
       '<p class="lede" style="margin-top:12px;font-size:12px">Every four cycles each lift swaps to the next variation, so the training stays comparable but never repeats.</p>' +
+    '</div></div>';
+  });
+
+  /* ---- the road ---- */
+  html += '<div class="panel"><div class="pad">' +
+    '<p class="eyebrow">On the road</p>' +
+    '<h2 class="head">When there is no gym</h2>' +
+    '<p class="lede" style="margin-top:8px">Pick Dumbbells, TRX or Bodyweight at the top of the Train tab. One road rotation is shared by all three, so switching kit mid-trip never repeats a session, and the home programme waits exactly where you left it.</p>' +
+  '</div></div>';
+  ROAD_KITS.forEach(k=>{
+    let body = "";
+    SESSIONS.forEach(home=>{
+      const rs = roadSession(k.id, home.key);
+      body += '<div class="roadhead"><b>' + esc(rs.title) + '</b><span>~' + estimateMinutes(rs) + ' min</span></div>';
+      rs.blocks.forEach(b => b.items.forEach(item=>{
+        const ex = ROAD_EX[item.ex];
+        body += '<div class="varone' + (b === rs.blocks[0] ? " now" : "") + '">' +
+          '<button class="ex-name" style="font-size:16px" data-diag="' + ex.id + '">' + esc(ex.name) +
+            '<span class="chev">' + infoIcon(!!openDiag[ex.id]) + '</span></button>' +
+          '<p class="slotnote" style="margin:2px 0 0">' + item.sets + ' × ' + item.lo + '–' + item.hi +
+            (ex.perSide ? ' each side' : '') + ' · rest ' + b.rest + 's</p>' +
+          (openDiag[ex.id] ? '<p class="cue">' + esc(ex.cue) + '</p>' + diagram(ex.id) : "") +
+        '</div>';
+      }));
+    });
+    html += '<div class="panel"><div class="pad">' +
+      '<h2 class="head">' + esc(k.label) + '</h2>' +
+      '<p class="lede" style="margin-top:6px">' + esc(k.needs) + ' ' +
+        (k.id === "db" ? "Loads per hand, tracked apart from home." : "Reps only.") + '</p>' +
+      body +
     '</div></div>';
   });
 
@@ -4022,9 +4521,10 @@ let restoreOpen = false;
 /* The number on each device, so two of them can be compared at a glance. */
 function countLine(){
   const n = (S.history || []).length;
-  const programme = (S.history || []).filter(h => h.key && h.key !== "X").length;
+  const programme = (S.history || []).filter(h => h.key && h.key !== "X" && h.key !== "T").length;
+  const road = (S.history || []).filter(h => h.key === "T").length;
   return '<b>' + n + " session" + (n === 1 ? "" : "s") + " recorded</b> · " +
-    programme + " in the programme, " + (n - programme) + " alongside.";
+    programme + " in the programme, " + (road ? road + " on the road, " : "") + (n - programme - road) + " alongside.";
 }
 
 function viewSettings(){
@@ -4118,7 +4618,7 @@ function showFault(what, err){
     }
     box.innerHTML = '<b>Something went wrong — please send this to Claude</b><br>' +
       String(what) + ': ' + String(err && err.message || err) +
-      '<br><span style="opacity:.8">' + String((err && err.stack || "")).split("\n").slice(0,3).join(" ‹ ") + '</span>' +
+      '<br><span style="color:#F3DCCC">' + String((err && err.stack || "")).split("\n").slice(0,3).join(" ‹ ") + '</span>' +
       '<br><button style="margin-top:8px;padding:6px 12px" onclick="this.parentNode.remove()">Dismiss</button>';
   }catch(e){}
 }
@@ -4139,7 +4639,7 @@ function handleClick(e){
     render(); return;
   }
 
-  if(t.dataset.tab){ summaryRec = null; histIdx = null; histEx = null; histList = false; histDay = null; previewOpen = false; previewIdx = null; tab = t.dataset.tab; render(); return; }
+  if(t.dataset.tab){ summaryRec = null; histIdx = null; histEx = null; histList = false; histDay = null; previewOpen = false; previewIdx = null; roadPreview = null; tab = t.dataset.tab; render(); return; }
 
   if(t.dataset.rest){
     if(t.dataset.rest === "add"){ restLeft += 30; drawRest(); }
@@ -4443,6 +4943,20 @@ function handleClick(e){
   if(t.dataset.bar){ S.bar = Math.max(0, S.bar + Number(t.dataset.bar) * 2.5); save(); render(); return; }
 
   const act = t.dataset.act;
+  if(act.indexOf("kit:") === 0){
+    const k = act.slice(4);
+    if(k === "home" || kitInfo(k)) kit = k;
+    previewOpen = false; previewIdx = null; roadPreview = null;
+    render(); return;
+  }
+  if(act.indexOf("rprev:") === 0){
+    roadPreview = act.slice(6); previewOpen = true; previewIdx = null;
+    render(); return;
+  }
+  if(act === "roadList"){
+    histList = true; histFilter = "road"; histDay = null; histIdx = null; previewOpen = false; roadPreview = null;
+    render(); return;
+  }
   if(act === "addExtra"){
     const sel = document.getElementById("extraPick");
     if(sel && sel.value) addExtraToSession(sel.value);
@@ -4500,14 +5014,14 @@ function handleClick(e){
     return;
   }
   if(act === "preview"){ previewIdx = null; previewOpen = true; render(); return; }
-  if(act === "closePreview"){ previewOpen = false; previewIdx = null; render(); return; }
+  if(act === "closePreview"){ previewOpen = false; previewIdx = null; roadPreview = null; render(); return; }
   if(act === "signout"){
     if(confirm("Sign out? Your training is saved to your account.")){
       if(window.__auth) window.__auth.signOut();
     }
     return;
   }
-  if(act === "start"){ previewOpen = false; previewIdx = null; startSession(); }
+  if(act === "start"){ previewOpen = false; previewIdx = null; roadPreview = null; startSession(); }
   if(act === "startOpen"){ startOpen(); }
   if(act === "startOpenPick"){
     const sel = document.getElementById("openPick");
@@ -4849,7 +5363,7 @@ if(!FIREBASE_CONFIG.apiKey || !FIREBASE_CONFIG.projectId){
   document.getElementById("gateSub").textContent =
     "Accounts are not configured yet. Add your Firebase project details to firebase-config.js.";
   ["gSignIn","gCreate","gGoogle","gReset"].forEach(id=>{
-    const b = document.getElementById(id); b.disabled = true; b.style.opacity = ".45";
+    const b = document.getElementById(id); b.disabled = true;
   });
 }else{
   const app  = initializeApp(FIREBASE_CONFIG);
@@ -4927,7 +5441,7 @@ if(!FIREBASE_CONFIG.apiKey || !FIREBASE_CONFIG.projectId){
   };
 
   const busy = (on)=> ["gSignIn","gCreate","gGoogle"].forEach(id=>{
-    const b = document.getElementById(id); b.disabled = on; b.style.opacity = on ? ".55" : "1";
+    const b = document.getElementById(id); b.disabled = on;
   });
 
   document.getElementById("gSignIn").addEventListener("click", async ()=>{
