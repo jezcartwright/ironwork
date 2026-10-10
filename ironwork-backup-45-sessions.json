@@ -1,0 +1,5942 @@
+[
+  {
+    "open": false,
+    "minutes": 31,
+    "key": "A",
+    "index": 0,
+    "entries": [
+      {
+        "track": "load",
+        "exId": "back-squat",
+        "slot": "squat",
+        "sets": [
+          {
+            "w": 30,
+            "done": true,
+            "r": 8
+          },
+          {
+            "done": true,
+            "r": 8,
+            "w": 30
+          },
+          {
+            "done": true,
+            "r": 8,
+            "w": 30
+          },
+          {
+            "w": 30,
+            "done": true,
+            "r": 8
+          }
+        ],
+        "extra": false,
+        "meta": {}
+      },
+      {
+        "extra": false,
+        "meta": {},
+        "track": "load",
+        "slot": "bench",
+        "sets": [
+          {
+            "r": 10,
+            "w": 50,
+            "done": true
+          },
+          {
+            "done": true,
+            "w": 50,
+            "r": 10
+          },
+          {
+            "done": true,
+            "r": 10,
+            "w": 50
+          }
+        ],
+        "exId": "bb-bench"
+      },
+      {
+        "exId": "pullup",
+        "sets": [
+          {
+            "done": true,
+            "r": 5,
+            "w": 180
+          },
+          {
+            "w": 180,
+            "r": 5,
+            "done": true
+          },
+          {
+            "r": 5,
+            "w": 180,
+            "done": true
+          }
+        ],
+        "slot": "vpull",
+        "track": "load",
+        "meta": {},
+        "extra": false
+      },
+      {
+        "extra": false,
+        "meta": {},
+        "track": "load",
+        "exId": "bb-rdl",
+        "sets": [
+          {
+            "r": 12,
+            "w": 50,
+            "done": true
+          },
+          {
+            "done": true,
+            "r": 12,
+            "w": 50
+          },
+          {
+            "w": 50,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "slot": "rdl"
+      }
+    ],
+    "effort": 6,
+    "title": null,
+    "date": "2026-08-01T21:03:36.573Z"
+  },
+  {
+    "open": true,
+    "title": "Golf",
+    "key": "X",
+    "tz": "America/Los_Angeles",
+    "entries": [
+      {
+        "extra": true,
+        "meta": {
+          "feel": "bad",
+          "teeName": "Blue",
+          "tee": null,
+          "effort": 7,
+          "score": 89,
+          "course": "The Olympic Club Lake Course",
+          "tees": []
+        },
+        "track": "time",
+        "sets": [
+          {
+            "w": 240,
+            "r": 7,
+            "done": true
+          }
+        ],
+        "name": "Golf",
+        "exId": "x-golf"
+      }
+    ],
+    "minutes": 240,
+    "index": 1,
+    "day": "2026-08-02",
+    "date": "2026-08-02T19:00:00.000Z",
+    "effort": 7
+  },
+  {
+    "day": "2026-08-03",
+    "effort": 6,
+    "open": false,
+    "title": null,
+    "tz": "America/Los_Angeles",
+    "date": "2026-08-03T15:54:58.109Z",
+    "index": 1,
+    "key": "B",
+    "entries": [
+      {
+        "meta": {},
+        "exId": "conv-deadlift",
+        "extra": false,
+        "track": "load",
+        "sets": [
+          {
+            "done": true,
+            "w": 50,
+            "r": 6
+          },
+          {
+            "done": true,
+            "w": 50,
+            "r": 6
+          },
+          {
+            "r": 6,
+            "done": true,
+            "w": 50
+          }
+        ],
+        "slot": "deadlift"
+      },
+      {
+        "slot": "press",
+        "sets": [
+          {
+            "w": 20,
+            "r": 8,
+            "done": true
+          },
+          {
+            "r": 8,
+            "done": true,
+            "w": 20
+          },
+          {
+            "w": 20,
+            "r": 8,
+            "done": true
+          }
+        ],
+        "track": "load",
+        "extra": false,
+        "exId": "db-shoulder",
+        "meta": {}
+      },
+      {
+        "slot": "hrow",
+        "sets": [
+          {
+            "r": 12,
+            "w": 30,
+            "done": true
+          },
+          {
+            "r": 12,
+            "w": 30,
+            "done": true
+          },
+          {
+            "r": 12,
+            "done": true,
+            "w": 30
+          }
+        ],
+        "exId": "bb-row",
+        "track": "load",
+        "meta": {},
+        "extra": false
+      },
+      {
+        "sets": [
+          {
+            "done": true,
+            "w": 20,
+            "r": 10
+          },
+          {
+            "done": true,
+            "r": 10,
+            "w": 20
+          },
+          {
+            "done": true,
+            "w": 20,
+            "r": 10
+          }
+        ],
+        "slot": "unilateral",
+        "track": "load",
+        "extra": false,
+        "exId": "bulgarian",
+        "meta": {}
+      },
+      {
+        "meta": {},
+        "slot": "antiext",
+        "extra": false,
+        "sets": [
+          {
+            "done": true,
+            "w": 180,
+            "r": 12
+          },
+          {
+            "done": true,
+            "r": 12,
+            "w": 180
+          },
+          {
+            "r": 12,
+            "done": true,
+            "w": 180
+          }
+        ],
+        "track": "load",
+        "exId": "hanging-knee"
+      }
+    ],
+    "minutes": 34
+  },
+  {
+    "index": 2,
+    "effort": 9,
+    "day": "2026-08-04",
+    "minutes": 0,
+    "tz": "America/Los_Angeles",
+    "open": true,
+    "entries": [
+      {
+        "track": "time",
+        "exId": "x-golf",
+        "name": "Golf",
+        "sets": [
+          {
+            "done": true,
+            "r": 9,
+            "w": 240
+          }
+        ],
+        "extra": true,
+        "meta": {
+          "tee": null,
+          "feel": "bad",
+          "teeName": "Black",
+          "effort": 9,
+          "score": 92,
+          "course": "Presidio Golf Course",
+          "tees": []
+        }
+      }
+    ],
+    "date": "2026-08-04T22:28:12.013Z",
+    "key": "X",
+    "title": "Golf"
+  },
+  {
+    "tz": "America/Los_Angeles",
+    "day": "2026-08-05",
+    "open": false,
+    "title": null,
+    "index": 2,
+    "entries": [
+      {
+        "meta": {},
+        "extra": false,
+        "exId": "weighted-pullup",
+        "slot": "vpullHeavy",
+        "track": "load",
+        "sets": [
+          {
+            "r": 8,
+            "done": true,
+            "w": 180
+          },
+          {
+            "done": true,
+            "w": 180,
+            "r": 8
+          },
+          {
+            "r": 8,
+            "w": 180,
+            "done": true
+          },
+          {
+            "done": true,
+            "w": 180,
+            "r": 8
+          }
+        ]
+      },
+      {
+        "extra": false,
+        "track": "load",
+        "meta": {},
+        "exId": "incline-bb",
+        "slot": "vpush2",
+        "sets": [
+          {
+            "r": 10,
+            "done": true,
+            "w": 30
+          },
+          {
+            "w": 30,
+            "done": true,
+            "r": 9
+          },
+          {
+            "w": 30,
+            "r": 10,
+            "done": true
+          }
+        ]
+      },
+      {
+        "track": "load",
+        "exId": "hip-thrust",
+        "slot": "glute",
+        "extra": false,
+        "sets": [
+          {
+            "r": 12,
+            "w": 0,
+            "done": true
+          },
+          {
+            "r": 12,
+            "done": true,
+            "w": 0
+          },
+          {
+            "done": true,
+            "r": 12,
+            "w": 0
+          }
+        ],
+        "meta": {}
+      },
+      {
+        "track": "load",
+        "exId": "pushdown",
+        "slot": "triceps",
+        "extra": false,
+        "sets": [
+          {
+            "r": 14,
+            "done": true,
+            "w": 30
+          }
+        ],
+        "meta": {}
+      },
+      {
+        "meta": {},
+        "extra": false,
+        "track": "load",
+        "sets": [
+          {
+            "done": true,
+            "r": 14,
+            "w": 20
+          },
+          {
+            "w": 20,
+            "done": true,
+            "r": 14
+          }
+        ],
+        "slot": "biceps",
+        "exId": "db-curl"
+      },
+      {
+        "extra": false,
+        "track": "load",
+        "meta": {},
+        "exId": "farmers",
+        "slot": "finisher",
+        "sets": [
+          {
+            "r": 20,
+            "w": 30,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 20,
+            "done": true
+          },
+          {
+            "r": 20,
+            "w": 30,
+            "done": true
+          }
+        ]
+      }
+    ],
+    "key": "C",
+    "minutes": 37,
+    "date": "2026-08-05T15:26:38.102Z",
+    "effort": 6
+  },
+  {
+    "entries": [
+      {
+        "extra": false,
+        "meta": {},
+        "profile": "strength",
+        "track": "load",
+        "sets": [
+          {
+            "done": true,
+            "w": 40,
+            "r": 8
+          },
+          {
+            "r": 8,
+            "done": true,
+            "w": 40
+          },
+          {
+            "w": 40,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 40,
+            "r": 8,
+            "done": true
+          }
+        ],
+        "slot": "squat",
+        "exId": "back-squat"
+      },
+      {
+        "meta": {},
+        "extra": false,
+        "profile": "strength",
+        "exId": "bb-bench",
+        "track": "load",
+        "slot": "bench",
+        "sets": [
+          {
+            "r": 10,
+            "done": true,
+            "w": 55
+          },
+          {
+            "r": 10,
+            "done": true,
+            "w": 55
+          },
+          {
+            "done": true,
+            "w": 55,
+            "r": 10
+          }
+        ]
+      },
+      {
+        "track": "load",
+        "exId": "pullup",
+        "slot": "vpull",
+        "sets": [
+          {
+            "w": 180,
+            "r": 5,
+            "done": true
+          },
+          {
+            "r": 5,
+            "done": true,
+            "w": 180
+          },
+          {
+            "done": true,
+            "r": 5,
+            "w": 180
+          }
+        ],
+        "extra": false,
+        "profile": "strength",
+        "meta": {}
+      },
+      {
+        "exId": "bb-rdl",
+        "slot": "rdl",
+        "sets": [
+          {
+            "done": true,
+            "w": 55,
+            "r": 12
+          },
+          {
+            "r": 12,
+            "done": true,
+            "w": 55
+          }
+        ],
+        "profile": "strength",
+        "track": "load",
+        "meta": {},
+        "extra": false
+      }
+    ],
+    "minutes": 34,
+    "day": "2026-08-07",
+    "open": false,
+    "title": null,
+    "date": "2026-08-07T15:00:49.040Z",
+    "index": 3,
+    "tz": "America/Los_Angeles",
+    "key": "A",
+    "effort": 7
+  },
+  {
+    "entries": [
+      {
+        "meta": {},
+        "extra": false,
+        "profile": "strength",
+        "slot": "deadlift",
+        "sets": [
+          {
+            "done": true,
+            "r": 6,
+            "w": 50
+          },
+          {
+            "r": 6,
+            "done": true,
+            "w": 50
+          },
+          {
+            "w": 50,
+            "r": 6,
+            "done": true
+          },
+          {
+            "r": 6,
+            "done": true,
+            "w": 50
+          }
+        ],
+        "exId": "conv-deadlift",
+        "track": "load"
+      },
+      {
+        "profile": "strength",
+        "meta": {},
+        "extra": false,
+        "exId": "db-shoulder",
+        "track": "load",
+        "slot": "press",
+        "sets": [
+          {
+            "w": 25,
+            "r": 8,
+            "done": true
+          },
+          {
+            "r": 8,
+            "w": 25,
+            "done": true
+          },
+          {
+            "w": 25,
+            "done": true,
+            "r": 8
+          }
+        ]
+      },
+      {
+        "extra": false,
+        "meta": {},
+        "track": "load",
+        "slot": "hrow",
+        "sets": [
+          {
+            "done": true,
+            "r": 12,
+            "w": 35
+          },
+          {
+            "w": 35,
+            "done": true,
+            "r": 12
+          },
+          {
+            "r": 12,
+            "done": true,
+            "w": 35
+          }
+        ],
+        "profile": "strength",
+        "exId": "bb-row"
+      },
+      {
+        "sets": [
+          {
+            "done": true,
+            "r": 12,
+            "w": 180
+          },
+          {
+            "done": true,
+            "w": 180,
+            "r": 12
+          },
+          {
+            "done": true,
+            "r": 12,
+            "w": 180
+          }
+        ],
+        "slot": "antiext",
+        "exId": "hanging-knee",
+        "meta": {},
+        "track": "load",
+        "extra": false,
+        "profile": "strength"
+      }
+    ],
+    "title": null,
+    "minutes": 35,
+    "key": "B",
+    "date": "2026-08-09T23:47:41.681Z",
+    "tz": "America/Los_Angeles",
+    "open": false,
+    "day": "2026-08-09",
+    "effort": 8,
+    "index": 4
+  },
+  {
+    "minutes": 12,
+    "key": "X",
+    "entries": [
+      {
+        "sets": [],
+        "track": "time",
+        "extra": true,
+        "exId": "x-golf",
+        "name": "Golf",
+        "meta": {
+          "course": "The Olympic Club Lake Course",
+          "score": 88,
+          "feel": "mid",
+          "tees": [],
+          "teeName": "Blue",
+          "tee": null,
+          "effort": 7
+        }
+      }
+    ],
+    "index": 5,
+    "date": "2026-08-09T19:00:00.000Z",
+    "tz": "America/Los_Angeles",
+    "title": "Golf",
+    "open": true,
+    "effort": 7,
+    "day": "2026-08-09"
+  },
+  {
+    "entries": [
+      {
+        "exId": "weighted-pullup",
+        "track": "load",
+        "sets": [
+          {
+            "w": 180,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 180,
+            "r": 8,
+            "done": true
+          },
+          {
+            "done": true,
+            "w": 180,
+            "r": 8
+          },
+          {
+            "done": true,
+            "r": 8,
+            "w": 180
+          }
+        ],
+        "slot": "vpullHeavy",
+        "extra": false,
+        "meta": {},
+        "profile": "strength"
+      },
+      {
+        "track": "load",
+        "exId": "incline-bb",
+        "slot": "vpush2",
+        "sets": [
+          {
+            "r": 10,
+            "w": 30,
+            "done": true
+          },
+          {
+            "r": 10,
+            "w": 30,
+            "done": true
+          },
+          {
+            "done": true,
+            "w": 30,
+            "r": 10
+          }
+        ],
+        "extra": false,
+        "profile": "strength",
+        "meta": {}
+      },
+      {
+        "profile": "strength",
+        "exId": "hip-thrust",
+        "slot": "glute",
+        "sets": [
+          {
+            "r": 12,
+            "w": 20,
+            "done": true
+          },
+          {
+            "r": 12,
+            "w": 20,
+            "done": true
+          },
+          {
+            "done": true,
+            "w": 20,
+            "r": 12
+          }
+        ],
+        "track": "load",
+        "meta": {},
+        "extra": false
+      },
+      {
+        "sets": [
+          {
+            "w": 30,
+            "r": 14,
+            "done": true
+          },
+          {
+            "done": true,
+            "w": 30,
+            "r": 14
+          }
+        ],
+        "track": "load",
+        "slot": "triceps",
+        "extra": false,
+        "exId": "pushdown",
+        "meta": {},
+        "profile": "strength"
+      },
+      {
+        "exId": "db-curl",
+        "track": "load",
+        "sets": [
+          {
+            "done": true,
+            "w": 25,
+            "r": 14
+          },
+          {
+            "done": true,
+            "w": 25,
+            "r": 14
+          }
+        ],
+        "profile": "strength",
+        "slot": "biceps",
+        "extra": false,
+        "meta": {}
+      },
+      {
+        "sets": [
+          {
+            "done": true,
+            "r": 20,
+            "w": 30
+          },
+          {
+            "w": 30,
+            "r": 20,
+            "done": true
+          },
+          {
+            "done": true,
+            "r": 20,
+            "w": 30
+          }
+        ],
+        "track": "load",
+        "slot": "finisher",
+        "extra": false,
+        "exId": "farmers",
+        "meta": {},
+        "profile": "strength"
+      }
+    ],
+    "minutes": 48,
+    "open": false,
+    "title": null,
+    "key": "C",
+    "index": 5,
+    "date": "2026-08-11T16:16:22.121Z",
+    "effort": 8,
+    "day": "2026-08-11",
+    "tz": "America/Los_Angeles"
+  },
+  {
+    "date": "2026-08-13T19:52:44.430Z",
+    "day": "2026-08-13",
+    "tz": "America/Los_Angeles",
+    "key": "A",
+    "index": 6,
+    "open": false,
+    "title": null,
+    "minutes": 46,
+    "entries": [
+      {
+        "slot": "squat",
+        "exId": "back-squat",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 50,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 50,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 50,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 50,
+            "r": 8,
+            "done": true
+          }
+        ]
+      },
+      {
+        "slot": "bench",
+        "exId": "bb-bench",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 60,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 60,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 60,
+            "r": 10,
+            "done": true
+          }
+        ]
+      },
+      {
+        "slot": "vpull",
+        "exId": "pullup",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 162.5,
+            "r": 5,
+            "done": true
+          },
+          {
+            "w": 162.5,
+            "r": 5,
+            "done": true
+          },
+          {
+            "w": 162.5,
+            "r": 5,
+            "done": true
+          }
+        ]
+      },
+      {
+        "slot": "rdl",
+        "exId": "bb-rdl",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 60,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 60,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 60,
+            "r": 12,
+            "done": true
+          }
+        ]
+      },
+      {
+        "slot": "antirot",
+        "exId": "chop",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 10,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 10,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 10,
+            "r": 12,
+            "done": true
+          }
+        ]
+      }
+    ],
+    "effort": 6
+  },
+  {
+    "date": "2026-08-15T16:25:33.806Z",
+    "day": "2026-08-15",
+    "tz": "America/Los_Angeles",
+    "key": "B",
+    "index": 7,
+    "open": false,
+    "title": null,
+    "minutes": 44,
+    "entries": [
+      {
+        "slot": "deadlift",
+        "exId": "conv-deadlift",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 60,
+            "r": 6,
+            "done": true
+          },
+          {
+            "w": 60,
+            "r": 6,
+            "done": true
+          },
+          {
+            "w": 60,
+            "r": 6,
+            "done": true
+          },
+          {
+            "w": 60,
+            "r": 6,
+            "done": true
+          }
+        ]
+      },
+      {
+        "slot": "press",
+        "exId": "db-shoulder",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 30,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 8,
+            "done": true
+          }
+        ]
+      },
+      {
+        "slot": "hrow",
+        "exId": "bb-row",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 40,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 40,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 40,
+            "r": 12,
+            "done": true
+          }
+        ]
+      },
+      {
+        "slot": "unilateral",
+        "exId": "low-step-up",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 25,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 25,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 25,
+            "r": 10,
+            "done": true
+          }
+        ]
+      },
+      {
+        "slot": "antiext",
+        "exId": "hanging-knee",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 0,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 12,
+            "done": true
+          }
+        ]
+      }
+    ],
+    "effort": 8
+  },
+  {
+    "date": "2026-08-17T19:00:55.044Z",
+    "day": "2026-08-17",
+    "tz": "America/Los_Angeles",
+    "key": "C",
+    "index": 8,
+    "open": false,
+    "title": null,
+    "minutes": 47,
+    "entries": [
+      {
+        "slot": "vpullHeavy",
+        "exId": "weighted-pullup",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 185,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 185,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 185,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 185,
+            "r": 8,
+            "done": true
+          }
+        ]
+      },
+      {
+        "slot": "vpush2",
+        "exId": "incline-bb",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 35,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 35,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 35,
+            "r": 10,
+            "done": true
+          }
+        ]
+      },
+      {
+        "slot": "glute",
+        "exId": "hip-thrust",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 30,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 12,
+            "done": true
+          }
+        ]
+      },
+      {
+        "slot": "triceps",
+        "exId": "pushdown",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 30,
+            "r": 14,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 14,
+            "done": true
+          }
+        ]
+      },
+      {
+        "slot": "biceps",
+        "exId": "db-curl",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 30,
+            "r": 14,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 14,
+            "done": true
+          }
+        ]
+      },
+      {
+        "slot": "finisher",
+        "exId": "farmers",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 30,
+            "r": 20,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 20,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 20,
+            "done": true
+          }
+        ]
+      }
+    ],
+    "effort": 8
+  },
+  {
+    "date": "2026-08-19T14:41:40.359Z",
+    "day": "2026-08-19",
+    "tz": "America/Los_Angeles",
+    "key": "A",
+    "index": 9,
+    "open": false,
+    "title": null,
+    "minutes": 37,
+    "entries": [
+      {
+        "slot": "squat",
+        "exId": "front-squat",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 30,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 8,
+            "done": true
+          }
+        ]
+      },
+      {
+        "slot": "bench",
+        "exId": "db-bench",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 25,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 25,
+            "r": 10,
+            "done": true
+          }
+        ]
+      },
+      {
+        "slot": "vpull",
+        "exId": "lat-pulldown",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 60,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 60,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 60,
+            "r": 10,
+            "done": true
+          }
+        ]
+      },
+      {
+        "slot": "rdl",
+        "exId": "db-rdl",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 25,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 25,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 25,
+            "r": 12,
+            "done": true
+          }
+        ]
+      },
+      {
+        "slot": "antirot",
+        "exId": "hk-pallof",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 25,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 25,
+            "r": 10,
+            "done": true
+          }
+        ]
+      }
+    ],
+    "effort": 6
+  },
+  {
+    "date": "2026-08-21T23:12:48.370Z",
+    "day": "2026-08-21",
+    "tz": "America/Los_Angeles",
+    "key": "B",
+    "index": 10,
+    "open": false,
+    "title": null,
+    "minutes": 34,
+    "entries": [
+      {
+        "slot": "deadlift",
+        "exId": "rack-pull",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 50,
+            "r": 6,
+            "done": true
+          },
+          {
+            "w": 60,
+            "r": 6,
+            "done": true
+          },
+          {
+            "w": 65,
+            "r": 6,
+            "done": true
+          },
+          {
+            "w": 65,
+            "r": 6,
+            "done": true
+          }
+        ]
+      },
+      {
+        "slot": "press",
+        "exId": "landmine-press",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 15,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 15,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 15,
+            "r": 8,
+            "done": true
+          }
+        ]
+      },
+      {
+        "slot": "hrow",
+        "exId": "cs-row",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 25,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 25,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 25,
+            "r": 12,
+            "done": true
+          }
+        ]
+      },
+      {
+        "slot": "unilateral",
+        "exId": "sl-hip-thrust-u",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 25,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 25,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 25,
+            "r": 10,
+            "done": true
+          }
+        ]
+      },
+      {
+        "slot": "antiext",
+        "exId": "cable-crunch",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 20,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 50,
+            "r": 12,
+            "done": true
+          }
+        ]
+      }
+    ],
+    "effort": 6
+  },
+  {
+    "date": "2026-08-22T04:01:35.143Z",
+    "day": "2026-08-21",
+    "tz": "America/Los_Angeles",
+    "key": "X",
+    "index": 11,
+    "open": true,
+    "title": "Golf",
+    "minutes": 0,
+    "entries": [
+      {
+        "exId": "x-golf",
+        "track": "load",
+        "profile": "golf",
+        "extra": true,
+        "name": "Golf",
+        "meta": {
+          "course": "The Olympic Club Lake Course",
+          "tees": [],
+          "tee": null,
+          "teeName": "Blue",
+          "score": 94,
+          "feel": "bad",
+          "effort": 7
+        },
+        "sets": []
+      }
+    ],
+    "effort": 7
+  },
+  {
+    "date": "2026-08-23T16:15:58.093Z",
+    "day": "2026-08-23",
+    "tz": "America/Los_Angeles",
+    "key": "C",
+    "index": 11,
+    "open": false,
+    "title": null,
+    "minutes": 41,
+    "entries": [
+      {
+        "slot": "vpullHeavy",
+        "exId": "heavy-pulldown",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 70,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 70,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 70,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 70,
+            "r": 8,
+            "done": true
+          }
+        ]
+      },
+      {
+        "slot": "vpush2",
+        "exId": "incline-db",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 25,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 10,
+            "done": true
+          }
+        ]
+      },
+      {
+        "slot": "glute",
+        "exId": "good-morning",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 20,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 20,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 20,
+            "r": 12,
+            "done": true
+          }
+        ]
+      },
+      {
+        "slot": "triceps",
+        "exId": "overhead-ext",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 30,
+            "r": 14,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 14,
+            "done": true
+          }
+        ]
+      },
+      {
+        "slot": "biceps",
+        "exId": "hammer-curl",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 25,
+            "r": 14,
+            "done": true
+          },
+          {
+            "w": 25,
+            "r": 14,
+            "done": true
+          }
+        ]
+      },
+      {
+        "slot": "finisher",
+        "exId": "thruster",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 20,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 20,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 20,
+            "r": 12,
+            "done": true
+          }
+        ]
+      }
+    ],
+    "effort": 7
+  },
+  {
+    "date": "2026-08-25T02:47:14.657Z",
+    "day": "2026-08-24",
+    "tz": "America/Los_Angeles",
+    "key": "A",
+    "index": 12,
+    "open": false,
+    "title": null,
+    "minutes": 37,
+    "entries": [
+      {
+        "slot": "squat",
+        "exId": "front-squat",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 35,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 35,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 35,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 35,
+            "r": 8,
+            "done": true
+          }
+        ]
+      },
+      {
+        "slot": "bench",
+        "exId": "db-bench",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 25,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 10,
+            "done": true
+          }
+        ]
+      },
+      {
+        "slot": "vpull",
+        "exId": "lat-pulldown",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 65,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 65,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 65,
+            "r": 10,
+            "done": true
+          }
+        ]
+      },
+      {
+        "slot": "rdl",
+        "exId": "db-rdl",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 30,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 12,
+            "done": true
+          }
+        ]
+      },
+      {
+        "slot": "antirot",
+        "exId": "hk-pallof",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 25,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 25,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 25,
+            "r": 10,
+            "done": true
+          }
+        ]
+      }
+    ],
+    "effort": 7
+  },
+  {
+    "date": "2026-08-26T14:39:59.195Z",
+    "day": "2026-08-26",
+    "tz": "America/Los_Angeles",
+    "key": "B",
+    "index": 13,
+    "open": false,
+    "title": null,
+    "minutes": 37,
+    "entries": [
+      {
+        "slot": "deadlift",
+        "exId": "rack-pull",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 75,
+            "r": 6,
+            "done": true
+          },
+          {
+            "w": 75,
+            "r": 6,
+            "done": true
+          },
+          {
+            "w": 75,
+            "r": 6,
+            "done": true
+          }
+        ]
+      },
+      {
+        "slot": "press",
+        "exId": "landmine-press",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 20,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 20,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 20,
+            "r": 8,
+            "done": true
+          }
+        ]
+      },
+      {
+        "slot": "hrow",
+        "exId": "cs-row",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 30,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 12,
+            "done": true
+          }
+        ]
+      },
+      {
+        "slot": "unilateral",
+        "exId": "sl-hip-thrust-u",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 30,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 10,
+            "done": true
+          }
+        ]
+      },
+      {
+        "slot": "antiext",
+        "exId": "cable-crunch",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 50,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 50,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 50,
+            "r": 12,
+            "done": true
+          }
+        ]
+      }
+    ],
+    "effort": 7
+  },
+  {
+    "date": "2026-08-25T19:00:00.000Z",
+    "day": "2026-08-25",
+    "tz": "America/Los_Angeles",
+    "key": "X",
+    "index": 14,
+    "open": true,
+    "title": "Golf",
+    "minutes": 0,
+    "entries": [
+      {
+        "exId": "x-golf",
+        "track": "load",
+        "profile": "golf",
+        "extra": true,
+        "name": "Golf",
+        "meta": {
+          "course": "Meadow Club",
+          "tees": [],
+          "tee": null,
+          "teeName": "MacK",
+          "feel": "mid",
+          "effort": 6
+        },
+        "sets": []
+      }
+    ],
+    "effort": 6
+  },
+  {
+    "date": "2026-08-27T21:53:46.429Z",
+    "day": "2026-08-27",
+    "tz": "America/Los_Angeles",
+    "key": "C",
+    "index": 14,
+    "open": false,
+    "title": null,
+    "minutes": 44,
+    "entries": [
+      {
+        "slot": "vpullHeavy",
+        "exId": "heavy-pulldown",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 75,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 75,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 75,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 75,
+            "r": 8,
+            "done": true
+          }
+        ]
+      },
+      {
+        "slot": "vpush2",
+        "exId": "incline-db",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 35,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 35,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 35,
+            "r": 10,
+            "done": true
+          }
+        ]
+      },
+      {
+        "slot": "glute",
+        "exId": "good-morning",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 25,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 25,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 25,
+            "r": 12,
+            "done": true
+          }
+        ]
+      },
+      {
+        "slot": "triceps",
+        "exId": "overhead-ext",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 20,
+            "r": 14,
+            "done": true
+          },
+          {
+            "w": 20,
+            "r": 14,
+            "done": true
+          }
+        ]
+      },
+      {
+        "slot": "biceps",
+        "exId": "hammer-curl",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 30,
+            "r": 14,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 14,
+            "done": true
+          }
+        ]
+      },
+      {
+        "slot": "finisher",
+        "exId": "thruster",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 25,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 25,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 25,
+            "r": 7,
+            "done": true
+          }
+        ]
+      }
+    ],
+    "effort": 8
+  },
+  {
+    "date": "2026-08-28T19:00:00.000Z",
+    "day": "2026-08-28",
+    "tz": "America/Los_Angeles",
+    "key": "X",
+    "index": 16,
+    "open": true,
+    "title": "Golf",
+    "minutes": 2,
+    "entries": [
+      {
+        "exId": "x-golf",
+        "track": "load",
+        "profile": "golf",
+        "extra": true,
+        "name": "Golf",
+        "meta": {
+          "course": "Los Altos Golf Country Club",
+          "tees": [],
+          "tee": null,
+          "teeName": "Club",
+          "score": 83,
+          "feel": "good",
+          "effort": 6
+        },
+        "sets": []
+      }
+    ],
+    "effort": 6
+  },
+  {
+    "date": "2026-09-01T13:50:48.391Z",
+    "day": "2026-09-01",
+    "tz": "America/Los_Angeles",
+    "key": "A",
+    "index": 18,
+    "open": false,
+    "title": null,
+    "minutes": 35,
+    "entries": [
+      {
+        "slot": "squat",
+        "exId": "paused-squat",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 30,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 8,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "bench",
+        "exId": "floor-press",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 25,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 25,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 25,
+            "r": 10,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "vpull",
+        "exId": "neutral-chin",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 0,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 8,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "rdl",
+        "exId": "sl-rdl",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 20,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 20,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 20,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "antirot",
+        "exId": "landmine-rainbow",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 0,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": []
+      }
+    ],
+    "effort": 6
+  },
+  {
+    "date": "2026-09-02T22:55:33.486Z",
+    "day": "2026-09-02",
+    "tz": "America/Los_Angeles",
+    "key": "B",
+    "index": 19,
+    "open": false,
+    "title": null,
+    "minutes": 47,
+    "entries": [
+      {
+        "slot": "deadlift",
+        "exId": "deficit-deadlift",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 50,
+            "r": 6,
+            "done": true
+          },
+          {
+            "w": 50,
+            "r": 6,
+            "done": true
+          },
+          {
+            "w": 50,
+            "r": 6,
+            "done": true
+          },
+          {
+            "w": 50,
+            "r": 6,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "press",
+        "exId": "arnold",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 25,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 25,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 25,
+            "r": 8,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "hrow",
+        "exId": "seated-cable-row",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 50,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 50,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 55,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "unilateral",
+        "exId": "bstance-rdl",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 25,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 10,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "antiext",
+        "exId": "deadbug",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 20,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 25,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": [
+          {
+            "w": 25,
+            "r": 12
+          }
+        ]
+      }
+    ],
+    "effort": 7
+  },
+  {
+    "date": "2026-09-04T14:27:19.886Z",
+    "day": "2026-09-04",
+    "tz": "America/Los_Angeles",
+    "key": "C",
+    "index": 20,
+    "open": false,
+    "title": null,
+    "minutes": 52,
+    "entries": [
+      {
+        "slot": "vpullHeavy",
+        "exId": "db-pullover",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 20,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 20,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 20,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 20,
+            "r": 8,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "vpush2",
+        "exId": "standing-landmine",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 10,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 10,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 10,
+            "r": 10,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "glute",
+        "exId": "pull-through",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 40,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 40,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 45,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "triceps",
+        "exId": "skullcrusher",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 0,
+            "r": 14,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 14,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "biceps",
+        "exId": "cable-curl",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 30,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 11,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "finisher",
+        "exId": "bb-complex",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 0,
+            "r": 4,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 4,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 4,
+            "done": true
+          }
+        ],
+        "pending": []
+      }
+    ],
+    "effort": 7
+  },
+  {
+    "date": "2026-09-05T22:04:28.823Z",
+    "day": "2026-09-05",
+    "tz": "America/Los_Angeles",
+    "key": "A",
+    "index": 21,
+    "open": false,
+    "title": null,
+    "minutes": 42,
+    "entries": [
+      {
+        "slot": "squat",
+        "exId": "paused-squat",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 35,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 35,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 35,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 35,
+            "r": 8,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "bench",
+        "exId": "floor-press",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 30,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 10,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "vpull",
+        "exId": "neutral-chin",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 0,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 8,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "rdl",
+        "exId": "sl-rdl",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 25,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 25,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 25,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "antirot",
+        "exId": "landmine-rainbow",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 5,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 5,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 5,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": []
+      }
+    ],
+    "effort": 7
+  },
+  {
+    "date": "2026-09-06T16:15:24.008Z",
+    "day": "2026-09-06",
+    "tz": "America/Los_Angeles",
+    "key": "B",
+    "index": 22,
+    "open": false,
+    "title": null,
+    "minutes": 41,
+    "entries": [
+      {
+        "slot": "deadlift",
+        "exId": "deficit-deadlift",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 55,
+            "r": 6,
+            "done": true
+          },
+          {
+            "w": 55,
+            "r": 6,
+            "done": true
+          },
+          {
+            "w": 55,
+            "r": 6,
+            "done": true
+          }
+        ],
+        "pending": [
+          {
+            "w": 55,
+            "r": 6
+          }
+        ]
+      },
+      {
+        "slot": "press",
+        "exId": "arnold",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 30,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 8,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "hrow",
+        "exId": "seated-cable-row",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 60,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 60,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 60,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "unilateral",
+        "exId": "bstance-rdl",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 35,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 35,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 35,
+            "r": 10,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "antiext",
+        "exId": "deadbug",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 25,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 25,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 25,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": []
+      }
+    ],
+    "effort": 6
+  },
+  {
+    "date": "2026-09-08T19:20:56.462Z",
+    "day": "2026-09-08",
+    "tz": "America/Los_Angeles",
+    "key": "C",
+    "index": 23,
+    "open": false,
+    "title": null,
+    "minutes": 38,
+    "entries": [
+      {
+        "slot": "vpullHeavy",
+        "exId": "db-pullover",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 25,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 25,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 25,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 25,
+            "r": 8,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "vpush2",
+        "exId": "standing-landmine",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 15,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 15,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 15,
+            "r": 10,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "glute",
+        "exId": "pull-through",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 50,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 50,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 50,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "triceps",
+        "exId": "skullcrusher",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 5,
+            "r": 14,
+            "done": true
+          },
+          {
+            "w": 5,
+            "r": 5,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "biceps",
+        "exId": "cable-curl",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 30,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "finisher",
+        "exId": "bb-complex",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 0,
+            "r": 4,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 4,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 4,
+            "done": true
+          }
+        ],
+        "pending": []
+      }
+    ],
+    "effort": 6
+  },
+  {
+    "date": "2026-09-09T20:06:20.562Z",
+    "day": "2026-09-09",
+    "tz": "America/Los_Angeles",
+    "key": "A",
+    "index": 24,
+    "open": false,
+    "title": null,
+    "minutes": 74,
+    "entries": [
+      {
+        "slot": "squat",
+        "exId": "paused-squat",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 40,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 40,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 40,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 40,
+            "r": 8,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "bench",
+        "exId": "floor-press",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 35,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 35,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 35,
+            "r": 10,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "vpull",
+        "exId": "neutral-chin",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 0,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 8,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "rdl",
+        "exId": "sl-rdl",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 30,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "antirot",
+        "exId": "landmine-rainbow",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 10,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 10,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": [
+          {
+            "w": 10,
+            "r": 12
+          }
+        ]
+      }
+    ],
+    "effort": 7
+  },
+  {
+    "date": "2026-09-11T14:28:49.314Z",
+    "day": "2026-09-11",
+    "tz": "America/Los_Angeles",
+    "key": "B",
+    "index": 25,
+    "open": false,
+    "title": null,
+    "minutes": 47,
+    "entries": [
+      {
+        "slot": "deadlift",
+        "exId": "deficit-deadlift",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 55,
+            "r": 6,
+            "done": true
+          },
+          {
+            "w": 55,
+            "r": 6,
+            "done": true
+          },
+          {
+            "w": 55,
+            "r": 6,
+            "done": true
+          },
+          {
+            "w": 55,
+            "r": 6,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "press",
+        "exId": "arnold",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 35,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 35,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 35,
+            "r": 8,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "hrow",
+        "exId": "seated-cable-row",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 65,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 65,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 65,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "unilateral",
+        "exId": "bstance-rdl",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 40,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 40,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 40,
+            "r": 10,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "antiext",
+        "exId": "deadbug",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 27.5,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 27.5,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 27.5,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": []
+      }
+    ],
+    "effort": 7
+  },
+  {
+    "date": "2026-09-13T23:49:10.581Z",
+    "day": "2026-09-13",
+    "tz": "America/Los_Angeles",
+    "key": "C",
+    "index": 26,
+    "open": false,
+    "title": null,
+    "minutes": 55,
+    "entries": [
+      {
+        "slot": "vpullHeavy",
+        "exId": "db-pullover",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 30,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 8,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "vpush2",
+        "exId": "standing-landmine",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 20,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 20,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 20,
+            "r": 10,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "glute",
+        "exId": "pull-through",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 55,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 55,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 55,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "triceps",
+        "exId": "skullcrusher",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 5,
+            "r": 5,
+            "done": true
+          },
+          {
+            "w": 5,
+            "r": 5,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "biceps",
+        "exId": "cable-curl",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 30,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "finisher",
+        "exId": "bb-complex",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 5,
+            "r": 4,
+            "done": true
+          },
+          {
+            "w": 5,
+            "r": 4,
+            "done": true
+          },
+          {
+            "w": 5,
+            "r": 4,
+            "done": true
+          }
+        ],
+        "pending": []
+      }
+    ],
+    "effort": 7
+  },
+  {
+    "date": "2026-09-14T17:13:10.815Z",
+    "day": "2026-09-14",
+    "tz": "America/Los_Angeles",
+    "key": "A",
+    "index": 27,
+    "open": false,
+    "title": null,
+    "minutes": 27,
+    "entries": [
+      {
+        "slot": "squat",
+        "exId": "landmine-squat",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 25,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 25,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 25,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 25,
+            "r": 8,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "bench",
+        "exId": "weighted-pressup",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 0,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 10,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "vpull",
+        "exId": "sa-pulldown",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 20,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 10,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "rdl",
+        "exId": "landmine-rdl",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 25,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "antirot",
+        "exId": "suitcase-carry",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 35,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 35,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 35,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": []
+      }
+    ],
+    "effort": 5
+  },
+  {
+    "date": "2026-09-16T00:21:27.094Z",
+    "day": "2026-09-15",
+    "tz": "America/Los_Angeles",
+    "key": "B",
+    "index": 28,
+    "open": false,
+    "title": null,
+    "minutes": 37,
+    "entries": [
+      {
+        "slot": "deadlift",
+        "exId": "paused-deadlift",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 50,
+            "r": 6,
+            "done": true
+          },
+          {
+            "w": 50,
+            "r": 6,
+            "done": true
+          },
+          {
+            "w": 50,
+            "r": 6,
+            "done": true
+          },
+          {
+            "w": 50,
+            "r": 6,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "press",
+        "exId": "bb-ohp",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 10,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 10,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 10,
+            "r": 8,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "hrow",
+        "exId": "landmine-row",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 15,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 15,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 15,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "unilateral",
+        "exId": "sl-glute-bridge",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 30,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 10,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "antiext",
+        "exId": "hollow",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 0,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": [
+          {
+            "w": 0,
+            "r": 12
+          }
+        ]
+      }
+    ],
+    "effort": 6
+  },
+  {
+    "date": "2026-09-17T16:55:31.620Z",
+    "day": "2026-09-17",
+    "tz": "America/Los_Angeles",
+    "key": "C",
+    "index": 29,
+    "open": false,
+    "title": null,
+    "minutes": 51,
+    "entries": [
+      {
+        "slot": "vpullHeavy",
+        "exId": "eccentric-pullup",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 0,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 8,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "vpush2",
+        "exId": "sa-db-press",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 20,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 20,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 20,
+            "r": 10,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "glute",
+        "exId": "bridge-march",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 20,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 20,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": [
+          {
+            "w": 20,
+            "r": 12
+          }
+        ]
+      },
+      {
+        "slot": "triceps",
+        "exId": "close-grip",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 30,
+            "r": 14,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 14,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "biceps",
+        "exId": "bb-curl",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 0,
+            "r": 14,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 14,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "finisher",
+        "exId": "landmine-rot-press",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 15,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 15,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 15,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": []
+      }
+    ],
+    "effort": 7
+  },
+  {
+    "date": "2026-09-20T00:04:43.984Z",
+    "day": "2026-09-19",
+    "tz": "America/Los_Angeles",
+    "key": "A",
+    "index": 30,
+    "open": false,
+    "title": null,
+    "minutes": 36,
+    "entries": [
+      {
+        "slot": "squat",
+        "exId": "landmine-squat",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 30,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 8,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "bench",
+        "exId": "weighted-pressup",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 0,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 10,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "vpull",
+        "exId": "sa-pulldown",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 32.5,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 32.5,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 32.5,
+            "r": 10,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "rdl",
+        "exId": "landmine-rdl",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 35,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 35,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 35,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "antirot",
+        "exId": "suitcase-carry",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 40,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 40,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 40,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": []
+      }
+    ],
+    "effort": 5
+  },
+  {
+    "date": "2026-09-21T02:42:49.538Z",
+    "day": "2026-09-20",
+    "tz": "America/Los_Angeles",
+    "key": "B",
+    "index": 31,
+    "open": false,
+    "title": null,
+    "minutes": 29,
+    "entries": [
+      {
+        "slot": "deadlift",
+        "exId": "paused-deadlift",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 55,
+            "r": 6,
+            "done": true
+          },
+          {
+            "w": 55,
+            "r": 6,
+            "done": true
+          },
+          {
+            "w": 55,
+            "r": 6,
+            "done": true
+          }
+        ],
+        "pending": [
+          {
+            "w": 55,
+            "r": 6
+          }
+        ]
+      },
+      {
+        "slot": "press",
+        "exId": "bb-ohp",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 10,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 10,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 10,
+            "r": 8,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "hrow",
+        "exId": "landmine-row",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 20,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 20,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 20,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "unilateral",
+        "exId": "sl-glute-bridge",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 30,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 10,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "antiext",
+        "exId": "hollow",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 0,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": []
+      }
+    ],
+    "effort": 6
+  },
+  {
+    "date": "2026-09-21T22:19:40.229Z",
+    "day": "2026-09-21",
+    "tz": "America/Los_Angeles",
+    "key": "C",
+    "index": 32,
+    "open": false,
+    "title": null,
+    "minutes": 54,
+    "entries": [
+      {
+        "slot": "vpullHeavy",
+        "exId": "eccentric-pullup",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 0,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 6,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "vpush2",
+        "exId": "sa-db-press",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 25,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 25,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 25,
+            "r": 10,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "glute",
+        "exId": "bridge-march",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 20,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 20,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 20,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "triceps",
+        "exId": "close-grip",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 35,
+            "r": 14,
+            "done": true
+          },
+          {
+            "w": 35,
+            "r": 14,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "biceps",
+        "exId": "bb-curl",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 5,
+            "r": 14,
+            "done": true
+          }
+        ],
+        "pending": [
+          {
+            "w": 5,
+            "r": 14
+          }
+        ]
+      },
+      {
+        "slot": "finisher",
+        "exId": "landmine-rot-press",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 20,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 20,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 20,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": []
+      }
+    ],
+    "effort": 7
+  },
+  {
+    "date": "2026-09-24T03:46:59.637Z",
+    "day": "2026-09-23",
+    "tz": "America/Los_Angeles",
+    "key": "A",
+    "index": 33,
+    "open": false,
+    "title": null,
+    "minutes": 43,
+    "entries": [
+      {
+        "slot": "squat",
+        "exId": "landmine-squat",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 35,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 35,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 35,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 35,
+            "r": 8,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "bench",
+        "exId": "weighted-pressup",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 0,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 10,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "vpull",
+        "exId": "sa-pulldown",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 35,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 35,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 35,
+            "r": 10,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "rdl",
+        "exId": "landmine-rdl",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 40,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 40,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": [
+          {
+            "w": 40,
+            "r": 12
+          }
+        ]
+      },
+      {
+        "slot": "antirot",
+        "exId": "suitcase-carry",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 40,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 40,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 40,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": []
+      }
+    ],
+    "effort": 6
+  },
+  {
+    "date": "2026-09-25T14:39:23.580Z",
+    "day": "2026-09-25",
+    "tz": "America/Los_Angeles",
+    "key": "B",
+    "index": 34,
+    "open": false,
+    "title": null,
+    "minutes": 78,
+    "entries": [
+      {
+        "slot": "deadlift",
+        "exId": "paused-deadlift",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 55,
+            "r": 6,
+            "done": true
+          },
+          {
+            "w": 55,
+            "r": 6,
+            "done": true
+          },
+          {
+            "w": 55,
+            "r": 6,
+            "done": true
+          },
+          {
+            "w": 55,
+            "r": 6,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "press",
+        "exId": "bb-ohp",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 15,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 15,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 15,
+            "r": 8,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "hrow",
+        "exId": "landmine-row",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 25,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 25,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 25,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "unilateral",
+        "exId": "sl-glute-bridge",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 35,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 35,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 35,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "antiext",
+        "exId": "hollow",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 0,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": []
+      }
+    ],
+    "effort": 6
+  },
+  {
+    "date": "2026-09-26T18:19:45.840Z",
+    "day": "2026-09-26",
+    "tz": "America/Los_Angeles",
+    "key": "C",
+    "index": 35,
+    "open": false,
+    "title": null,
+    "minutes": 46,
+    "entries": [
+      {
+        "slot": "vpullHeavy",
+        "exId": "eccentric-pullup",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 0,
+            "r": 6,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 6,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 6,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 6,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "vpush2",
+        "exId": "sa-db-press",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 30,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 10,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "glute",
+        "exId": "bridge-march",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 25,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 25,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 25,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "triceps",
+        "exId": "close-grip",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 40,
+            "r": 14,
+            "done": true
+          },
+          {
+            "w": 40,
+            "r": 14,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "biceps",
+        "exId": "bb-curl",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 5,
+            "r": 14,
+            "done": true
+          },
+          {
+            "w": 5,
+            "r": 14,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "finisher",
+        "exId": "landmine-rot-press",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 25,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 25,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 25,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": []
+      }
+    ],
+    "effort": 8
+  },
+  {
+    "date": "2026-09-27T17:42:49.007Z",
+    "day": "2026-09-27",
+    "tz": "America/Los_Angeles",
+    "key": "A",
+    "index": 36,
+    "open": false,
+    "title": null,
+    "minutes": 49,
+    "entries": [
+      {
+        "slot": "squat",
+        "exId": "back-squat",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 60,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 60,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 60,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 60,
+            "r": 8,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "bench",
+        "exId": "bb-bench",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 65,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 65,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 65,
+            "r": 10,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "vpull",
+        "exId": "pullup",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 0,
+            "r": 5,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 5,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 5,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "rdl",
+        "exId": "bb-rdl",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 65,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 65,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 65,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "antirot",
+        "exId": "renegade-row",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 20,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 20,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 20,
+            "r": 8,
+            "done": true
+          }
+        ],
+        "pending": []
+      }
+    ],
+    "effort": 7
+  },
+  {
+    "date": "2026-09-30T00:27:46.126Z",
+    "day": "2026-09-29",
+    "tz": "America/Los_Angeles",
+    "key": "B",
+    "index": 37,
+    "open": false,
+    "title": null,
+    "minutes": 40,
+    "entries": [
+      {
+        "slot": "deadlift",
+        "exId": "conv-deadlift",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 70,
+            "r": 6,
+            "done": true
+          },
+          {
+            "w": 70,
+            "r": 6,
+            "done": true
+          },
+          {
+            "w": 70,
+            "r": 6,
+            "done": true
+          },
+          {
+            "w": 70,
+            "r": 6,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "press",
+        "exId": "db-shoulder",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 35,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 35,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 35,
+            "r": 8,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "hrow",
+        "exId": "bb-row",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 45,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 45,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 45,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "unilateral",
+        "exId": "low-step-up",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 30,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 30,
+            "r": 10,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "antiext",
+        "exId": "hanging-knee",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 0,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": []
+      }
+    ],
+    "effort": 7
+  },
+  {
+    "date": "2026-09-30T15:30:09.978Z",
+    "day": "2026-09-30",
+    "tz": "America/Los_Angeles",
+    "key": "C",
+    "index": 38,
+    "open": false,
+    "title": null,
+    "minutes": 53,
+    "entries": [
+      {
+        "slot": "vpullHeavy",
+        "exId": "archer-pullup",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 0,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 8,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "vpush2",
+        "exId": "incline-bb",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 40,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 40,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 40,
+            "r": 10,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "glute",
+        "exId": "hip-thrust",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 40,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 40,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 40,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "triceps",
+        "exId": "pushdown",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 32.5,
+            "r": 14,
+            "done": true
+          },
+          {
+            "w": 32.5,
+            "r": 14,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "biceps",
+        "exId": "db-curl",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 35,
+            "r": 14,
+            "done": true
+          },
+          {
+            "w": 35,
+            "r": 14,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "finisher",
+        "exId": "farmers",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 35,
+            "r": 20,
+            "done": true
+          },
+          {
+            "w": 35,
+            "r": 20,
+            "done": true
+          },
+          {
+            "w": 35,
+            "r": 20,
+            "done": true
+          }
+        ],
+        "pending": []
+      }
+    ],
+    "effort": 7
+  },
+  {
+    "date": "2026-10-02T23:28:57.838Z",
+    "day": "2026-10-02",
+    "tz": "America/Los_Angeles",
+    "key": "A",
+    "index": 39,
+    "open": false,
+    "title": null,
+    "minutes": 53,
+    "entries": [
+      {
+        "slot": "squat",
+        "exId": "back-squat",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 70,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 70,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 70,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 70,
+            "r": 8,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "bench",
+        "exId": "bb-bench",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 70,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 70,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 70,
+            "r": 10,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "vpull",
+        "exId": "pullup",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 0,
+            "r": 5,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 5,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 5,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "rdl",
+        "exId": "bb-rdl",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 70,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 70,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 70,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "antirot",
+        "exId": "renegade-row",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 20,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 20,
+            "r": 8,
+            "done": true
+          },
+          {
+            "w": 20,
+            "r": 8,
+            "done": true
+          }
+        ],
+        "pending": []
+      }
+    ],
+    "effort": 7
+  },
+  {
+    "date": "2026-10-04T20:07:29.767Z",
+    "day": "2026-10-04",
+    "tz": "America/Los_Angeles",
+    "key": "B",
+    "index": 40,
+    "open": false,
+    "title": null,
+    "minutes": 36,
+    "entries": [
+      {
+        "slot": "deadlift",
+        "exId": "conv-deadlift",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 80,
+            "r": 6,
+            "done": true
+          },
+          {
+            "w": 80,
+            "r": 6,
+            "done": true
+          },
+          {
+            "w": 80,
+            "r": 6,
+            "done": true
+          },
+          {
+            "w": 80,
+            "r": 6,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "press",
+        "exId": "db-shoulder",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 40,
+            "r": 6,
+            "done": true
+          },
+          {
+            "w": 40,
+            "r": 6,
+            "done": true
+          },
+          {
+            "w": 40,
+            "r": 6,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "hrow",
+        "exId": "bb-row",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 50,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 50,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 50,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "unilateral",
+        "exId": "low-step-up",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 35,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 35,
+            "r": 10,
+            "done": true
+          }
+        ],
+        "pending": [
+          {
+            "w": 35,
+            "r": 10
+          }
+        ]
+      },
+      {
+        "slot": "antiext",
+        "exId": "hanging-knee",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 0,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": []
+      }
+    ],
+    "effort": 7
+  },
+  {
+    "date": "2026-10-06T05:47:03.776Z",
+    "day": "2026-10-05",
+    "tz": "America/Los_Angeles",
+    "key": "C",
+    "index": 41,
+    "open": false,
+    "title": null,
+    "minutes": 38,
+    "entries": [
+      {
+        "slot": "vpullHeavy",
+        "exId": "archer-pullup",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 0,
+            "r": 6,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 6,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 6,
+            "done": true
+          },
+          {
+            "w": 0,
+            "r": 3,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "vpush2",
+        "exId": "incline-bb",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 45,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 45,
+            "r": 10,
+            "done": true
+          },
+          {
+            "w": 45,
+            "r": 10,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "glute",
+        "exId": "hip-thrust",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 50,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 50,
+            "r": 12,
+            "done": true
+          },
+          {
+            "w": 50,
+            "r": 12,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "biceps",
+        "exId": "db-curl",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 40,
+            "r": 14,
+            "done": true
+          },
+          {
+            "w": 40,
+            "r": 10,
+            "done": true
+          }
+        ],
+        "pending": []
+      },
+      {
+        "slot": "finisher",
+        "exId": "farmers",
+        "track": "load",
+        "profile": "strength",
+        "extra": false,
+        "meta": {},
+        "sets": [
+          {
+            "w": 40,
+            "r": 20,
+            "done": true
+          },
+          {
+            "w": 40,
+            "r": 20,
+            "done": true
+          },
+          {
+            "w": 40,
+            "r": 20,
+            "done": true
+          }
+        ],
+        "pending": []
+      }
+    ],
+    "effort": 6
+  }
+]
