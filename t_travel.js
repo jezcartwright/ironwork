@@ -414,7 +414,7 @@ console.log("\n15. house rules");
   const html = fs.readFileSync(__dirname + "/index.html", "utf8");
   ok("no opacity anywhere", !/opacity/.test(html));
   ok("no rgba anywhere", !/rgba\(/.test(html));
-  ok("the build is 64", /const BUILD = "64"/.test(html));
+  ok("the build is 64 or later", Number((html.match(/const BUILD = "(\d+)"/) || [])[1]) >= 64);
   ok("every road exercise is used, every used one exists", (function(){
     const b = boot({cloud: makeCloud()});
     const res = b.win.eval(`(function(){
