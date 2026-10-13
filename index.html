@@ -84,6 +84,20 @@ button{cursor:pointer;border:0;background:none}
 .sync{font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--slate)}
 .sync.on{color:var(--green)}
 .sync.off{color:var(--orange-deep)}
+/* ---------- when the account cannot be reached ---------- */
+.offbar{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:var(--orange-pale);
+  color:var(--orange-deep);border:1px solid var(--orange);border-radius:3px;padding:11px 12px;margin:14px 0 0;
+  font-size:13px;line-height:1.45}
+.offbar b{display:block;color:var(--ink);font-size:14px}
+.offbar .chev-r{margin-left:auto;font-size:20px;color:var(--orange-deep)}
+.offbar:active{background:var(--paper)}
+.fixbox{background:var(--paper-2);border:1px solid var(--rule);border-radius:3px;padding:14px;margin:12px 0 0}
+.fixbox h3{font-family:var(--display);font-size:22px;font-weight:700;margin:0 0 6px;color:var(--ink)}
+.fixbox ol{margin:8px 0 0;padding-left:20px;font-size:13px;line-height:1.55;color:var(--iron-3)}
+.fixbox li{margin-bottom:6px}
+.fixbox pre{background:var(--iron);color:var(--paper);font:12px/1.5 var(--mono);padding:10px 12px;border-radius:2px;
+  margin:10px 0;white-space:pre;overflow-x:auto}
+.fixbox a{color:var(--orange-deep);font-weight:600}
 
 /* ---------- masthead ---------- */
 .masthead{
@@ -1400,7 +1414,7 @@ function diagram(exId){
 /* ============================================================
    STATE
    ============================================================ */
-const BUILD = "64";
+const BUILD = "65";
 /* the masthead and Setup show this as v3.4 — one number, formatted on the way out */
 const VERSION = (function(){ const n = String(BUILD).padStart(2, "0");
   return "v" + n.slice(0, -1) + "." + n.slice(-1); })();
@@ -3193,7 +3207,7 @@ function viewHome(){
   }
 
   let html = storageWarn() +
-    '<div class="panel"><div class="pad">' + kitSwitch();
+    '<div class="panel"><div class="pad">' + kitSwitch() + offlineBar();
   if(kit !== "home"){
     html += roadCard() + '</div></div>';
   }else html +=
@@ -4469,6 +4483,84 @@ function viewLibrary(){
   return html;
 }
 
+
+/* ------------------------------------------------------------------
+   When the account refuses Ironwork
+
+   "permission-denied" never means the phone is offline. It means the
+   Firestore rules for the shared Firebase project have lost Ironwork's
+   block — Progress Tracker's rules get rebuilt from time to time, and if
+   the copy they are rebuilt from predates the block, Ironwork is locked
+   out on every device the moment they are published. Nothing on the phone
+   can override the rules, so the app says exactly what is wrong and hands
+   over the fix: the block to paste, where to paste it, and a button that
+   reconnects the moment it is published.
+   ------------------------------------------------------------------ */
+const RULES_BLOCK =
+  "match /ironwork/{ironUid} {\n" +
+  "  allow read, write:\n" +
+  "    if signedIn() && ironUid == uid();\n" +
+  "}";
+const RULES_URL = "https://console.firebase.google.com/project/performance-tracker-7415e/firestore/rules";
+function rulesRefused(){ return !cloudOK && /permission/i.test(lastCloudError || ""); }
+
+/* Reconnect now: forget every back-off, read the account, merge, restart the
+   listener (an error ends it for good), and send this device's copy up. The
+   growth-only guard in sendCloud still stands, so this can never shrink the
+   account. */
+let reconnecting = false;
+async function forceReconnect(){
+  if(!UID || !window.__cloud || reconnecting) return;
+  reconnecting = true; render();
+  lastResync = 0;
+  try{
+    await resyncCloud();
+    if(cloudOK){
+      startCloudWatch();
+      startHealing();
+      sendCloud();
+    }
+  }finally{
+    reconnecting = false; render();
+  }
+}
+
+function offlineBar(){
+  if(cloudOK || !UID) return "";
+  const refused = rulesRefused();
+  return '<button class="offbar" data-act="goFix">' +
+    '<span><b>' + (refused ? "Not syncing — your account is refusing Ironwork" : "Not syncing to your account") + '</b>' +
+    (refused ? "Everything is safe on this phone. Tap to fix it." : "Everything is safe on this phone. Tap to reconnect.") +
+    '</span><span class="chev-r">›</span></button>';
+}
+
+function fixPanel(){
+  if(cloudOK || !UID) return "";
+  const btn = '<button class="btn" data-act="reconnect"' + (reconnecting ? " disabled" : "") + '>' +
+    (reconnecting ? "Reconnecting…" : "Reconnect now") + '</button>';
+  if(!rulesRefused()){
+    return '<div class="fixbox"><h3>Not syncing</h3>' +
+      '<p class="lede" style="font-size:13px">Reason: ' + esc(lastCloudError || "no answer from your account") +
+      '. It retries on its own every 25 seconds. Reconnect now tries straight away, merges with your account and sends this phone’s sessions up.</p>' +
+      '<div style="height:10px"></div>' + btn + '</div>';
+  }
+  return '<div class="fixbox"><h3>Your account is refusing Ironwork</h3>' +
+    '<p class="lede" style="font-size:13px">Not a signal problem. The Firebase rules that Ironwork shares with Progress Tracker have lost Ironwork’s block, usually when Progress Tracker’s rules are republished from an older copy. Every session is safe on this phone and nothing is written until the account can be read again.</p>' +
+    '<ol>' +
+      '<li>Copy the block below.</li>' +
+      '<li>Open the Firebase rules page, signed in as jc@jezcartwright.com.</li>' +
+      '<li>Paste it on a new line just <b>above</b> <code>match /{document=**}</code> near the bottom, then press <b>Publish</b>.</li>' +
+      '<li>Come back and tap Reconnect now.</li>' +
+    '</ol>' +
+    '<pre>' + esc(RULES_BLOCK) + '</pre>' +
+    '<button class="btn btn-ghost" data-act="copyRules">Copy the block</button>' +
+    '<div style="height:8px"></div>' +
+    '<a class="btn btn-ghost" href="' + RULES_URL + '" target="_blank" rel="noopener" style="text-decoration:none">Open the Firebase rules page</a>' +
+    '<div style="height:8px"></div>' + btn +
+    '<p class="lede" style="margin:10px 0 0;font-size:11.5px">Then add the same block to <b>firestore.rules</b> in jezcartwright/performance-tracker, or the next rules publish from that repo takes it out again.</p>' +
+  '</div>';
+}
+
 /* ---------- settings ---------- */
 function syncLine(){
   if(!cloudOK) return "Offline — waiting to send to your account" +
@@ -4538,6 +4630,8 @@ function viewSettings(){
         '<button class="sync ' + (cloudOK ? "on" : "off") + '" data-act="cloudTest" ' +
           'title="Check the connection">' + (cloudOK ? "Online" : "Offline") + '</button>' +
       '</div>' +
+      fixPanel() +
+      '<div style="height:12px"></div>' +
       tallyLine() +
       '<p class="lede" style="margin-bottom:14px">' + countLine() + ' Every session is recorded against your account rather than this device, and this screen updates itself when you log something elsewhere. Sign in on any machine to carry on where you left off. With no signal it keeps working here and sends everything up as soon as you are back.</p>' +
       '<button class="btn btn-ghost" data-act="cloudTest">Check the connection</button>' +
@@ -5071,6 +5165,19 @@ function handleClick(e){
       }catch(e){}
       location.reload(true);
     })();
+    return;
+  }
+  if(act === "goFix"){
+    summaryRec = null; histIdx = null; histEx = null; histList = false; previewOpen = false; roadPreview = null;
+    tab = "settings"; render(); window.scrollTo(0, 0); return;
+  }
+  if(act === "reconnect"){ forceReconnect(); return; }
+  if(act === "copyRules"){
+    const done = ()=> alert("Copied. Paste it just above  match /{document=**}  and press Publish.");
+    try{
+      if(navigator.clipboard) navigator.clipboard.writeText(RULES_BLOCK).then(done, ()=> alert(RULES_BLOCK));
+      else alert(RULES_BLOCK);
+    }catch(e){ alert(RULES_BLOCK); }
     return;
   }
   if(act === "cloudTest"){
