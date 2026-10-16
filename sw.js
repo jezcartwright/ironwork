@@ -12,7 +12,7 @@
 
 const VERSION = "32";
 const SHELL   = "ironwork-shell-v" + VERSION;
-const ART     = "ironwork-art-v4";   /* bump this whenever a diagram is redrawn
+const ART     = "ironwork-art-v5";   /* bump this whenever a diagram is redrawn
                                         under an existing filename — the activate
                                         handler then clears the old cache on every
                                         device without anyone pressing anything */
