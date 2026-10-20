@@ -34,6 +34,8 @@
   --orange-pale:#FFE0C4;
   --green:#2F6E4A;
   --green-pale:#D3E4D8;
+  --red:#B3261E;
+  --red-pale:#F6DAD7;
   --ui:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
   --display:'Cormorant Garamond',Georgia,'Times New Roman',serif;
   --mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
@@ -358,6 +360,33 @@ h2.head{
 .rgb{height:36px;border-radius:3px;background:var(--green);color:#FFFFFF;border:0;font-family:var(--ui);
   display:flex;align-items:center;justify-content:center;gap:5px;font-size:12px;font-weight:600;padding:0}
 .rgb.none{background:var(--paper-3);color:var(--slate)}
+.rgb.sick{background:var(--red);color:#FFFFFF}
+.rbx .sk{display:block;background:var(--red);color:#FFFFFF;font-family:var(--mono);font-size:8px;font-weight:400;
+  padding:1px 5px;border-radius:2px;margin-top:1px;line-height:1.3}
+.redtxt{color:var(--red)}
+/* ---------- sick days ---------- */
+.sick-tile{display:flex;align-items:center;gap:12px;width:100%;text-align:left;margin-top:10px;
+  border:2px solid var(--rule);border-radius:14px;padding:14px;color:var(--red)}
+.sick-tile b{display:block;font-size:16px;font-weight:600;line-height:1.2;color:var(--red)}
+.sick-tile span span{font-size:12px;color:var(--red);line-height:1.45;display:block;margin-top:2px}
+.sick-ico{width:40px;height:40px;flex:0 0 40px;border-radius:11px;background:var(--red-pale);
+  color:var(--red);display:flex;align-items:center;justify-content:center}
+.sick-tile:active{background:var(--red-pale)}
+.sickpick{border:2px solid var(--red);border-radius:14px;padding:14px;margin-top:10px}
+.sickpick p{margin:0 0 10px;font-size:14px;font-weight:600;color:var(--red)}
+.sickpick .row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.sickpick .row button{padding:12px 6px;border:1px solid var(--red);border-radius:2px;color:var(--red);font-weight:600;font-size:14px;background:var(--paper)}
+.sickpick .row button:active{background:var(--red-pale)}
+.sickpick label{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--slate);margin:12px 0 6px}
+.sickpick .dated{display:flex;gap:8px}
+.sickpick input[type=date]{flex:1;min-width:0;padding:10px;border:1px solid var(--rule);border-radius:2px;background:var(--paper);font-size:14px;color:var(--ink)}
+.sickpick .dated button{padding:10px 14px;border-radius:2px;background:var(--red);color:#FFFFFF;font-weight:600;font-size:14px}
+.sickblock{background:var(--red-pale);border-radius:11px;padding:14px;margin:12px 0 0;display:flex;gap:12px;align-items:flex-start}
+.sickblock .sick-ico{width:36px;height:36px;flex:0 0 36px;border-radius:10px;background:var(--red);color:#FFFFFF}
+.sickblock b{display:block;font-size:15px;color:var(--red)}
+.sickblock span span{display:block;font-size:13px;color:var(--iron-3);line-height:1.5;margin-top:2px}
+.sickblock .undo{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--red);
+  border-bottom:1px solid var(--red);padding:2px 0;margin:8px 12px 0 0;display:inline-block}
 .rkey{display:flex;gap:12px;margin-top:12px;font-size:10.5px;color:var(--slate);align-items:center;flex-wrap:wrap}
 .rkey i{width:9px;height:9px;border-radius:2px;display:inline-block;margin-right:4px;vertical-align:-1px}
 .histrow.inblock{background:var(--green-pale)}
@@ -1030,13 +1059,52 @@ function roadNextKey(){
   return sessionAt(S.sessionIndex).key;
 }
 
+
+/* ------------------------------------------------------------------
+   SICK DAYS
+
+   A sick day rests that day and the next: the next session falls due two
+   days after it, and everything after that moves with it. Being ill never
+   makes the next session lighter, and a gap you were too ill to train
+   through is not late.
+   ------------------------------------------------------------------ */
+function sickDays(){ return (S.sick || []).filter(x => !x.off).map(x => x.day).sort(); }
+function isSick(day){ return sickDays().includes(day); }
+/* sick days since the last session actually trained, home or road */
+function sickSinceTrained(){
+  const lt = lastTrained();
+  const from = lt ? recDay(lt) : "";
+  return sickDays().filter(d => d > from);
+}
+function logSick(day){
+  if(!day || !/^\d{4}-\d{2}-\d{2}$/.test(day) || day > dayKey(new Date())) return false;
+  S.sick = (S.sick || []).filter(x => x.day !== day);
+  S.sick.push({day: day, at: Date.now()});
+  S.sick.sort((a, b)=> a.day < b.day ? -1 : 1);
+  save(true); render();
+  return true;
+}
+function unSick(day){
+  S.sick = (S.sick || []).filter(x => x.day !== day);
+  S.sick.push({day: day, at: Date.now(), off: true});
+  S.sick.sort((a, b)=> a.day < b.day ? -1 : 1);
+  save(true); render();
+}
+function plusDays(key, n){ const d = keyDate(key); d.setDate(d.getDate() + n); return dayKey(d); }
+function niceDay(key){
+  return keyDate(key).toLocaleDateString("en-US", {weekday:"short", month:"short", day:"numeric"});
+}
+let sickOpen = false;
+
 /* Back to the barbell after a week or more away from it: the barbell lifts in
    that first home session are suggested at 90%, and that session is not used
    as the basis for the next one, so full loads return the time after. */
 const RAMP_DAYS = 7;
 function rampDue(){
   const lh = lastHome();
-  return !!lh && daysSinceKey(recDay(lh)) >= RAMP_DAYS;
+  if(!lh || daysSinceKey(recDay(lh)) < RAMP_DAYS) return false;
+  /* time off being ill is not time to ease back from */
+  return !sickDays().some(d => d > recDay(lh));
 }
 
 /* which kit this device is training with. Not saved: the app opens on the
@@ -1448,7 +1516,7 @@ function diagram(exId){
 /* ============================================================
    STATE
    ============================================================ */
-const BUILD = "66";
+const BUILD = "67";
 /* the masthead and Setup show this as v3.4 — one number, formatted on the way out */
 const VERSION = (function(){ const n = String(BUILD).padStart(2, "0");
   return "v" + n.slice(0, -1) + "." + n.slice(-1); })();
@@ -1463,6 +1531,7 @@ function blankState(){
     v:1, units:"kg", bar:20, figure:"m", courses:[],
     sessionIndex:0,
     roadIndex:0,       // road sessions logged — a counter of their own
+    sick:[],           // {day, at, off?} — days too ill to train
     nudge:{},          // slotId -> manual variant offset
     custom:[],         // exercises you have added yourself
     history:[],        // completed sessions
@@ -1545,6 +1614,18 @@ function mergeHistories(a, b){
   return out;
 }
 
+/* Sick days unite by day. An Undo is kept as {off:true} with a later time,
+   so another device's older copy cannot bring an undone day back. */
+function mergeSick(a, b){
+  const by = {};
+  (a || []).concat(b || []).forEach(x=>{
+    if(!x || typeof x.day !== "string") return;
+    const cur = by[x.day];
+    if(!cur || (x.at || 0) > (cur.at || 0)) by[x.day] = x;
+  });
+  return Object.keys(by).sort().map(k => by[k]);
+}
+
 function mergeLists(a, b, key){
   const out = [], seen = {};
   (a || []).concat(b || []).forEach(x=>{
@@ -1576,6 +1657,7 @@ function mergeStates(local, cloud){
   out.custom  = mergeLists(local.custom, cloud.custom, "id");
   out.courses = mergeLists(local.courses, cloud.courses, "name");
   out.nudge   = Object.assign({}, older.nudge || {}, newer.nudge || {});
+  out.sick    = mergeSick(local.sick, cloud.sick);
   out.updatedAt = Math.max(local.updatedAt || 0, cloud.updatedAt || 0);
 
   /* One copy may have finished a session the other still has on the bench. The
@@ -1620,7 +1702,8 @@ function stateFingerprint(s){
   return (s.history || []).map(h => sessionId(h) + "/" + logged(h)).join(",") + " #" + live +
     " " + (s.units || "") + "/" + (s.bar || "") + "/" + (s.figure || "") +
     " r" + (s.rest ? s.rest.endsAt : "-") + " i" + (s.sessionIndex || 0) + " t" + (s.roadIndex || 0) +
-    " c" + (s.custom || []).length + " k" + (s.courses || []).length;
+    " c" + (s.custom || []).length + " k" + (s.courses || []).length +
+    " s" + (s.sick || []).filter(x => !x.off).map(x => x.day).join("|");
 }
 
 /* kept for callers that predate the merge */
@@ -2458,7 +2541,8 @@ function renderView(){
   /* nothing can be drawn before the state exists, and every caller is async */
   if(!S) return;
   document.getElementById("mastSub").textContent =
-    (!cloudOK ? "Offline" : S.current ? "Session in progress" : "Session " + (S.sessionIndex + 1)) +
+    (!cloudOK ? "Offline" : S.current ? "Session in progress"
+      : (sickDays().includes(dayKey(new Date())) ? "Sick day" : "Session " + (S.sessionIndex + 1))) +
     "  ·  " + VERSION;
   document.querySelectorAll(".nav button").forEach(b=>{
     b.classList.toggle("on", b.dataset.tab === tab);
@@ -2575,6 +2659,9 @@ function blockStartDay(i){
 function blockAlongside(i){
   const from = blockStartDay(i);
   const groups = {};
+  /* sick days are a tile of their own, in red */
+  const ill = sickDays().filter(d => d >= from).length;
+  if(ill) groups["sick"] = {exId:"sick", name:"Sick", n:ill, rounds:[], sick:true};
   /* road sessions are one tile between them, whichever kit */
   S.history.forEach(h=>{
     if(!isRoad(h) || recDay(h) < from) return;
@@ -2634,6 +2721,8 @@ function dueDay(n){
   }
   const today = dayKey(new Date());
   if(today > start) start = today;
+  /* a sick day rests that day and the next */
+  sickSinceTrained().forEach(d=>{ const r = plusDays(d, 2); if(r > start) start = r; });
   const out = keyDate(start); out.setDate(out.getDate() + (n - S.sessionIndex) * 2);
   return dayKey(out);
 }
@@ -2642,12 +2731,19 @@ function dueDay(n){
    rhythm going — no stretch of more than two days without training — the
    gap was trained through, not missed, and the count is returned. */
 function roadBridge(fromKey, toKey){
-  const days = S.history.filter(h => isRoad(h) && recDay(h) > fromKey && recDay(h) < toKey)
-    .map(h => recDay(h)).sort();
-  if(!days.length) return 0;
+  return gapBridge(fromKey, toKey).road;
+}
+/* What filled a gap between two home sessions: road sessions kept the
+   rhythm going, sick days excused it. Covered when no stretch is longer than
+   two days — a sick day is followed by its rest day, so it covers two. */
+function gapBridge(fromKey, toKey){
+  const road = S.history.filter(h => isRoad(h) && recDay(h) > fromKey && recDay(h) < toKey).map(h => recDay(h));
+  const sick = sickDays().filter(d => d > fromKey && d < toKey);
+  const days = road.concat(sick).sort();
+  if(!days.length) return {road:0, sick:0};
   const chain = [fromKey].concat(days, [toKey]);
-  for(let k = 1; k < chain.length; k++) if(dayGap(chain[k - 1], chain[k]) > 2) return 0;
-  return days.length;
+  for(let k = 1; k < chain.length; k++) if(dayGap(chain[k - 1], chain[k]) > 2) return {road:0, sick:0};
+  return {road: road.length, sick: sick.length};
 }
 
 function shortDate(key){
@@ -3091,6 +3187,47 @@ function viewPreview(){
 
 /* ---------- home ---------- */
 
+
+/* the tile, and once tapped, the choice of day */
+function sickTile(sess){
+  const today = dayKey(new Date()), yest = plusDays(today, -1);
+  if(!sickOpen){
+    return '<button class="sick-tile" data-act="sickOpen">' +
+      '<span class="sick-ico">' + icon("sick", 21) + '</span>' +
+      '<span style="min-width:0"><b>Sick day</b>' +
+      '<span>Not well enough to train. Rest that day and the next — ' + esc(sess.title) + ' moves with you, nothing else changes.</span></span>' +
+    '</button>';
+  }
+  return '<div class="sickpick">' +
+    '<p>Which day were you ill?</p>' +
+    '<div class="row">' +
+      '<button data-act="sickLog:' + today + '"' + (isSick(today) ? ' disabled' : '') + '>Today</button>' +
+      '<button data-act="sickLog:' + yest + '"' + (isSick(yest) ? ' disabled' : '') + '>Yesterday</button>' +
+    '</div>' +
+    '<label for="sickDate">Another day</label>' +
+    '<div class="dated"><input type="date" id="sickDate" max="' + today + '" value="' + plusDays(today, -2) + '">' +
+      '<button data-act="sickLog:pick">Log it</button></div>' +
+    '<div style="height:10px"></div>' +
+    '<button class="btn btn-ghost" data-act="sickClose">Cancel</button>' +
+  '</div>';
+}
+
+/* sick since the last session: what it did, and the way back out */
+function sickBlock(sess){
+  const ill = sickSinceTrained();
+  if(!ill.length) return "";
+  const due = dueDay(S.sessionIndex);
+  const head = ill.length === 1 ? "Sick day logged · " + niceDay(ill[0])
+    : ill.length + " sick days logged · " + niceDay(ill[0]) + " – " + niceDay(ill[ill.length - 1]);
+  return '<div class="sickblock">' +
+    '<span class="sick-ico">' + icon("sick", 20) + '</span>' +
+    '<span style="min-width:0"><b>' + esc(head) + '</b>' +
+      '<span>Rest up. ' + esc(sess.title) + ' is now due <b style="display:inline;font-size:13px;color:var(--ink)">' +
+        esc(niceDay(due)) + '</b>, and everything after it moves with it. Loads, variations and the rotation are untouched.</span>' +
+      ill.map(d => '<button class="undo" data-act="unsick:' + d + '">Undo ' + esc(niceDay(d)) + '</button>').join("") +
+    '</span></div>';
+}
+
 /* the four places to train. The home gym is where the app always opens. */
 function kitSwitch(){
   const opts = [["home","Home gym","full kit"]].concat(ROAD_KITS.map(k => [k.id, k.label, k.sub]));
@@ -3137,7 +3274,7 @@ function roadCard(){
     '<p class="contents">' + esc(names.join(" · ")) + '</p>' +
     '<p class="eyebrow" style="margin-top:11px">' + estimateMinutes(sess) + ' min · ' + sets + ' sets · ' +
       (kit === "db" ? "loads tracked separately from home" : "reps only") + '</p>' +
-    '<div style="margin-top:16px"><button class="btn" data-act="start">Start ' + esc(sess.title) + ' · ' + esc(k.tag) + '</button></div>' +
+    '<div style="margin-top:16px"><button class="btn' + (isSick(dayKey(new Date())) ? ' btn-quiet' : '') + '" data-act="start">Start ' + esc(sess.title) + ' · ' + esc(k.tag) + (isSick(dayKey(new Date())) ? ' anyway' : '') + '</button></div>' +
     '<div style="height:9px"></div>' +
     '<button class="btn btn-ghost" data-act="rprev:' + nextKey + '">See next session ›</button>';
 }
@@ -3196,6 +3333,8 @@ function viewHome(){
   const days = last ? daysSinceKey(recDay(last)) : null;
   const onRoad = isRoad(last);
   const ramp = rampDue() && !isDeload(i);
+  const ill = sickSinceTrained();
+  const sickToday = isSick(dayKey(new Date()));
   const totalSets = S.history.reduce((n,h)=> n + h.entries.reduce((m,e)=> m + e.sets.length, 0), 0);
   const totalMins = S.history.reduce((n,h)=> n + (h.minutes || 0), 0);
   const totalVol = S.history.reduce((n,h)=> n + h.entries.reduce((m,e)=>
@@ -3205,6 +3344,7 @@ function viewHome(){
     ? "First session. Start light enough that the last set still looks like the first."
     : days === 0 ? "You trained today" + (onRoad ? ", on the road" : "") + ". Rest is where the adaptation happens — come back tomorrow."
     : days === 1 ? "You trained yesterday" + (onRoad ? ", on the road" : "") + ". This is the rhythm."
+    : ill.length ? "Last trained " + days + " days ago. Train at your usual loads when you are well."
     : days >= 4 ? (ramp && kit === "home"
         ? "It has been " + days + " days. Barbell loads are already at 90% — take the same off the rest."
         : "It has been " + days + " days. Take 10% off the suggested loads and rebuild from there.")
@@ -3250,7 +3390,7 @@ function viewHome(){
   }
 
   let html = storageWarn() +
-    '<div class="panel"><div class="pad">' + kitSwitch() + offlineBar();
+    '<div class="panel"><div class="pad">' + kitSwitch() + offlineBar() + sickBlock(sess);
   if(kit !== "home"){
     html += roadCard() + '</div></div>';
   }else html +=
@@ -3264,7 +3404,7 @@ function viewHome(){
       (isDeload(i) ? '<div class="warn">Deload session. Loads drop to 85% — speed and quality, not strain.</div>' : '') +
       '<p class="eyebrow" style="margin-top:11px">' + estimateMinutes(sess) + ' min · ' +
         sess.blocks.reduce((n,b)=> n + b.items.length * b.items[0].sets, 0) + ' sets · ' + esc(readiness.replace(/\.$/, "")) + '</p>' +
-      '<div style="margin-top:16px"><button class="btn" data-act="start">Start ' + esc(sess.title) + '</button></div>' +
+      '<div style="margin-top:16px"><button class="btn' + (sickToday ? ' btn-quiet' : '') + '" data-act="start">Start ' + esc(sess.title) + (sickToday ? ' anyway' : '') + '</button></div>' +
       '<div style="height:9px"></div>' +
       '<button class="btn btn-ghost" data-act="preview">See next session ›</button>' +
     '</div></div>';
@@ -3274,7 +3414,7 @@ function viewHome(){
         '<span class="aero-ico">' + icon("run", 21) + '</span>' +
         '<span style="min-width:0"><b>Aerobic session</b>' +
         '<span>A run, ride, intervals or mobility. Does not use a slot — ' + esc(sess.title) + ' stays next.</span></span>' +
-      '</button>' +
+      '</button>' + sickTile(sess) +
     '</div></div>';
 
   /* ---- anything waiting to be filled in ---- */
@@ -3308,7 +3448,8 @@ function viewHome(){
   const bDone = blockSessions(i);
   const bAlso = blockAlongside(i);
   const nDone = Object.keys(bDone).length;
-  const nAlso = bAlso.reduce((n,g)=> n + g.n, 0);
+  const nAlso = bAlso.filter(g => !g.sick).reduce((n,g)=> n + g.n, 0);
+  const nSick = bAlso.filter(g => g.sick).reduce((n,g)=> n + g.n, 0);
   const varNo = Math.floor(cycleAt(bb.start) / ROTATE_EVERY) % 4;
 
   let cells = '<span class="rgl"></span>' +
@@ -3323,14 +3464,17 @@ function viewHome(){
       if(rec){
         const day  = recDay(rec.h);
         const gap  = prevDay ? dayGap(prevDay, day) : 2;
-        const away = gap > 2 ? roadBridge(prevDay, day) : 0;
-        const late = gap > 2 && !away;
+        const br   = gap > 2 ? gapBridge(prevDay, day) : {road:0, sick:0};
+        const away = br.sick ? 0 : br.road;
+        const ill  = br.sick;
+        const late = gap > 2 && !away && !ill;
         prevDay = day;
         cells += '<button class="rbx ' + (late ? "late" : "on") + '" data-hopen="' + rec.i + '" ' +
           'aria-label="' + esc(sessionTitle(rec.h)) + ' on ' + esc(shortDate(day)) + '">' +
           esc(shortDate(day)) +
           (late ? '<small>+' + (gap - 2) + ' day' + (gap - 2 > 1 ? "s" : "") + '</small>' : "") +
           (away ? '<small>' + away + ' on the road</small>' : "") +
+          (ill ? '<span class="sk">' + ill + ' sick day' + (ill > 1 ? "s" : "") + '</span>' : "") +
           '</button>';
       }else{
         const due   = dueDay(n);
@@ -3356,6 +3500,11 @@ function viewHome(){
       continue;
     }
     const g = bAlso[p];
+    if(g && g.sick){
+      cells += '<div class="rgb sick" aria-label="' + g.n + ' sick days in this block">' +
+        '<span style="display:flex">' + icon("sick", 14) + '</span>Sick ' + g.n + '</div>';
+      continue;
+    }
     if(g && g.road){
       cells += '<button class="rgb" data-act="roadList" aria-label="Every road session">' +
         '<span style="display:flex">' + icon("road", 14) + '</span>Road ' + g.n + '</button>';
@@ -3369,7 +3518,8 @@ function viewHome(){
 
   html += '<div class="panel"><div class="pad">' +
     '<p class="eyebrow">Rhythm · variation ' + (varNo + 1) + ' of 4</p>' +
-    '<h2 class="head">' + nDone + ' of 9 sessions' + (nAlso ? ' · ' + nAlso + ' alongside' : "") + '</h2>' +
+    '<h2 class="head">' + nDone + ' of 9 sessions' + (nAlso ? ' · ' + nAlso + ' alongside' : "") +
+      (nSick ? ' · <span class="redtxt">' + nSick + ' sick day' + (nSick > 1 ? "s" : "") + '</span>' : "") + '</h2>' +
     '<p class="lede" style="margin-top:4px">' +
       (nDone >= 9 ? "Block complete. Everything advances next session."
        : nDone === 0 ? "Nothing logged in this block yet."
@@ -3379,9 +3529,10 @@ function viewHome(){
     '<div class="rkey">' +
       '<span><i style="background:var(--orange)"></i>Sessions</span>' +
       '<span><i style="background:var(--green)"></i>Alongside</span>' +
+      (nSick ? '<span class="redtxt"><i style="background:var(--red)"></i>Sick</span>' : "") +
       '<span><i style="background:var(--orange-deep)"></i>Ran late</span>' +
     '</div>' +
-    '<p class="lede" style="font-size:12px;margin-top:10px">Nine sessions — each exercise three times — then every slot moves on. Road, aerobic and open sessions sit alongside and do not use a slot. A gap you trained through on the road is not late. Tap anything to look inside.</p>' +
+    '<p class="lede" style="font-size:12px;margin-top:10px">Nine sessions — each exercise three times — then every slot moves on. Road, aerobic and open sessions sit alongside and do not use a slot. A gap you trained through on the road, or were too ill to train through, is not late. Tap anything to look inside.</p>' +
   '</div></div>';
 
   /* ---- totals ---- */
@@ -3488,6 +3639,7 @@ function viewHome(){
    ============================================================ */
 const ICON_PATHS = {
   barbell:'<path d="M3 9v6M6 7.5v9M18 7.5v9M21 9v6M6 12h12"/>',
+  sick:'<path d="M14 4a3 3 0 0 0-6 0v9.5a5 5 0 1 0 6 0z"/><path d="M11 9v7"/>',
   road:'<path d="M5 20c3-6 11-8 14-16"/><circle cx="5" cy="20" r="1.6"/><circle cx="19" cy="4" r="1.6"/>',
   dumbbell:'<path d="M5 9v6M8.5 7v10M15.5 7v10M19 9v6M8.5 12h7"/>',
   pullbar:'<path d="M2.5 6h19M7 6v4.5M17 6v4.5M5.6 10.5h2.8M15.6 10.5h2.8"/>',
@@ -5212,6 +5364,18 @@ function handleClick(e){
     })();
     return;
   }
+  if(act === "sickOpen"){ sickOpen = true; render(); return; }
+  if(act === "sickClose"){ sickOpen = false; render(); return; }
+  if(act.indexOf("sickLog:") === 0){
+    let day = act.slice(8);
+    if(day === "pick"){ const el = document.getElementById("sickDate"); day = el ? el.value : ""; }
+    if(!day || day > dayKey(new Date())){ alert("Pick a day up to today."); return; }
+    sickOpen = false;
+    logSick(day);
+    window.scrollTo(0, 0);
+    return;
+  }
+  if(act.indexOf("unsick:") === 0){ unSick(act.slice(7)); return; }
   if(act === "goFix"){
     summaryRec = null; histIdx = null; histEx = null; histList = false; previewOpen = false; roadPreview = null;
     tab = "settings"; render(); window.scrollTo(0, 0); return;
