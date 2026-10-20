@@ -61,6 +61,23 @@ console.log("\n1. the tile, under Aerobic session, in red");
   b.win.close();
 }
 
+console.log("\n1b. Not well enough today, under Start, in red");
+{
+  const b = await up(st(46, 2));
+  const btn = b.q('#view .btn-sick');
+  ok("the button is under Start, beside See next session", !!btn && /Not well enough today/.test(btn.textContent) &&
+     btn.parentNode.classList.contains("ghost-pair") && !!btn.parentNode.querySelector('[data-act="preview"]'));
+  ok("styled red", btn && btn.classList.contains("btn-sick"));
+  b.click(btn);
+  ok("one tap logs today", b.g("isSick(dayKey(new Date()))") === true && b.due() === ago(-2));
+  ok("and the button goes, leaving Undo in the red block", !b.q('#view .btn-sick') && !!b.q('#view [data-act="unsick:' + ago(0) + '"]'));
+  b.click(b.qa('#view .kits button')[1]);
+  ok("road cards have no button once today is logged", !b.q('#view .btn-sick'));
+  b.click(b.q('#view [data-act="unsick:' + ago(0) + '"]'));
+  ok("after Undo the road card has it too", !!b.q('#view .btn-sick'));
+  b.win.close();
+}
+
 console.log("\n2. sick on a training day");
 {
   const b = await up(st(46, 2));                       // Reach due today

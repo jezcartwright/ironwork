@@ -364,6 +364,9 @@ h2.head{
 .rbx .sk{display:block;background:var(--red);color:#FFFFFF;font-family:var(--mono);font-size:8px;font-weight:400;
   padding:1px 5px;border-radius:2px;margin-top:1px;line-height:1.3}
 .redtxt{color:var(--red)}
+.ghost-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.btn-ghost.btn-sick{border-color:var(--red);color:var(--red);font-weight:600}
+.btn-ghost.btn-sick:active{background:var(--red-pale)}
 /* ---------- sick days ---------- */
 .sick-tile{display:flex;align-items:center;gap:12px;width:100%;text-align:left;margin-top:10px;
   border:2px solid var(--rule);border-radius:14px;padding:14px;color:var(--red)}
@@ -3276,7 +3279,16 @@ function roadCard(){
       (kit === "db" ? "loads tracked separately from home" : "reps only") + '</p>' +
     '<div style="margin-top:16px"><button class="btn' + (isSick(dayKey(new Date())) ? ' btn-quiet' : '') + '" data-act="start">Start ' + esc(sess.title) + ' · ' + esc(k.tag) + (isSick(dayKey(new Date())) ? ' anyway' : '') + '</button></div>' +
     '<div style="height:9px"></div>' +
-    '<button class="btn btn-ghost" data-act="rprev:' + nextKey + '">See next session ›</button>';
+    ghostPair('<button class="btn btn-ghost" data-act="rprev:' + nextKey + '">See next session ›</button>');
+}
+
+/* See next session, with Not well enough today beside it in red — one tap
+   logs today as a sick day. Gone once today is logged; Undo is in the block. */
+function ghostPair(nextBtn){
+  const today = dayKey(new Date());
+  if(isSick(today)) return nextBtn;
+  return '<div class="ghost-pair">' + nextBtn +
+    '<button class="btn btn-ghost btn-sick" data-act="sickLog:' + today + '">Not well enough today</button></div>';
 }
 
 /* a road session, looked at before starting it */
@@ -3406,7 +3418,7 @@ function viewHome(){
         sess.blocks.reduce((n,b)=> n + b.items.length * b.items[0].sets, 0) + ' sets · ' + esc(readiness.replace(/\.$/, "")) + '</p>' +
       '<div style="margin-top:16px"><button class="btn' + (sickToday ? ' btn-quiet' : '') + '" data-act="start">Start ' + esc(sess.title) + (sickToday ? ' anyway' : '') + '</button></div>' +
       '<div style="height:9px"></div>' +
-      '<button class="btn btn-ghost" data-act="preview">See next session ›</button>' +
+      ghostPair('<button class="btn btn-ghost" data-act="preview">See next session ›</button>') +
     '</div></div>';
   html +=
     '<div class="panel"><div class="pad">' +
