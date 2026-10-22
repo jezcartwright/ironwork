@@ -48,8 +48,18 @@ body{
   font-family:var(--ui);
   font-size:16px;
   line-height:1.45;
-  padding-bottom:calc(84px + env(safe-area-inset-bottom));
 }
+/* The app shell. Nothing is pinned to the window: the page itself never
+   scrolls, the content scrolls inside #scroller, and the rest bar and tab bar
+   sit under it in the normal flow. iOS home-screen apps lose track of
+   position:fixed bars after a bounce or the keyboard closing, and leave them
+   stranded mid-screen; a bar that is not fixed cannot be stranded. */
+html,body{height:100%;overflow:hidden;overscroll-behavior:none}
+body{display:flex;flex-direction:column;height:100vh;height:100dvh}
+#scroller{flex:1 1 auto;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+#scroller > main{padding-bottom:18px}
+#restHost{flex:0 0 auto}
+.nav{flex:0 0 auto}
 button,input,select{font-family:inherit;font-size:inherit;color:inherit}
 button{cursor:pointer;border:0;background:none}
 :focus-visible{outline:2px solid var(--orange);outline-offset:2px}
@@ -265,7 +275,6 @@ h2.head{
 
 /* ---------- rest timer ---------- */
 .rest{
-  position:fixed;left:0;right:0;bottom:calc(66px + env(safe-area-inset-bottom));z-index:45;
   background:var(--orange);color:#FFFFFF;
 }
 .rest-in{
@@ -281,7 +290,7 @@ h2.head{
 
 /* ---------- nav ---------- */
 .nav{
-  position:fixed;left:0;right:0;bottom:0;z-index:50;
+  position:relative;z-index:50;
   background:var(--iron-2);border-top:1px solid var(--iron-line);
   padding-bottom:env(safe-area-inset-bottom);
 }
@@ -715,6 +724,7 @@ button.tile:active{transform:translateY(2px)}
   </div>
 </div>
 
+<div id="scroller">
 <header class="masthead">
   <div class="masthead-in">
     <div class="mark">
@@ -733,6 +743,7 @@ button.tile:active{transform:translateY(2px)}
 </header>
 
 <main id="view" class="wrap"></main>
+</div>
 <div id="restHost"></div>
 
 <nav class="nav">
@@ -1519,7 +1530,7 @@ function diagram(exId){
 /* ============================================================
    STATE
    ============================================================ */
-const BUILD = "67";
+const BUILD = "68";
 /* the masthead and Setup show this as v3.4 — one number, formatted on the way out */
 const VERSION = (function(){ const n = String(BUILD).padStart(2, "0");
   return "v" + n.slice(0, -1) + "." + n.slice(-1); })();
@@ -2479,18 +2490,27 @@ function adoptRest(){
   }
   drawRest();
 }
+/* Built once when a rest starts; after that only the clock and label text
+   change, so nothing is torn down and rebuilt under your thumb every second. */
 function drawRest(){
   const host = document.getElementById("restHost");
   if(!host) return;
-  if(!restTimer && restLeft <= 0){ host.innerHTML = ""; return; }
+  if(!restTimer && restLeft <= 0){ if(host.firstChild) host.innerHTML = ""; return; }
   const m = Math.floor(restLeft / 60), s = restLeft % 60;
-  host.innerHTML =
-    '<div class="rest"><div class="rest-in">' +
-      '<span class="rest-t">' + m + ":" + String(s).padStart(2, "0") + '</span>' +
-      '<span class="rest-l">' + restLabel + '</span>' +
-      '<button data-rest="add">+30s</button>' +
-      '<button data-rest="skip">Skip</button>' +
-    '</div></div>';
+  const clock = m + ":" + String(s).padStart(2, "0");
+  let t = host.querySelector(".rest-t"), l = host.querySelector(".rest-l");
+  if(!t || !l){
+    host.innerHTML =
+      '<div class="rest"><div class="rest-in">' +
+        '<span class="rest-t"></span>' +
+        '<span class="rest-l"></span>' +
+        '<button data-rest="add">+30s</button>' +
+        '<button data-rest="skip">Skip</button>' +
+      '</div></div>';
+    t = host.querySelector(".rest-t"); l = host.querySelector(".rest-l");
+  }
+  if(t.textContent !== clock) t.textContent = clock;
+  if(l.textContent !== restLabel) l.textContent = restLabel;
 }
 
 /* ============================================================
@@ -2531,6 +2551,13 @@ function keepFocus(fn){
     if(mark.start !== null && mark.start !== undefined && el.setSelectionRange)
       el.setSelectionRange(mark.start, mark.end);
   }catch(e){}
+}
+
+/* the content scrolls in #scroller, not the window */
+function scrollToTop(){
+  const sc = document.getElementById("scroller");
+  if(sc) sc.scrollTop = 0;
+  try{ window.scrollTo(0, 0); }catch(e){}
 }
 
 function render(){
@@ -5384,13 +5411,13 @@ function handleClick(e){
     if(!day || day > dayKey(new Date())){ alert("Pick a day up to today."); return; }
     sickOpen = false;
     logSick(day);
-    window.scrollTo(0, 0);
+    scrollToTop();
     return;
   }
   if(act.indexOf("unsick:") === 0){ unSick(act.slice(7)); return; }
   if(act === "goFix"){
     summaryRec = null; histIdx = null; histEx = null; histList = false; previewOpen = false; roadPreview = null;
-    tab = "settings"; render(); window.scrollTo(0, 0); return;
+    tab = "settings"; render(); scrollToTop(); return;
   }
   if(act === "reconnect"){ forceReconnect(); return; }
   if(act === "copyRules"){
