@@ -40,10 +40,13 @@ console.log("\n1. nothing else in the programme moved");
   Object.keys(V65).forEach(k=>{
     const want = V65[k].slice();
     if(k === "deadlift") want[2] = "power-clean";
+    /* v6.9 re-ordered Drive's pull against Reach's — same four, new order */
+    if(k === "vpull") want.splice(0, 4, "lat-pulldown", "pullup", "neutral-chin", "sa-pulldown");
     if(JSON.stringify(now[k]) !== JSON.stringify(want)) moved.push(k);
   });
   ok("every v6.5 slot is unchanged but the one swap", moved.length === 0, moved.join(","));
   ok("the power clean took the deficit deadlift's place", now.deadlift[2] === "power-clean" && now.deadlift.length === 4);
+  ok("the fly holds the same four in its v6.9 order", JSON.stringify(now.fly) === JSON.stringify(["db-fly","floor-fly","incline-fly","cable-fly"]), JSON.stringify(now.fly));
   ok("one new slot, the fly, with four variations", now.fly && now.fly.length === 4 &&
      Object.keys(now).length === Object.keys(V65).length + 1);
   ok("every slot still has four variations", Object.values(now).every(p => p.length === 4));

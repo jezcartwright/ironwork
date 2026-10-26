@@ -775,9 +775,12 @@ const SLOTS = {
     {id:"floor-press",name:"Dumbbell floor press",kind:"dumbbell",inc:2,cue:"Weight per hand. Triceps touch the floor, brief pause, drive. Shortened range takes the strain off the shoulder."},
     {id:"weighted-pressup",name:"Weighted press-up",kind:"bodyweight",inc:2.5,cue:"Plate across the upper back, feet on the bench. Log added weight only. Ribs down, body in one line, chest to within a fist of the floor."}
   ]},
+  /* Ordered against vpullHeavy so the two pulls never share a movement in the
+     same block: cable against bar, bar against cable, bar against dumbbell,
+     cable against bar (v6.9). */
   vpull:{label:"Vertical pull", pool:[
-    {id:"pullup",name:"Pull-ups",kind:"bodyweight",bwOnly:true,inc:2.5,cue:"Wide grip on the multi-grip bar. Bodyweight only — chase reps, not load. Chest to bar, control the lower."},
     {id:"lat-pulldown",name:"Lat pulldown",kind:"cable",inc:2.5,cue:"High pulley, long bar. Sit on the bench directly under the pulley so the cable runs straight down, facing the column. There is no thigh pad, so keep the load where bodyweight holds you down. Drive the elbows down and back to the collarbone."},
+    {id:"pullup",name:"Pull-ups",kind:"bodyweight",bwOnly:true,inc:2.5,cue:"Wide grip on the multi-grip bar. Bodyweight only — chase reps, not load. Chest to bar, control the lower."},
     {id:"neutral-chin",name:"Neutral-grip chin-ups",kind:"bodyweight",bwOnly:true,inc:2.5,cue:"Parallel handles on the pull-up station. Bodyweight only — chase reps. Kindest grip on the elbows."},
     {id:"sa-pulldown",name:"Half-kneeling single-arm pulldown",kind:"cable",inc:1.25,cue:"High pulley, single handle, inside knee down. Ribs stay stacked — no side bend to finish the rep."}
   ]},
@@ -847,11 +850,12 @@ const SLOTS = {
     {id:"skullcrusher",name:"Barbell skullcrusher",kind:"barbell",inc:2.5,cue:"Bench flat, bar to the forehead or just behind. Elbows point at the ceiling and stay there."},
     {id:"close-grip",name:"Close-grip bench press",kind:"barbell",inc:2.5,cue:"Hands shoulder-width, elbows tucked to about 30 degrees. Safety arms set as for a normal bench."}
   ]},
+  /* Ordered so the incline fly never shares a block with Reach's incline press (v6.9). */
   fly:{label:"Chest fly", pool:[
     {id:"db-fly",name:"Dumbbell chest fly",kind:"dumbbell",inc:1,cue:"Weight per hand. Flat bench, a soft bend in the elbows that never changes. Open wide until the chest is stretched, then hug the bells back together over the chest. Light — it is a stretch, not a press."},
+    {id:"floor-fly",name:"Dumbbell floor fly",kind:"dumbbell",inc:1,cue:"Weight per hand. Lying on the floor; the floor stops the arms at the bottom, so it is the kindest fly on the shoulders. Pause with the upper arms resting, then squeeze up."},
     {id:"incline-fly",name:"Incline dumbbell fly",kind:"dumbbell",inc:1,cue:"Weight per hand. Bench at 30 degrees. Same fixed elbow bend as the flat fly; bring the bells together over the upper chest, not the face."},
-    {id:"cable-fly",name:"Single-arm low-to-high cable fly",kind:"cable",inc:1.25,cue:"Low pulley, single handle, standing side-on. Arm long and low, sweep it up and across to eye level in an arc. Ribs down, no twist. Both sides."},
-    {id:"floor-fly",name:"Dumbbell floor fly",kind:"dumbbell",inc:1,cue:"Weight per hand. Lying on the floor; the floor stops the arms at the bottom, so it is the kindest fly on the shoulders. Pause with the upper arms resting, then squeeze up."}
+    {id:"cable-fly",name:"Single-arm low-to-high cable fly",kind:"cable",inc:1.25,cue:"Low pulley, single handle, standing side-on. Arm long and low, sweep it up and across to eye level in an arc. Ribs down, no twist. Both sides."}
   ]},
   biceps:{label:"Biceps", pool:[
     {id:"db-curl",name:"Dumbbell curl",kind:"dumbbell",inc:1,cue:"Weight per hand. Elbows still, no swinging. Supinate hard at the top."},
@@ -1530,7 +1534,7 @@ function diagram(exId){
 /* ============================================================
    STATE
    ============================================================ */
-const BUILD = "68";
+const BUILD = "69";
 /* the masthead and Setup show this as v3.4 — one number, formatted on the way out */
 const VERSION = (function(){ const n = String(BUILD).padStart(2, "0");
   return "v" + n.slice(0, -1) + "." + n.slice(-1); })();
